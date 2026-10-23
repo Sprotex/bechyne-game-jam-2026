@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://tio5tmw76tye"]
+
+[ext_resource type="PackedScene" uid="uid://ciig10qyo8xdm" path="res://scenes/player.tscn" id="1_player"]
+[ext_resource type="Script" uid="uid://c2x8ks7hlt3in" path="res://scripts/root.gd" id="2_root_script"]
+
+[node name="root" type="Node2D" unique_id=1042585740]
+script = ExtResource("2_root_script")
+
+[node name="Background" type="Polygon2D" parent="." unique_id=569422743]
+color = Color(0.055, 0.075, 0.095, 1)
+polygon = PackedVector2Array(0, 0, 1152, 0, 1152, 648, 0, 648)
+
+[node name="Arena" type="Node2D" parent="." unique_id=1081297983]
+position = Vector2(576, 324)
+
+[node name="Floor" type="Polygon2D" parent="Arena" unique_id=1148737317]
+color = Color(0.13, 0.18, 0.21, 1)
+polygon = PackedVector2Array(-320, -204, 320, -204, 504, 236, -504, 236)
+
+[node name="Outline" type="Line2D" parent="Arena" unique_id=1445397231]
+points = PackedVector2Array(-320, -204, 320, -204, 504, 236, -504, 236, -320, -204)
+width = 8.0
+default_color = Color(0.28, 0.78, 0.75, 1)
+joint_mode = 2
+begin_cap_mode = 2
+end_cap_mode = 2
+
+[node name="Boundary" type="StaticBody2D" parent="Arena" unique_id=1425292525]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Arena/Boundary" unique_id=607269672]
+build_mode = 1
+polygon = PackedVector2Array(-320, -204, 320, -204, 504, 236, -504, 236)
+
+[node name="Player" parent="." unique_id=513205766 instance=ExtResource("1_player")]
+position = Vector2(576, 324)
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1462122912]
+
+[node name="OpenUserMessages" type="Button" parent="HUD" unique_id=640202376]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -252.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 60.0
+text = "Open User Messages Folder"
+
+[connection signal="pressed" from="HUD/OpenUserMessages" to="." method="_on_open_user_messages_pressed"]
