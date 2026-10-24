@@ -2,6 +2,7 @@ extends Node2D
 
 @export var room_title := "ROOM"
 @export var room_color := Color("#e8dfc6")
+@export var background_texture: Texture2D
 @export var up_room := ""
 @export var down_room := ""
 @export var left_room := ""
@@ -29,14 +30,18 @@ func get_room_for_direction(direction: String) -> String:
 
 
 func _draw() -> void:
-	draw_rect(Rect2(Vector2.ZERO, SIZE), room_color)
-	draw_rect(Rect2(Vector2(EDGE, EDGE), SIZE - Vector2(EDGE * 2.0, EDGE * 2.0)), room_color.lightened(0.08))
+	if background_texture:
+		draw_texture_rect(background_texture, Rect2(Vector2.ZERO, SIZE), false)
+	else:
+		draw_rect(Rect2(Vector2.ZERO, SIZE), room_color)
+		draw_rect(Rect2(Vector2(EDGE, EDGE), SIZE - Vector2(EDGE * 2.0, EDGE * 2.0)), room_color.lightened(0.08))
 	_draw_wall("up")
 	_draw_wall("down")
 	_draw_wall("left")
 	_draw_wall("right")
-	draw_string(ThemeDB.fallback_font, Vector2(52, 78), room_title, HORIZONTAL_ALIGNMENT_LEFT, -1, 22, Color("#665f4d"))
-	_draw_furniture()
+	if not background_texture:
+		draw_string(ThemeDB.fallback_font, Vector2(52, 78), room_title, HORIZONTAL_ALIGNMENT_LEFT, -1, 22, Color("#665f4d"))
+		_draw_furniture()
 	if staircase_position != Vector2.ZERO:
 		_draw_staircase(staircase_position)
 

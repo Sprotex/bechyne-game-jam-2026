@@ -1,9 +1,11 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/room.gd" id="1_room"]
+[ext_resource type="Texture2D" path="res://assets/koupelna.png" id="2_background"]
 
 [node name="WestRoom" type="Node2D"]
 script = ExtResource("1_room")
+background_texture = ExtResource("2_background")
 room_title = "BATHROOM"
 room_color = Color(0.78431, 0.83529, 0.77647, 1)
 up_room = "entrance"
