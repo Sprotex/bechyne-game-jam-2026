@@ -1,9 +1,10 @@
 extends CanvasLayer
 ## Screen-space dialog panel shared by interactions throughout the game.
 
+const DIALOG_BOX_SCENE := preload("res://scenes/dialog_box.tscn")
+
 var panel: PanelContainer
 var message_label: Label
-var close_hint: Label
 var messages: Array[String] = []
 var current_message := 0
 var image_overlay: ColorRect
@@ -68,7 +69,7 @@ func show_generated_file(file_name: String, content: PackedByteArray) -> void:
 	elif extension in ["wav", "ogg", "mp3"]:
 		_play_generated_audio(file_name, content)
 	else:
-		show_dialog(["Something happened in the background.\n\n%s" % content.get_string_from_utf8()])
+		show_dialog(["Something happened in the background."])
 
 
 func _show_generated_image(file_name: String, content: PackedByteArray) -> void:
@@ -138,49 +139,9 @@ func _build_image_overlay() -> void:
 
 
 func _build_dialog() -> void:
-	panel = PanelContainer.new()
-	panel.name = "DialogPanel"
-	panel.anchor_left = 0.04
-	panel.anchor_top = 0.64
-	panel.anchor_right = 0.96
-	panel.anchor_bottom = 0.98
-	panel.add_theme_stylebox_override("panel", _panel_style())
-	add_child(panel)
-
-	var content := VBoxContainer.new()
-	content.add_theme_constant_override("separation", 8)
-	panel.add_child(content)
-
-	var message_scroll := ScrollContainer.new()
-	message_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	message_scroll.custom_minimum_size.y = 100
+	var dialog_box := DIALOG_BOX_SCENE.instantiate()
+	panel = dialog_box as PanelContainer
+	var message_scroll := dialog_box.get_node("Content/MessageScroll") as ScrollContainer
 	message_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	content.add_child(message_scroll)
-
-	message_label = Label.new()
-	message_label.name = "Message"
-	message_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	message_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	message_label.add_theme_color_override("font_color", Color("#fff8df"))
-	message_label.add_theme_font_size_override("font_size", 20)
-	message_scroll.add_child(message_label)
-
-	close_hint = Label.new()
-	close_hint.text = "Press E to continue"
-	close_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	close_hint.add_theme_color_override("font_color", Color("#c7b99a"))
-	close_hint.add_theme_font_size_override("font_size", 14)
-	content.add_child(close_hint)
-
-
-func _panel_style() -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color("#211f1b", 0.94)
-	style.border_color = Color("#c7b99a")
-	style.set_border_width_all(2)
-	style.set_corner_radius_all(8)
-	style.content_margin_left = 22
-	style.content_margin_top = 14
-	style.content_margin_right = 22
-	style.content_margin_bottom = 14
-	return style
+	message_label = dialog_box.get_node("Content/MessageScroll/Message") as Label
+	add_child(dialog_box)
