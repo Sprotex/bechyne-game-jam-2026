@@ -1,118 +1,112 @@
 extends Node2D
+class_name Level
 
 const OPTIONS_SCENE := preload("res://scenes/options.tscn")
+const INITIAL_ROOM := "res://scenes/rooms/main_entrance.tscn"
+const SAVE_PATH := "user://game_progress.cfg"
+const START_POSITION := Vector2(1080, 560)
 
-@export var main_entrance_scene: PackedScene
-@export var west_room_scene: PackedScene
-@export var office_scene: PackedScene
-@export var hall_scene: PackedScene
-@export var living_room_scene: PackedScene
-
-var room_scenes: Dictionary
-const ROOM_LABELS := {
-	"entrance": "MAIN ENTRANCE",
-	"west_room": "BATHROOM",
-	"office": "BEDROOM",
-	"hall": "CORRIDOR",
-	"living_room": "LIVING ROOM",
-}
-const VIEW_SIZE := Vector2(1152, 648)
-const PLAYER_MARGIN := 28.0
-const DOOR_HALF_WIDTH := 92.0
-const START_POSITION := Vector2(1080, 324)
-
-var current_room := "entrance"
+var room: Room
 var transition_locked := false
-var room_instance: Node2D
 var options_screen: Control
+var dialog_manager: DialogManager
+var flags: Dictionary = {}
 
 
 func _ready() -> void:
-	room_scenes = {
-		"entrance": main_entrance_scene,
-		"west_room": west_room_scene,
-		"office": office_scene,
-		"hall": hall_scene,
-		"living_room": living_room_scene,
-	}
-	_load_room(current_room)
+	_load_flags()
+	_load_room(INITIAL_ROOM, "start")
 	options_screen = OPTIONS_SCENE.instantiate()
 	options_screen.hide()
 	options_screen.connect("back_pressed", _close_options)
 	$HUD.add_child(options_screen)
-	$Player/Movement.global_position = START_POSITION
+	dialog_manager = preload("res://scenes/dialog_manager.tscn").instantiate() as DialogManager
+	add_child(dialog_manager)
+	dialog_manager.modal_changed.connect(_refresh_controls)
+	UserMessages.message_delivered.connect(_on_message_delivered)
+	_refresh_controls()
 	_update_room_label()
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
+	if event.is_action_pressed("menu_back"):
 		options_screen.visible = not options_screen.visible
+		_refresh_controls()
 		get_viewport().set_input_as_handled()
 
 
 func _close_options() -> void:
 	options_screen.hide()
+	_refresh_controls()
 
 
-func _physics_process(_delta: float) -> void:
-	if transition_locked:
+func request_room_transition(destination_scene_path: String, arrival_id: String) -> void:
+	if transition_locked or not $Player/Movement.controls_enabled:
 		return
-	var player: CharacterBody2D = $Player/Movement
-	var point := player.global_position
-	var exit_direction := ""
-	if point.x <= PLAYER_MARGIN and absf(point.y - VIEW_SIZE.y * 0.5) < DOOR_HALF_WIDTH:
-		exit_direction = "left"
-	elif point.x >= VIEW_SIZE.x - PLAYER_MARGIN and absf(point.y - VIEW_SIZE.y * 0.5) < DOOR_HALF_WIDTH:
-		exit_direction = "right"
-	elif point.y <= PLAYER_MARGIN and absf(point.x - VIEW_SIZE.x * 0.5) < DOOR_HALF_WIDTH:
-		exit_direction = "up"
-	elif point.y >= VIEW_SIZE.y - PLAYER_MARGIN and absf(point.x - VIEW_SIZE.x * 0.5) < DOOR_HALF_WIDTH:
-		exit_direction = "down"
-	if not exit_direction.is_empty():
-		var destination: String = room_instance.call("get_room_for_direction", exit_direction)
-		if not destination.is_empty():
-			_transition_to(destination, exit_direction)
-			return
-		player.global_position = point.clamp(Vector2(PLAYER_MARGIN, PLAYER_MARGIN), VIEW_SIZE - Vector2(PLAYER_MARGIN, PLAYER_MARGIN))
-		return
-	player.global_position = point.clamp(Vector2(PLAYER_MARGIN, PLAYER_MARGIN), VIEW_SIZE - Vector2(PLAYER_MARGIN, PLAYER_MARGIN))
-	_update_staircase_hint(player.global_position)
-
-
-func _transition_to(destination: String, exit_direction: String) -> void:
 	transition_locked = true
-	var arrival := VIEW_SIZE * 0.5
-	match exit_direction:
-		"left": arrival.x = VIEW_SIZE.x - PLAYER_MARGIN - 4.0
-		"right": arrival.x = PLAYER_MARGIN + 4.0
-		"up": arrival.y = VIEW_SIZE.y - PLAYER_MARGIN - 4.0
-		"down": arrival.y = PLAYER_MARGIN + 4.0
-	$Player/Movement.global_position = arrival
+	_refresh_controls()
+	var destination := load(destination_scene_path) as PackedScene
 	$HUD/Fade.color.a = 1.0
-	_load_room(destination)
-	current_room = destination
+	_load_room(destination.resource_path, arrival_id)
 	_update_room_label()
 	$HUD/Hint.text = ""
 	var tween := create_tween()
 	tween.tween_property($HUD/Fade, "color:a", 0.0, 0.22)
 	await tween.finished
 	transition_locked = false
+	_refresh_controls()
 
 
-func _load_room(room_id: String) -> void:
-	if is_instance_valid(room_instance):
-		room_instance.queue_free()
-	room_instance = room_scenes[room_id].instantiate()
-	$RoomHolder.add_child(room_instance)
+func has_flag(flag_id: String) -> bool:
+	return bool(flags.get(flag_id, false))
 
 
-func _update_staircase_hint(player_position: Vector2) -> void:
-	var staircase_position: Vector2 = room_instance.get("staircase_position")
-	if staircase_position != Vector2.ZERO and player_position.distance_to(staircase_position) < 90.0:
-		$HUD/Hint.text = "The staircase leads to another room"
-	elif $HUD/Hint.text == "The staircase leads to another room":
-		$HUD/Hint.text = ""
+func player_controls_enabled() -> bool:
+	return $Player/Movement.controls_enabled
+
+
+func set_flag(flag_id: String, value: bool = true) -> void:
+	if flag_id.is_empty():
+		return
+	flags[flag_id] = value
+	var config := ConfigFile.new()
+	for key in flags:
+		config.set_value("flags", key, flags[key])
+	config.save(SAVE_PATH)
+
+
+func _load_room(scene_path: String, arrival_id: String) -> void:
+	if is_instance_valid(room):
+		room.queue_free()
+	room = (load(scene_path) as PackedScene).instantiate() as Room
+	$RoomHolder.add_child(room)
+	room.exit_entered.connect(_on_exit_entered)
+	$Player/Movement.global_position = room.get_arrival_position(arrival_id, START_POSITION)
+	_update_room_label()
+
+
+func _on_exit_entered(exit: RoomExit) -> void:
+	request_room_transition(exit.destination_scene_path, exit.destination_arrival_id)
+
+
+func _refresh_controls() -> void:
+	if not is_instance_valid($Player/Movement):
+		return
+	dialog_manager.set_input_enabled(not options_screen.visible)
+	$Player/Movement.controls_enabled = not transition_locked and not dialog_manager.is_modal_open() and not options_screen.visible
+
+
+func _on_message_delivered(file_name: String, content: PackedByteArray) -> void:
+	dialog_manager.show_generated_file(file_name, content)
+
+
+func _load_flags() -> void:
+	var config := ConfigFile.new()
+	if config.load(SAVE_PATH) == OK:
+		for key in config.get_section_keys("flags"):
+			flags[key] = config.get_value("flags", key, false)
 
 
 func _update_room_label() -> void:
-	$HUD/RoomLabel.text = ROOM_LABELS[current_room]
+	if is_instance_valid(room):
+		$HUD/RoomLabel.text = room.room_title

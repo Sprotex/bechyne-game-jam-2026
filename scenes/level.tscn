@@ -1,28 +1,19 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bxkf4sikqa4jd"]
 
-[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="1_player"]
-[ext_resource type="Script" path="res://scripts/level.gd" id="2_level"]
-[ext_resource type="PackedScene" path="res://scenes/rooms/main_entrance.tscn" id="3_entrance"]
-[ext_resource type="PackedScene" path="res://scenes/rooms/west_room.tscn" id="4_west"]
-[ext_resource type="PackedScene" path="res://scenes/rooms/office.tscn" id="5_office"]
-[ext_resource type="PackedScene" path="res://scenes/rooms/hall.tscn" id="6_hall"]
-[ext_resource type="PackedScene" path="res://scenes/rooms/living_room.tscn" id="7_living"]
+[ext_resource type="PackedScene" uid="uid://ciig10qyo8xdm" path="res://scenes/player.tscn" id="1_player"]
+[ext_resource type="Script" uid="uid://bqo2g03bag4xq" path="res://scripts/level.gd" id="2_level"]
 
-[node name="Level" type="Node2D"]
+[node name="Level" type="Node2D" unique_id=644383136]
 script = ExtResource("2_level")
-main_entrance_scene = ExtResource("3_entrance")
-west_room_scene = ExtResource("4_west")
-office_scene = ExtResource("5_office")
-hall_scene = ExtResource("6_hall")
-living_room_scene = ExtResource("7_living")
 
-[node name="RoomHolder" type="Node2D" parent="."]
+[node name="RoomHolder" type="Node2D" parent="." unique_id=1992615337]
 
-[node name="Player" parent="." instance=ExtResource("1_player")]
+[node name="Player" parent="." unique_id=1458469355 instance=ExtResource("1_player")]
 
-[node name="HUD" type="CanvasLayer" parent="."]
+[node name="HUD" type="CanvasLayer" parent="." unique_id=2141082300]
+layer = 30
 
-[node name="RoomLabel" type="Label" parent="HUD"]
+[node name="RoomLabel" type="Label" parent="HUD" unique_id=62608615]
 offset_left = 24.0
 offset_top = 20.0
 offset_right = 360.0
@@ -31,7 +22,8 @@ theme_override_colors/font_color = Color(0.19, 0.16, 0.07, 1)
 theme_override_font_sizes/font_size = 20
 text = "MAIN ENTRANCE"
 
-[node name="Hint" type="Label" parent="HUD"]
+[node name="Hint" type="Label" parent="HUD" unique_id=2037976642]
+anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -260.0
@@ -40,11 +32,10 @@ offset_right = 260.0
 offset_bottom = 52.0
 theme_override_colors/font_color = Color(0.19, 0.16, 0.07, 1)
 theme_override_font_sizes/font_size = 16
-text = ""
 horizontal_alignment = 1
 
-[node name="Fade" type="ColorRect" parent="HUD"]
+[node name="Fade" type="ColorRect" parent="HUD" unique_id=563383373]
 offset_right = 1152.0
 offset_bottom = 648.0
-color = Color(0.05, 0.055, 0.05, 0)
 mouse_filter = 2
+color = Color(0.05, 0.055, 0.05, 0)

@@ -1,21 +1,23 @@
 extends Area2D
-## Cycles through sample files to exercise the web message previews.
+## Cycles through sample files to exercise generated-file previews.
 
 const AUDIO_PATH := "res://assets/audio/voice_message.wav"
 
 var nearby := false
 var preview_index := 0
 var hint: Label
+var level: Level
 
 
 func _ready() -> void:
+	level = get_tree().current_scene as Level
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
 	_build_hint()
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not nearby or DialogManager.is_dialog_open() or not event.is_action_pressed("interact"):
+	if not nearby or level == null or not level.player_controls_enabled() or not event.is_action_pressed("interact"):
 		return
 	_preview_next_file()
 	get_viewport().set_input_as_handled()
@@ -30,15 +32,15 @@ func _preview_next_file() -> void:
 				"entrance_test_message.txt"
 			)
 		1:
-			var room_texture := get_parent().get("background_texture") as Texture2D
-			if room_texture == null:
+			var current_room := get_parent() as Room
+			if current_room.background_texture == null:
 				result = ERR_UNAVAILABLE
 			else:
-				result = UserMessages.deliver_user_picture(room_texture.get_image(), "entrance_test_picture.png")
+				result = UserMessages.deliver_user_picture(current_room.background_texture.get_image(), "entrance_test_picture.png")
 		2:
 			result = UserMessages.deliver_user_message_file(AUDIO_PATH, "entrance_test_audio.wav")
 	if result != OK:
-		DialogManager.show_dialog(["Could not create the test file. Error code: %d" % result])
+		level.dialog_manager.show_dialog(["Could not create the test file. Error code: %d" % result])
 	preview_index = (preview_index + 1) % 3
 	_update_hint()
 
@@ -69,4 +71,4 @@ func _build_hint() -> void:
 
 func _update_hint() -> void:
 	if hint != null:
-		hint.text = "E  Test file preview (%d/3)" % (preview_index + 1)
+		hint.text = "%s  Test file preview (%d/3)" % [InputPrompts.action_label(&"interact"), preview_index + 1]

@@ -3,24 +3,70 @@
 [ext_resource type="Script" path="res://scripts/room.gd" id="1_room"]
 [ext_resource type="Texture2D" path="res://assets/gfx/predsin.png" id="2_background"]
 [ext_resource type="Script" path="res://scripts/message_preview_interactor.gd" id="3_message_preview"]
+[ext_resource type="PackedScene" path="res://scenes/room_exit.tscn" id="4_exit"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_message_preview"]
 radius = 78.0
+
+[sub_resource type="RectangleShape2D" id="EntranceCabinet"]
+size = Vector2(150, 130)
+
+[sub_resource type="RectangleShape2D" id="EntranceChest"]
+size = Vector2(190, 80)
 
 [node name="MainEntrance" type="Node2D"]
 script = ExtResource("1_room")
 background_texture = ExtResource("2_background")
 room_title = "MAIN ENTRANCE"
 room_color = Color(0.87451, 0.82353, 0.68235, 1)
-left_room = "hall"
-up_room = "living_room"
-down_room = "west_room"
 
 [node name="MessagePreviewInteractor" type="Area2D" parent="."]
-position = Vector2(850, 324)
+position = Vector2(850, 520)
 collision_layer = 0
 collision_mask = 1
 script = ExtResource("3_message_preview")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="MessagePreviewInteractor"]
 shape = SubResource("CircleShape2D_message_preview")
+
+[node name="FurnitureCollisions" type="StaticBody2D" parent="."]
+
+[node name="CabinetCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
+position = Vector2(290, 250)
+shape = SubResource("EntranceCabinet")
+
+[node name="ChestCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
+position = Vector2(700, 420)
+shape = SubResource("EntranceChest")
+
+[node name="ExitToHall" parent="." instance=ExtResource("4_exit")]
+position = Vector2(40, 550)
+destination_scene_path = "res://scenes/rooms/hall.tscn"
+destination_arrival_id = "from_entrance"
+wall_side = "west"
+
+[node name="ExitToLivingRoom" parent="." instance=ExtResource("4_exit")]
+position = Vector2(820, 40)
+destination_scene_path = "res://scenes/rooms/living_room.tscn"
+destination_arrival_id = "from_entrance"
+wall_side = "north"
+
+[node name="ExitToBathroom" parent="." instance=ExtResource("4_exit")]
+position = Vector2(650, 608)
+destination_scene_path = "res://scenes/rooms/west_room.tscn"
+destination_arrival_id = "from_entrance"
+wall_side = "south"
+
+[node name="Arrivals" type="Node2D" parent="."]
+
+[node name="start" type="Marker2D" parent="Arrivals"]
+position = Vector2(1080, 560)
+
+[node name="from_hall" type="Marker2D" parent="Arrivals"]
+position = Vector2(120, 550)
+
+[node name="from_living_room" type="Marker2D" parent="Arrivals"]
+position = Vector2(820, 150)
+
+[node name="from_bathroom" type="Marker2D" parent="Arrivals"]
+position = Vector2(650, 500)

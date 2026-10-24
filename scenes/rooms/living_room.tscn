@@ -1,9 +1,23 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/room.gd" id="1_room"]
+[ext_resource type="PackedScene" path="res://scenes/room_exit.tscn" id="2_exit"]
 
 [node name="LivingRoom" type="Node2D"]
 script = ExtResource("1_room")
 room_title = "LIVING ROOM"
 room_color = Color(0.82745, 0.76863, 0.71373, 1)
-down_room = "entrance"
+
+[node name="ExitToEntrance" parent="." instance=ExtResource("2_exit")]
+position = Vector2(820, 608)
+destination_scene_path = "res://scenes/rooms/main_entrance.tscn"
+destination_arrival_id = "from_living_room"
+wall_side = "south"
+
+[node name="Arrivals" type="Node2D" parent="."]
+
+[node name="start" type="Marker2D" parent="Arrivals"]
+position = Vector2(820, 150)
+
+[node name="from_entrance" type="Marker2D" parent="Arrivals"]
+position = Vector2(820, 150)

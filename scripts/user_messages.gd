@@ -1,6 +1,8 @@
 extends Node
 ## Stores game-generated messages in user data and downloads them in web builds.
 
+signal message_delivered(file_name: String, content: PackedByteArray)
+
 const USER_MESSAGES_FOLDER := "user_messages"
 
 
@@ -102,12 +104,12 @@ func _write_user_message(file_name: String, content: PackedByteArray) -> Error:
 	file.close()
 	if write_error != OK:
 		return write_error
+	var safe_name := target_path.get_file()
+	message_delivered.emit(safe_name, content)
 	if OS.has_feature("web"):
-		var safe_name := target_path.get_file()
 		var base64 := Marshalls.raw_to_base64(content)
 		var script := "window.godotSaveMessage(%s, %s)" % [JSON.stringify(safe_name), JSON.stringify(base64)]
 		JavaScriptBridge.eval(script)
-		DialogManager.show_generated_file(safe_name, content)
 	elif _is_desktop_platform():
 		var open_error := open_user_messages_folder()
 		if open_error != OK:

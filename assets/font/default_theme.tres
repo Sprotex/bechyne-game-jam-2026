@@ -1,0 +1,6 @@
+[gd_resource type="Theme" format=3 uid="uid://r15m6lm6a8ek"]
+
+[ext_resource type="FontFile" uid="uid://crmomiaqs2xss" path="res://assets/font/static/Rubik-SemiBold.ttf" id="1_qqrbj"]
+
+[resource]
+default_font = ExtResource("1_qqrbj")

@@ -6,3 +6,4 @@
 script = ExtResource("2_root_script")
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=1462122912]
+layer = 30

@@ -1,5 +1,8 @@
 extends CanvasLayer
+class_name DialogManager
 ## Screen-space dialog panel shared by interactions throughout the game.
+
+signal modal_changed
 
 const DIALOG_BOX_SCENE := preload("res://scenes/dialog_box.tscn")
 
@@ -11,23 +14,30 @@ var image_overlay: ColorRect
 var image_preview: TextureRect
 var image_hint: Label
 var generated_audio: AudioStreamPlayer
+var input_enabled := true
 
 
 func _ready() -> void:
 	layer = 20
 	_build_dialog()
+	(get_node("DialogPanel/Content/CloseHint") as Label).text = "Press %s to continue" % InputPrompts.action_label(&"interact")
 	hide_dialog()
 
 
 func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("interact"):
+	if input_enabled and event.is_action_pressed("interact"):
 		if image_overlay != null and image_overlay.visible:
 			image_overlay.hide()
+			modal_changed.emit()
 		elif is_dialog_open():
 			advance_dialog()
 		else:
 			return
 		get_viewport().set_input_as_handled()
+
+
+func set_input_enabled(enabled: bool) -> void:
+	input_enabled = enabled
 
 
 func show_dialog(dialog_messages: Array[String]) -> void:
@@ -37,6 +47,7 @@ func show_dialog(dialog_messages: Array[String]) -> void:
 	current_message = 0
 	message_label.text = messages[current_message]
 	panel.show()
+	modal_changed.emit()
 
 
 func advance_dialog() -> void:
@@ -51,9 +62,14 @@ func is_dialog_open() -> bool:
 	return panel != null and panel.visible
 
 
+func is_modal_open() -> bool:
+	return is_dialog_open() or (image_overlay != null and image_overlay.visible)
+
+
 func hide_dialog() -> void:
-	if panel:
+	if panel and panel.visible:
 		panel.hide()
+		modal_changed.emit()
 
 
 func show_generated_file(file_name: String, content: PackedByteArray) -> void:
@@ -86,8 +102,9 @@ func _show_generated_image(file_name: String, content: PackedByteArray) -> void:
 		_build_image_overlay()
 	hide_dialog()
 	image_preview.texture = ImageTexture.create_from_image(image)
-	image_hint.text = "Something happened in the background: %s  ·  Press E to hide" % file_name
+	image_hint.text = "Something happened in the background: %s  ·  Press %s to hide" % [file_name, InputPrompts.action_label(&"interact")]
 	image_overlay.show()
+	modal_changed.emit()
 
 
 func _play_generated_audio(file_name: String, content: PackedByteArray) -> void:
@@ -103,6 +120,7 @@ func _play_generated_audio(file_name: String, content: PackedByteArray) -> void:
 	if generated_audio == null:
 		generated_audio = AudioStreamPlayer.new()
 		generated_audio.name = "GeneratedFileAudio"
+		generated_audio.bus = &"Sound"
 		add_child(generated_audio)
 	generated_audio.stream = audio
 	generated_audio.play()

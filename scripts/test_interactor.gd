@@ -1,19 +1,21 @@
 extends Area2D
-## Bathroom prototype interaction that opens the shared dialog panel.
+## Bathroom prototype interaction that opens the gameplay-owned dialog.
 
 var nearby := false
 var hint: Label
+var level: Level
 
 
 func _ready() -> void:
+	level = get_tree().current_scene as Level
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
 	_build_hint()
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if nearby and not DialogManager.is_dialog_open() and event.is_action_pressed("interact"):
-		DialogManager.show_dialog([
+	if nearby and level != null and level.player_controls_enabled() and event.is_action_pressed("interact"):
+		level.dialog_manager.show_dialog([
 			"The mirror is fogged over.",
 			"Someone has written: HELLO.",
 		])
@@ -34,7 +36,7 @@ func _on_body_exited(body: Node2D) -> void:
 
 func _build_hint() -> void:
 	hint = Label.new()
-	hint.text = "E  Interact"
+	hint.text = "%s  Interact" % InputPrompts.action_label(&"interact")
 	hint.position = Vector2(-48, -55)
 	hint.add_theme_color_override("font_color", Color("#fff8df"))
 	hint.add_theme_color_override("font_outline_color", Color.BLACK)

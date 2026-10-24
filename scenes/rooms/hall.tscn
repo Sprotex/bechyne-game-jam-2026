@@ -1,13 +1,33 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/room.gd" id="1_room"]
+[ext_resource type="PackedScene" path="res://scenes/room_exit.tscn" id="2_exit"]
 
 [node name="Hall" type="Node2D"]
 script = ExtResource("1_room")
 room_title = "CORRIDOR"
 room_color = Color(0.84706, 0.78039, 0.71765, 1)
-right_room = "entrance"
-down_room = "office"
-staircase_wall = "up"
-staircase_offset = 120.0
 staircase_position = Vector2(120, 130)
+
+[node name="ExitToEntrance" parent="." instance=ExtResource("2_exit")]
+position = Vector2(1112, 550)
+destination_scene_path = "res://scenes/rooms/main_entrance.tscn"
+destination_arrival_id = "from_hall"
+wall_side = "east"
+
+[node name="ExitToOffice" parent="." instance=ExtResource("2_exit")]
+position = Vector2(650, 608)
+destination_scene_path = "res://scenes/rooms/office.tscn"
+destination_arrival_id = "from_hall"
+wall_side = "south"
+
+[node name="Arrivals" type="Node2D" parent="."]
+
+[node name="start" type="Marker2D" parent="Arrivals"]
+position = Vector2(120, 550)
+
+[node name="from_entrance" type="Marker2D" parent="Arrivals"]
+position = Vector2(1030, 550)
+
+[node name="from_office" type="Marker2D" parent="Arrivals"]
+position = Vector2(650, 500)
