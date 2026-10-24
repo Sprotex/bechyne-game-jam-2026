@@ -1,0 +1,16 @@
+[gd_scene format=3]
+
+[sub_resource type="RectangleShape2D" id="EntranceCabinet"]
+size = Vector2(300, 240)
+
+[sub_resource type="ConvexPolygonShape2D" id="EntranceChestFootprint"]
+points = PackedVector2Array(1040, 552, 1380, 550, 1400, 606, 1392, 632, 1040, 632)
+
+[node name="FurnitureCollisions" type="StaticBody2D"]
+
+[node name="CabinetCollision" type="CollisionShape2D" parent="."]
+position = Vector2(460, 330)
+shape = SubResource("EntranceCabinet")
+
+[node name="ChestCollision" type="CollisionShape2D" parent="."]
+shape = SubResource("EntranceChestFootprint")

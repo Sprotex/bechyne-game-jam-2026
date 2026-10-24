@@ -7,18 +7,7 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/light_switch.tscn" id="4_switch"]
 [ext_resource type="PackedScene" path="res://scenes/objects/keypad_interactor.tscn" id="4_keypad"]
 [ext_resource type="Script" path="res://scripts/objects/bed_interactor.gd" id="5_bed"]
-
-[sub_resource type="ConvexPolygonShape2D" id="BedroomBed"]
-points = PackedVector2Array(160, 135, 545, 140, 555, 563, 0, 563)
-
-[sub_resource type="RectangleShape2D" id="BedroomDesk"]
-size = Vector2(410, 90)
-
-[sub_resource type="RectangleShape2D" id="BedroomChair"]
-size = Vector2(180, 150)
-
-[sub_resource type="RectangleShape2D" id="BedroomWardrobe"]
-size = Vector2(360, 210)
+[ext_resource type="PackedScene" path="res://scenes/rooms/collisions/bedroom_collisions.tscn" id="6_collisions"]
 
 [sub_resource type="CircleShape2D" id="BedInteractionRange"]
 radius = 150.0
@@ -27,7 +16,7 @@ radius = 150.0
 script = ExtResource("1_room")
 room_title = "LOŽNICE"
 room_color = Color(0.78824, 0.81176, 0.8549, 1)
-walkable_outline = PackedVector2Array(150, 280, 1850, 280, 2000, 563, 0, 563)
+walkable_outline = PackedVector2Array(150, 290, 1850, 290, 2000, 563, 0, 563)
 
 [node name="FloorFill" type="Polygon2D" parent="."]
 z_index = -2
@@ -48,11 +37,6 @@ position = Vector2(1450, 60)
 [node name="LightSwitch" parent="." instance=ExtResource("4_switch")]
 position = Vector2(250, 330)
 
-[node name="FurnitureCollisions" type="StaticBody2D" parent="."]
-
-[node name="BedCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
-shape = SubResource("BedroomBed")
-
 [node name="BedInteractor" type="Area2D" parent="."]
 position = Vector2(510, 420)
 collision_layer = 0
@@ -62,20 +46,10 @@ script = ExtResource("5_bed")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BedInteractor"]
 shape = SubResource("BedInteractionRange")
 
-[node name="DeskCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
-position = Vector2(1100, 270)
-shape = SubResource("BedroomDesk")
-
-[node name="ChairCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
-position = Vector2(1100, 375)
-shape = SubResource("BedroomChair")
+[node name="FurnitureCollisions" parent="." instance=ExtResource("6_collisions")]
 
 [node name="Keypad" parent="." instance=ExtResource("4_keypad")]
 position = Vector2(1100, 445)
-
-[node name="WardrobeCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
-position = Vector2(1800, 300)
-shape = SubResource("BedroomWardrobe")
 
 [node name="ExitToHall" parent="." instance=ExtResource("2_exit")]
 position = Vector2(1450, 280)

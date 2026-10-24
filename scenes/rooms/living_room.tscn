@@ -6,24 +6,13 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/house_key.tscn" id="3_key"]
 [ext_resource type="PackedScene" path="res://scenes/objects/light_source.tscn" id="5_light"]
 [ext_resource type="PackedScene" path="res://scenes/objects/light_switch.tscn" id="6_switch"]
-
-[sub_resource type="ConvexPolygonShape2D" id="LivingSofa"]
-points = PackedVector2Array(340, 135, 755, 135, 790, 277, 325, 277)
-
-[sub_resource type="RectangleShape2D" id="LivingBookcase"]
-size = Vector2(310, 85)
-
-[sub_resource type="RectangleShape2D" id="LivingConsole"]
-size = Vector2(400, 75)
-
-[sub_resource type="RectangleShape2D" id="LivingTable"]
-size = Vector2(230, 65)
+[ext_resource type="PackedScene" path="res://scenes/rooms/collisions/living_room_collisions.tscn" id="7_collisions"]
 
 [node name="LivingRoom" type="Node2D"]
 script = ExtResource("1_room")
 room_title = "OBÝVACÍ POKOJ"
 room_color = Color(0.82745, 0.76863, 0.71373, 1)
-walkable_outline = PackedVector2Array(0, 238, 2000, 238, 2000, 375, 0, 375)
+walkable_outline = PackedVector2Array(0, 237, 2000, 240, 2000, 375, 0, 375)
 
 [node name="FloorFill" type="Polygon2D" parent="."]
 z_index = -2
@@ -44,23 +33,7 @@ position = Vector2(1450, 60)
 [node name="LightSwitch" parent="." instance=ExtResource("6_switch")]
 position = Vector2(250, 285)
 
-[node name="FurnitureCollisions" type="StaticBody2D" parent="."]
-
-[node name="SofaCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
-position = Vector2(560, 215)
-shape = SubResource("LivingSofa")
-
-[node name="BookcaseCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
-position = Vector2(1000, 205)
-shape = SubResource("LivingBookcase")
-
-[node name="ConsoleCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
-position = Vector2(1640, 220)
-shape = SubResource("LivingConsole")
-
-[node name="TableCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
-position = Vector2(1500, 320)
-shape = SubResource("LivingTable")
+[node name="FurnitureCollisions" parent="." instance=ExtResource("7_collisions")]
 
 [node name="HouseKey" parent="." instance=ExtResource("3_key")]
 position = Vector2(1190, 320)

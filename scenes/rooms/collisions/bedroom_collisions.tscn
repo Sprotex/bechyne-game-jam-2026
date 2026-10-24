@@ -1,0 +1,30 @@
+[gd_scene format=3]
+
+[sub_resource type="ConvexPolygonShape2D" id="BedroomBed"]
+points = PackedVector2Array(160, 135, 545, 140, 555, 548, 170, 563)
+
+[sub_resource type="RectangleShape2D" id="BedroomDesk"]
+size = Vector2(410, 90)
+
+[sub_resource type="RectangleShape2D" id="BedroomChair"]
+size = Vector2(180, 150)
+
+[sub_resource type="RectangleShape2D" id="BedroomWardrobe"]
+size = Vector2(360, 210)
+
+[node name="FurnitureCollisions" type="StaticBody2D"]
+
+[node name="BedCollision" type="CollisionShape2D" parent="."]
+shape = SubResource("BedroomBed")
+
+[node name="DeskCollision" type="CollisionShape2D" parent="."]
+position = Vector2(1100, 270)
+shape = SubResource("BedroomDesk")
+
+[node name="ChairCollision" type="CollisionShape2D" parent="."]
+position = Vector2(1100, 375)
+shape = SubResource("BedroomChair")
+
+[node name="WardrobeCollision" type="CollisionShape2D" parent="."]
+position = Vector2(1800, 300)
+shape = SubResource("BedroomWardrobe")

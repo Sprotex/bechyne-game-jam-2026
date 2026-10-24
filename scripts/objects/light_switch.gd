@@ -1,19 +1,21 @@
 extends Area2D
-## Toggles every room light through the shared event bus.
+## Toggles the lights in its room.
 
 const OFF_TEXTURE := preload("res://assets/gfx/vypinac_vypnuto.png")
 const ON_TEXTURE := preload("res://assets/gfx/vypinac_zapnuto.png")
 
 var nearby := false
 var hint: Label
+var room: Room
 
 
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
-	EventBus.lights_state_changed.connect(_on_lights_state_changed)
+	room = get_parent() as Room
+	room.lights_state_changed.connect(_on_lights_state_changed)
 	_build_hint()
-	_on_lights_state_changed(EventBus.lights_are_on)
+	_on_lights_state_changed(room.lights_are_on)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -22,7 +24,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	var level := get_tree().current_scene as Level
 	if level == null or not level.player_controls_enabled():
 		return
-	EventBus.toggle_lights()
+	room.toggle_lights()
 	get_viewport().set_input_as_handled()
 
 

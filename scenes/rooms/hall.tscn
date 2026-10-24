@@ -5,24 +5,13 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/room_exit.tscn" id="2_exit"]
 [ext_resource type="PackedScene" path="res://scenes/objects/light_source.tscn" id="5_light"]
 [ext_resource type="PackedScene" path="res://scenes/objects/light_switch.tscn" id="6_switch"]
-
-[sub_resource type="RectangleShape2D" id="HallCloset"]
-size = Vector2(340, 110)
-
-[sub_resource type="RectangleShape2D" id="HallChest"]
-size = Vector2(290, 95)
-
-[sub_resource type="RectangleShape2D" id="HallConsole"]
-size = Vector2(250, 85)
-
-[sub_resource type="CircleShape2D" id="HallPlant"]
-radius = 66.0
+[ext_resource type="PackedScene" path="res://scenes/rooms/collisions/hall_collisions.tscn" id="7_collisions"]
 
 [node name="Hall" type="Node2D"]
 script = ExtResource("1_room")
 room_title = "CHODBA"
 room_color = Color(0.84706, 0.78039, 0.71765, 1)
-walkable_outline = PackedVector2Array(145, 280, 1855, 280, 2000, 563, 0, 563)
+walkable_outline = PackedVector2Array(145, 298, 1855, 298, 2000, 563, 0, 563)
 
 [node name="FloorFill" type="Polygon2D" parent="."]
 z_index = -2
@@ -43,23 +32,7 @@ position = Vector2(1450, 60)
 [node name="LightSwitch" parent="." instance=ExtResource("6_switch")]
 position = Vector2(1830, 320)
 
-[node name="FurnitureCollisions" type="StaticBody2D" parent="."]
-
-[node name="ClosetCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
-position = Vector2(650, 270)
-shape = SubResource("HallCloset")
-
-[node name="ChestCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
-position = Vector2(1030, 305)
-shape = SubResource("HallChest")
-
-[node name="ConsoleCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
-position = Vector2(1640, 300)
-shape = SubResource("HallConsole")
-
-[node name="PlantCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
-position = Vector2(420, 300)
-shape = SubResource("HallPlant")
+[node name="FurnitureCollisions" parent="." instance=ExtResource("7_collisions")]
 
 [node name="ExitToEntrance" parent="." instance=ExtResource("2_exit")]
 position = Vector2(1940, 440)

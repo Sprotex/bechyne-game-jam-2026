@@ -7,25 +7,17 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/photo_camera.tscn" id="5_camera"]
 [ext_resource type="PackedScene" path="res://scenes/objects/camera_photo_spot.tscn" id="6_photo_spot"]
 [ext_resource type="PackedScene" path="res://scenes/objects/light_source.tscn" id="7_light"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/collisions/bathroom_collisions.tscn" id="9_collisions"]
 [ext_resource type="PackedScene" path="res://scenes/objects/light_switch.tscn" id="8_switch"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_interactor"]
 radius = 78.0
 
-[sub_resource type="RectangleShape2D" id="BathroomVanity"]
-size = Vector2(340, 130)
-
-[sub_resource type="ConvexPolygonShape2D" id="BathroomTub"]
-points = PackedVector2Array(-180, -75, 155, -90, 190, 60, -180, 80)
-
-[sub_resource type="RectangleShape2D" id="BathroomToilet"]
-size = Vector2(220, 135)
-
 [node name="Bathroom" type="Node2D" unique_id=1178015887]
 script = ExtResource("1_room")
 room_title = "KOUPELNA"
 room_color = Color(0.78431, 0.83529, 0.77647, 1)
-walkable_outline = PackedVector2Array(0, 300, 1900, 290, 2000, 563, 0, 563)
+walkable_outline = PackedVector2Array(110, 300, 1860, 298, 2000, 563, 0, 563)
 
 [node name="FloorFill" type="Polygon2D" parent="." unique_id=1376171251]
 z_index = -2
@@ -54,19 +46,7 @@ script = ExtResource("3_interactor")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TestInteractor" unique_id=1272749704]
 shape = SubResource("CircleShape2D_interactor")
 
-[node name="FurnitureCollisions" type="StaticBody2D" parent="." unique_id=1368197858]
-
-[node name="VanityCollision" type="CollisionShape2D" parent="FurnitureCollisions" unique_id=771240103]
-position = Vector2(770, 275)
-shape = SubResource("BathroomVanity")
-
-[node name="TubCollision" type="CollisionShape2D" parent="FurnitureCollisions" unique_id=737769797]
-position = Vector2(1710, 360)
-shape = SubResource("BathroomTub")
-
-[node name="ToiletCollision" type="CollisionShape2D" parent="FurnitureCollisions" unique_id=846439522]
-position = Vector2(120, 470)
-shape = SubResource("BathroomToilet")
+[node name="FurnitureCollisions" parent="." instance=ExtResource("9_collisions") unique_id=1368197858]
 
 [node name="PhotoCamera" parent="." unique_id=1267620424 instance=ExtResource("5_camera")]
 position = Vector2(1020, 435)

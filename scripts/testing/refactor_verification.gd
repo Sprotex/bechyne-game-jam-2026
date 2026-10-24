@@ -3,6 +3,7 @@ extends Node
 var failures := 0
 var saved_progress := PackedByteArray()
 var had_progress := false
+const CAMERA_FRAMING_VERIFICATION = preload("res://scripts/testing/camera_framing_verification.gd")
 
 
 func _ready() -> void:
@@ -25,6 +26,7 @@ func _run() -> void:
 	_check_room_links()
 	await _check_lights_persist(level)
 	await _check_camera_and_art_bounds(level)
+	failures += await CAMERA_FRAMING_VERIFICATION.run(level)
 	await _check_duplicate_exit()
 	await _check_room_collisions(level)
 	await _check_modal_controls(level)
@@ -60,10 +62,14 @@ func _check_room_links() -> void:
 			count += 1
 		room.free()
 	_check(count == 8, "all eight existing directed room links are present")
+	var bathroom := (load("res://scenes/rooms/bathroom.tscn") as PackedScene).instantiate() as Room
+	_check(bathroom.has_node("PhotoCamera") and bathroom.has_node("CameraPhotoSpot"), "bathroom camera and photo spot remain present")
+	_check(bathroom.get_node("PhotoCamera").position == Vector2(1020, 435), "bathroom camera keeps its authored position")
+	_check(bathroom.get_node("CameraPhotoSpot").position == Vector2(1220, 430), "bathroom photo spot keeps its authored position")
+	bathroom.free()
 
 
 func _check_lights_persist(level: Level) -> void:
-	EventBus.set_lights_enabled(false)
 	var paths := [
 		"res://scenes/rooms/main_entrance.tscn",
 		"res://scenes/rooms/hall.tscn",
@@ -76,28 +82,35 @@ func _check_lights_persist(level: Level) -> void:
 		await get_tree().process_frame
 		var lights := level.room.find_children("*", "PointLight2D", true, false)
 		var switch := level.room.get_node("LightSwitch/Sprite2D") as Sprite2D
-		_check(not EventBus.lights_are_on, "%s keeps shared lights off" % path.get_file())
+		_check(not level.room.lights_are_on, "%s starts with its own lights off" % path.get_file())
 		_check(not lights.is_empty(), "%s creates room lights" % path.get_file())
 		for light in lights:
 			_check(not (light as PointLight2D).enabled, "%s initializes each light off" % path.get_file())
 		_check(switch.texture.resource_path.ends_with("vypinac_vypnuto.png"), "%s switch shows off state" % path.get_file())
-	EventBus.set_lights_enabled(true)
+		if path == paths[0]:
+			level.room.set_lights_enabled(true)
+			_check(level.room.lights_are_on, "entrance lights can be turned on")
+	level._load_room(paths[1], "start")
 	await get_tree().process_frame
-	var enabled_lights := level.room.find_children("*", "PointLight2D", true, false)
-	var enabled_switch := level.room.get_node("LightSwitch/Sprite2D") as Sprite2D
-	_check(EventBus.lights_are_on, "shared lights can be turned on in a room")
-	for light in enabled_lights:
-		_check((light as PointLight2D).enabled, "new room lights receive on state")
-	_check(enabled_switch.texture.resource_path.ends_with("vypinac_zapnuto.png"), "room switch shows on state")
+	_check(not level.room.lights_are_on, "another room keeps its own lights off")
+	level._load_room(paths[0], "start")
+	await get_tree().process_frame
+	var revisited_lights := level.room.find_children("*", "PointLight2D", true, false)
+	var revisited_switch := level.room.get_node("LightSwitch/Sprite2D") as Sprite2D
+	_check(level.room.lights_are_on, "room light state returns when revisiting")
+	for light in revisited_lights:
+		_check((light as PointLight2D).enabled, "revisited room lights restore their state")
+	_check(revisited_switch.texture.resource_path.ends_with("vypinac_zapnuto.png"), "revisited switch restores its state")
+	level.room.set_lights_enabled(false)
 
 
 func _check_camera_and_art_bounds(level: Level) -> void:
 	var room_cases := [
-		{"path": "res://scenes/rooms/main_entrance.tscn", "probe": Vector2(1700, 650)},
-		{"path": "res://scenes/rooms/bathroom.tscn", "probe": Vector2(1050, 390)},
-		{"path": "res://scenes/rooms/bedroom.tscn", "probe": Vector2(800, 370)},
-		{"path": "res://scenes/rooms/hall.tscn", "probe": Vector2(1300, 370)},
-		{"path": "res://scenes/rooms/living_room.tscn", "probe": Vector2(1300, 328)},
+		{"path": "res://scenes/rooms/main_entrance.tscn", "probe": Vector2(1700, 650), "native_size": Vector2(1920, 1080)},
+		{"path": "res://scenes/rooms/bathroom.tscn", "probe": Vector2(1050, 390), "native_size": Vector2(2000, 563)},
+		{"path": "res://scenes/rooms/bedroom.tscn", "probe": Vector2(800, 370), "native_size": Vector2(2000, 563)},
+		{"path": "res://scenes/rooms/hall.tscn", "probe": Vector2(1300, 370), "native_size": Vector2(2000, 563)},
+		{"path": "res://scenes/rooms/living_room.tscn", "probe": Vector2(1300, 328), "native_size": Vector2(2000, 375)},
 	]
 	var player: CharacterBody2D = level.get_node("Player")
 	var camera: Camera2D = player.get_node("Camera2D")
@@ -107,8 +120,13 @@ func _check_camera_and_art_bounds(level: Level) -> void:
 		await get_tree().physics_frame
 		var room := level.room
 		var bounds := room.get_background_bounds()
-		var expected_size: Vector2 = room.get_node("Background").texture.get_size()
-		_check(bounds.size == expected_size, "%s background uses its native bounds" % room.name)
+		var background := room.get_node("Background") as Sprite2D
+		var expected_size: Vector2 = room_case.native_size
+		_check(background.texture.get_size() == expected_size, "%s texture matches its native source dimensions" % room.name)
+		_check(background.scale == Vector2.ONE and background.global_transform.get_scale().is_equal_approx(Vector2.ONE), "%s background transform stays at native scale" % room.name)
+		_check(bounds.size == expected_size, "%s camera bounds use the native image extents" % room.name)
+		_check(camera.zoom == Vector2.ONE, "%s camera does not zoom the background to fit the viewport" % room.name)
+		_check(camera.limit_left == floori(bounds.position.x) and camera.limit_top == floori(bounds.position.y) and camera.limit_right == ceili(bounds.end.x) and camera.limit_bottom == ceili(bounds.end.y), "%s camera limits match the native image edges" % room.name)
 		_check(room.has_node("RoomWalls") and room.get_node("RoomWalls").get_child_count() >= 4, "%s builds its authored outline collisions" % room.name)
 		_check(room.has_node("FurnitureCollisions") and room.get_node("FurnitureCollisions").get_child_count() > 0, "%s has room-specific furniture collisions" % room.name)
 		var points_inside := true
@@ -119,12 +137,13 @@ func _check_camera_and_art_bounds(level: Level) -> void:
 		player.global_position = room_case.probe
 		await get_tree().process_frame
 		camera.force_update_scroll()
-		var min_x := bounds.position.x + viewport_size.x * 0.5
-		var max_x := bounds.end.x - viewport_size.x * 0.5
+		var half_viewport := viewport_size / camera.zoom * 0.5
+		var min_x := bounds.position.x + half_viewport.x
+		var max_x := bounds.end.x - half_viewport.x
 		var expected_x := (bounds.position.x + bounds.end.x) * 0.5 if max_x < min_x else clampf(player.global_position.x, min_x, max_x)
 		var expected_y := (bounds.position.y + bounds.end.y) * 0.5
-		if bounds.size.y >= viewport_size.y:
-			expected_y = clampf(player.global_position.y, bounds.position.y + viewport_size.y * 0.5, bounds.end.y - viewport_size.y * 0.5)
+		if bounds.size.y >= half_viewport.y * 2.0:
+			expected_y = clampf(player.global_position.y, bounds.position.y + half_viewport.y, bounds.end.y - half_viewport.y)
 		var camera_center := camera.get_screen_center_position()
 		_check(absf(camera_center.x - expected_x) < 2.0 and absf(camera_center.y - expected_y) < 2.0, "%s camera follows within image limits" % room.name)
 		await get_tree().physics_frame
@@ -154,16 +173,26 @@ func _check_duplicate_exit() -> void:
 
 
 func _check_room_collisions(level: Level) -> void:
-	level._load_room("res://scenes/rooms/main_entrance.tscn", "start")
-	await get_tree().physics_frame
 	var player: CharacterBody2D = level.get_node("Player")
 	var sprite: Sprite2D = player.get_node("Sprite2D")
 	var body_shape: CollisionShape2D = player.get_node("CollisionShape2D")
 	_check(sprite.position.y < body_shape.position.y and body_shape.position.y < 0.0, "player art and hit shape align above the feet anchor")
 	_check(player.vertical_speed_ratio < 1.0, "vertical speed is tunable below horizontal speed")
-	player.global_position = Vector2(1225, 700)
+	var cases := [
+		{"path": "res://scenes/rooms/main_entrance.tscn", "origin": Vector2(1225, 700), "motion": Vector2(0, -100), "description": "entrance chest footprint blocks the walk path"},
+		{"path": "res://scenes/rooms/hall.tscn", "origin": Vector2(650, 400), "motion": Vector2(0, -120), "description": "hall closet footprint blocks the walk path"},
+		{"path": "res://scenes/rooms/bedroom.tscn", "origin": Vector2(700, 450), "motion": Vector2(-180, 0), "description": "bed footprint blocks the walk path"},
+		{"path": "res://scenes/rooms/living_room.tscn", "origin": Vector2(560, 340), "motion": Vector2(0, -150), "description": "living room sofa footprint blocks the walk path"},
+		{"path": "res://scenes/rooms/bathroom.tscn", "origin": Vector2(770, 420), "motion": Vector2(0, -160), "description": "bathroom vanity footprint blocks the walk path"},
+	]
+	for collision_case in cases:
+		level._load_room(collision_case.path, "start")
+		await get_tree().physics_frame
+		player.global_position = collision_case.origin
+		await get_tree().physics_frame
+		_check(player.test_move(player.global_transform, collision_case.motion), collision_case.description)
+	level._load_room("res://scenes/rooms/main_entrance.tscn", "start")
 	await get_tree().physics_frame
-	_check(player.test_move(player.global_transform, Vector2(0, -100)), "entrance chest collision blocks the walk path")
 	player.global_position = Vector2(1700, 650)
 	await get_tree().physics_frame
 	_check(player.test_move(player.global_transform, Vector2(0, -120)), "entrance outline blocks a closed threshold")
@@ -210,11 +239,13 @@ func _check_fade_and_arrival(level: Level) -> void:
 	await get_tree().create_timer(0.32).timeout
 	_check(level.room.room_title == "CHODBA", "entrance exit loads hall")
 	_check(level.get_node("Player") != null, "player stays in the level across room transitions")
+	_check(level.get_world_render_rect().size.y == 563.0, "transition updates the visible room height to hall artwork")
 	_check(level.player_controls_enabled(), "fade completion restores controls")
 	level.request_room_transition("res://scenes/rooms/main_entrance.tscn", "from_hall")
 	await get_tree().create_timer(0.32).timeout
 	_check(level.room.room_title == "VSTUPNÍ HALA", "reverse exit returns to entrance")
 	_check(level.get_node("Player").global_position == Vector2(200, 916), "arrival marker positions player at return doorway")
+	_check(level.get_world_render_rect().size.y == 1080.0, "transition restores the full-height entrance frame")
 	Input.action_press("move_left")
 	await get_tree().create_timer(0.16).timeout
 	Input.action_release("move_left")

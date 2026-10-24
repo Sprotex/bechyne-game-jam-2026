@@ -2,6 +2,7 @@ extends Node2D
 class_name Room
 
 signal exit_entered(exit: RoomExit)
+signal lights_state_changed(is_on: bool)
 
 @export var room_title := "MĚSTNOST"
 @export var room_color := Color("#e8dfc6")
@@ -9,6 +10,19 @@ signal exit_entered(exit: RoomExit)
 
 const WALL_THICKNESS := 18.0
 const EXIT_EDGE_TOLERANCE := 100.0
+
+var lights_are_on := false
+
+
+func toggle_lights() -> void:
+	set_lights_enabled(not lights_are_on)
+
+
+func set_lights_enabled(is_on: bool) -> void:
+	if lights_are_on == is_on:
+		return
+	lights_are_on = is_on
+	lights_state_changed.emit(lights_are_on)
 
 
 func _ready() -> void:
