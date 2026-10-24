@@ -41,7 +41,7 @@ func _close_options() -> void:
 
 
 func request_room_transition(destination_scene_path: String, arrival_id: String) -> void:
-	if transition_locked or not $Player/Movement.controls_enabled:
+	if transition_locked or not $Player.controls_enabled:
 		return
 	transition_locked = true
 	_refresh_controls()
@@ -62,7 +62,7 @@ func has_flag(flag_id: String) -> bool:
 
 
 func player_controls_enabled() -> bool:
-	return $Player/Movement.controls_enabled
+	return $Player.controls_enabled
 
 
 func set_flag(flag_id: String, value: bool = true) -> void:
@@ -81,7 +81,7 @@ func _load_room(scene_path: String, arrival_id: String) -> void:
 	room = (load(scene_path) as PackedScene).instantiate() as Room
 	$RoomHolder.add_child(room)
 	room.exit_entered.connect(_on_exit_entered)
-	$Player/Movement.global_position = room.get_arrival_position(arrival_id, START_POSITION)
+	$Player.global_position = room.get_arrival_position(arrival_id, START_POSITION)
 	_update_room_label()
 
 
@@ -90,10 +90,10 @@ func _on_exit_entered(exit: RoomExit) -> void:
 
 
 func _refresh_controls() -> void:
-	if not is_instance_valid($Player/Movement):
+	if not is_instance_valid($Player):
 		return
 	dialog_manager.set_input_enabled(not options_screen.visible)
-	$Player/Movement.controls_enabled = not transition_locked and not dialog_manager.is_modal_open() and not options_screen.visible
+	$Player.controls_enabled = not transition_locked and not dialog_manager.is_modal_open() and not options_screen.visible
 
 
 func _on_message_delivered(file_name: String, content: PackedByteArray) -> void:

@@ -80,7 +80,7 @@ func _check_duplicate_exit() -> void:
 
 
 func _check_modal_controls(level: Level) -> void:
-	var movement: CharacterBody2D = level.get_node("Player/Movement")
+	var movement: CharacterBody2D = level.get_node("Player")
 	var preview = level.room.get_node("MessagePreviewInteractor")
 	level.dialog_manager.show_dialog(["one", "two"])
 	_check(not level.player_controls_enabled(), "dialog blocks controls")
@@ -119,7 +119,7 @@ func _check_fade_and_arrival(level: Level) -> void:
 	level.request_room_transition("res://scenes/rooms/main_entrance.tscn", "from_hall")
 	await get_tree().create_timer(0.32).timeout
 	_check(level.room.room_title == "MAIN ENTRANCE", "reverse exit returns to entrance")
-	_check(level.get_node("Player/Movement").global_position == Vector2(120, 550), "arrival marker positions player at return doorway")
+	_check(level.get_node("Player").global_position == Vector2(120, 550), "arrival marker positions player at return doorway")
 
 
 func _check_pickup_persistence(level: Level) -> void:
@@ -127,7 +127,7 @@ func _check_pickup_persistence(level: Level) -> void:
 	pickup.item_id = "verification.pickup"
 	level.room.add_child(pickup)
 	await get_tree().process_frame
-	pickup._on_body_entered(level.get_node("Player/Movement"))
+	pickup._on_body_entered(level.get_node("Player"))
 	var event := InputEventAction.new()
 	event.action = "interact"
 	event.pressed = true
