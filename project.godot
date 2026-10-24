@@ -14,6 +14,7 @@ config/name="gamejam-bechyne-2026"
 run/main_scene="uid://tio5tmw76tye"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
+audio/default_bus_layout="res://default_bus_layout.tres"
 
 [autoload]
 

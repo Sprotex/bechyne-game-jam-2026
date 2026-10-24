@@ -48,6 +48,7 @@ func _start_music() -> void:
 
 	music_player = AudioStreamPlayer.new()
 	music_player.stream = music
+	music_player.bus = &"Music"
 	music_player.finished.connect(_on_music_finished)
 	add_child(music_player)
 	music_player.play()

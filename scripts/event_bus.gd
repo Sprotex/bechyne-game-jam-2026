@@ -7,7 +7,7 @@ signal audio_play_requested(sound_id: StringName, volume_db: float, bus: StringN
 func request_audio(
 		sound_id: StringName,
 		volume_db: float = 0.0,
-		bus: StringName = &"Master"
+		bus: StringName = &"Sound"
 ) -> void:
 	if sound_id.is_empty():
 		return

@@ -1,5 +1,7 @@
 extends Node2D
 
+const OPTIONS_SCENE := preload("res://scenes/options.tscn")
+
 @export var main_entrance_scene: PackedScene
 @export var west_room_scene: PackedScene
 @export var office_scene: PackedScene
@@ -22,6 +24,7 @@ const START_POSITION := Vector2(1080, 324)
 var current_room := "entrance"
 var transition_locked := false
 var room_instance: Node2D
+var options_screen: Control
 
 
 func _ready() -> void:
@@ -33,8 +36,22 @@ func _ready() -> void:
 		"living_room": living_room_scene,
 	}
 	_load_room(current_room)
+	options_screen = OPTIONS_SCENE.instantiate()
+	options_screen.hide()
+	options_screen.connect("back_pressed", _close_options)
+	$HUD.add_child(options_screen)
 	$Player/Movement.global_position = START_POSITION
 	_update_room_label()
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
+		options_screen.visible = not options_screen.visible
+		get_viewport().set_input_as_handled()
+
+
+func _close_options() -> void:
+	options_screen.hide()
 
 
 func _physics_process(_delta: float) -> void:
