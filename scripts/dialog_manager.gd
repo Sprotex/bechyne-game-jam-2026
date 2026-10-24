@@ -41,7 +41,9 @@ func _input(event: InputEvent) -> void:
 				advance_dialog()
 		else:
 			return
-		get_viewport().set_input_as_handled()
+		var viewport := get_viewport()
+		if viewport != null:
+			viewport.set_input_as_handled()
 
 
 func set_input_enabled(enabled: bool) -> void:

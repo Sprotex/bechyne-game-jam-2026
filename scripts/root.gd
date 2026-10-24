@@ -8,9 +8,9 @@ const CUTSCENE_BACKGROUNDS := [
 	preload("res://assets/gfx/klic.png"),
 ]
 const CUTSCENE_MESSAGES: Array[String] = [
-	"[Placeholder text for the first cutscene dialog.]",
-	"[Placeholder text for the second cutscene dialog.]",
-	"[Placeholder text for the third cutscene dialog.]",
+	"Věci nemusí bejt tak, jak se na první pohled zdá.",
+	"Ale TETY dům mi teda vždycky naháněl husí kůži. Možná to je ta nostalgie nebo fakt, že jsem se tu vždycky cítila, jako bych sem nepatřila.",
+	"Stejně se za ní půjdu podívat.",
 ]
 const OPTIONS_SCENE := preload("res://scenes/options.tscn")
 const CREDITS_SCENE := preload("res://scenes/credits.tscn")
