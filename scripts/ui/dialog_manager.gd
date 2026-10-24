@@ -1,5 +1,5 @@
 extends CanvasLayer
-class_name DialogManagerNode
+class_name GameDialogManager
 ## Screen-space dialog panel shared by interactions throughout the game.
 
 signal modal_changed
