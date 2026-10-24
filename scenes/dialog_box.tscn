@@ -1,42 +1,48 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://dkw1t8fwd863d"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dialog"]
-bg_color = Color(0.129412, 0.121569, 0.105882, 0.94)
-border_color = Color(0.780392, 0.72549, 0.603922, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
 content_margin_left = 22.0
 content_margin_top = 14.0
 content_margin_right = 22.0
 content_margin_bottom = 14.0
+bg_color = Color(0.129412, 0.121569, 0.105882, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.780392, 0.72549, 0.603922, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
-[node name="DialogPanel" type="PanelContainer"]
+[node name="DialogPanel" type="PanelContainer" unique_id=1512401401]
+anchors_preset = -1
 anchor_left = 0.04
 anchor_top = 0.64
 anchor_right = 0.96
 anchor_bottom = 0.98
 theme_override_styles/panel = SubResource("StyleBoxFlat_dialog")
 
-[node name="Content" type="VBoxContainer" parent="."]
+[node name="Content" type="VBoxContainer" parent="." unique_id=301327098]
+layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="MessageScroll" type="ScrollContainer" parent="Content"]
+[node name="MessageScroll" type="ScrollContainer" parent="Content" unique_id=1202754721]
 custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Message" type="Label" parent="Content/MessageScroll"]
-autowrap_mode = 3
+[node name="Message" type="Label" parent="Content/MessageScroll" unique_id=1942375961]
+layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.972549, 0.87451, 1)
 theme_override_font_sizes/font_size = 20
+autowrap_mode = 3
+visible_characters_behavior = 1
 
-[node name="CloseHint" type="Label" parent="Content"]
-horizontal_alignment = 2
+[node name="CloseHint" type="Label" parent="Content" unique_id=1218995032]
+layout_mode = 2
 theme_override_colors/font_color = Color(0.780392, 0.72549, 0.603922, 1)
 theme_override_font_sizes/font_size = 14
+horizontal_alignment = 2

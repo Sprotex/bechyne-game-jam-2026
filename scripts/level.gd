@@ -8,7 +8,7 @@ const START_POSITION := Vector2(1080, 560)
 var room: Room
 var transition_locked := false
 var options_screen: Control
-var dialog_manager: DialogManager
+var dialog_manager: DialogManagerNode
 var flags: Dictionary = {}
 
 
@@ -18,7 +18,7 @@ func _ready() -> void:
 	options_screen.hide()
 	options_screen.connect("back_pressed", _close_options)
 	$HUD.add_child(options_screen)
-	dialog_manager = preload("res://scenes/dialog_manager.tscn").instantiate() as DialogManager
+	dialog_manager = preload("res://scenes/dialog_manager.tscn").instantiate() as DialogManagerNode
 	add_child(dialog_manager)
 	dialog_manager.modal_changed.connect(_refresh_controls)
 	UserMessages.message_delivered.connect(_on_message_delivered)

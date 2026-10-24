@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://ciig10qyo8xdm"]
 
 [ext_resource type="Script" uid="uid://i36doeojhwd" path="res://scripts/player_movement.gd" id="1_movement"]
-[ext_resource type="Texture2D" uid="uid://dx71b2e1o1sa" path="res://icon.svg" id="2_icon"]
+[ext_resource type="Texture2D" path="res://assets/gfx/player.png" id="2_player"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_player"]
 radius = 16.0
@@ -10,9 +10,9 @@ radius = 16.0
 script = ExtResource("1_movement")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1489891802]
-texture = ExtResource("2_icon")
-scale = Vector2(0.22, 0.22)
-position = Vector2(0, -20)
+texture = ExtResource("2_player")
+position = Vector2(0, -41)
+scale = Vector2(0.1, 0.1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1444064111]
 position = Vector2(0, -9)

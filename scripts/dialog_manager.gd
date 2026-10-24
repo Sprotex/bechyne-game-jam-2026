@@ -1,15 +1,20 @@
 extends CanvasLayer
-class_name DialogManager
+class_name DialogManagerNode
 ## Screen-space dialog panel shared by interactions throughout the game.
 
 signal modal_changed
+signal message_changed(message_index: int)
+signal dialog_finished
 
 const DIALOG_BOX_SCENE := preload("res://scenes/dialog_box.tscn")
+
+@export_range(1.0, 100.0, 1.0, "or_greater") var characters_per_second := 20.0
 
 var panel: PanelContainer
 var message_label: Label
 var messages: Array[String] = []
 var current_message := 0
+var reveal_tween: Tween
 var image_overlay: ColorRect
 var image_preview: TextureRect
 var image_hint: Label
@@ -30,7 +35,10 @@ func _input(event: InputEvent) -> void:
 			image_overlay.hide()
 			modal_changed.emit()
 		elif is_dialog_open():
-			advance_dialog()
+			if _is_revealing():
+				_finish_reveal()
+			else:
+				advance_dialog()
 		else:
 			return
 		get_viewport().set_input_as_handled()
@@ -45,7 +53,8 @@ func show_dialog(dialog_messages: Array[String]) -> void:
 		return
 	messages = dialog_messages
 	current_message = 0
-	message_label.text = messages[current_message]
+	_set_message(messages[current_message])
+	message_changed.emit(current_message)
 	panel.show()
 	modal_changed.emit()
 
@@ -54,8 +63,10 @@ func advance_dialog() -> void:
 	current_message += 1
 	if current_message >= messages.size():
 		hide_dialog()
+		dialog_finished.emit()
 		return
-	message_label.text = messages[current_message]
+	_set_message(messages[current_message])
+	message_changed.emit(current_message)
 
 
 func is_dialog_open() -> bool:
@@ -67,9 +78,43 @@ func is_modal_open() -> bool:
 
 
 func hide_dialog() -> void:
+	_stop_reveal()
 	if panel and panel.visible:
 		panel.hide()
 		modal_changed.emit()
+
+
+func _set_message(message: String) -> void:
+	_stop_reveal()
+	message_label.text = message
+	message_label.visible_characters = 0
+	var character_count := message_label.get_total_character_count()
+	if character_count == 0:
+		return
+	reveal_tween = create_tween()
+	reveal_tween.set_trans(Tween.TRANS_LINEAR)
+	reveal_tween.tween_property(
+		message_label,
+		"visible_characters",
+		character_count,
+		float(character_count) / maxf(characters_per_second, 1.0)
+	)
+
+
+func _is_revealing() -> bool:
+	return reveal_tween != null and reveal_tween.is_running()
+
+
+func _finish_reveal() -> void:
+	if reveal_tween != null and reveal_tween.is_running():
+		reveal_tween.kill()
+	message_label.visible_characters = -1
+
+
+func _stop_reveal() -> void:
+	if reveal_tween != null and reveal_tween.is_running():
+		reveal_tween.kill()
+	reveal_tween = null
 
 
 func show_generated_file(file_name: String, content: PackedByteArray) -> void:

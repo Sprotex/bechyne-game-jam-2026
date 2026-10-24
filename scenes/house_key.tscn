@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/persistent_pickup.tscn" id="1_pickup"]
-[ext_resource type="Texture2D" path="res://assets/gfx/house_key.svg" id="2_key"]
+[ext_resource type="Texture2D" path="res://assets/gfx/klic.png" id="2_key"]
 
 [node name="HouseKey" instance=ExtResource("1_pickup")]
 item_id = "item.key"
@@ -11,4 +11,4 @@ pickup_message = "You picked up a brass key. It may unlock something in the hous
 
 [node name="KeyArt" type="Sprite2D" parent="." index="0"]
 texture = ExtResource("2_key")
-scale = Vector2(0.55, 0.55)
+scale = Vector2(0.1, 0.1)
