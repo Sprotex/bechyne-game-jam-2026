@@ -2,6 +2,10 @@
 
 [ext_resource type="Script" path="res://scripts/room.gd" id="1_room"]
 [ext_resource type="Texture2D" path="res://assets/gfx/predsin.png" id="2_background"]
+[ext_resource type="Script" path="res://scripts/message_preview_interactor.gd" id="3_message_preview"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_message_preview"]
+radius = 78.0
 
 [node name="MainEntrance" type="Node2D"]
 script = ExtResource("1_room")
@@ -11,3 +15,12 @@ room_color = Color(0.87451, 0.82353, 0.68235, 1)
 left_room = "hall"
 up_room = "living_room"
 down_room = "west_room"
+
+[node name="MessagePreviewInteractor" type="Area2D" parent="."]
+position = Vector2(850, 324)
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("3_message_preview")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MessagePreviewInteractor"]
+shape = SubResource("CircleShape2D_message_preview")

@@ -37,6 +37,8 @@ func _build_hint() -> void:
 	hint.text = "E  Interact"
 	hint.position = Vector2(-48, -55)
 	hint.add_theme_color_override("font_color", Color("#fff8df"))
+	hint.add_theme_color_override("font_outline_color", Color.BLACK)
+	hint.add_theme_constant_override("outline_size", 3)
 	hint.add_theme_font_size_override("font_size", 16)
 	hint.hide()
 	add_child(hint)

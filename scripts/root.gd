@@ -1,20 +1,16 @@
 extends Node2D
 
 const LEVEL_SCENE := "res://scenes/level.tscn"
-const ROOM_LAYOUT := preload("res://assets/room_layout.png")
-
-var access_dialog: AcceptDialog
+const DOMECEK := preload("res://assets/gfx/domecek.png")
 
 
 func _ready() -> void:
-	UserMessages.browser_access_checked.connect(_on_browser_access_checked)
-	UserMessages.browser_write_failed.connect(_on_browser_write_failed)
 	_build_menu()
 
 
 func _build_menu() -> void:
 	var background := TextureRect.new()
-	background.texture = ROOM_LAYOUT
+	background.texture = DOMECEK
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	background.stretch_mode = TextureRect.STRETCH_SCALE
@@ -50,7 +46,7 @@ func _build_menu() -> void:
 	menu.add_child(title)
 
 	var prompt := Label.new()
-	prompt.text = "Move with WASD or the arrow keys.\nChoose where messages can be saved when you start."
+	prompt.text = "Move with WASD or the arrow keys.\nMessages created along the way will appear here."
 	prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	prompt.add_theme_color_override("font_color", Color("#e1ded3"))
 	prompt.add_theme_font_size_override("font_size", 17)
@@ -63,46 +59,9 @@ func _build_menu() -> void:
 	start.pressed.connect(_start_game)
 	menu.add_child(start)
 
-	access_dialog = AcceptDialog.new()
-	access_dialog.title = "MESSAGE FOLDER ACCESS"
-	access_dialog.ok_button_text = "TRY AGAIN"
-	access_dialog.add_button("CONTINUE ANYWAY", true, "continue")
-	access_dialog.confirmed.connect(_retry_folder_access)
-	access_dialog.custom_action.connect(_on_access_dialog_action)
-	$HUD.add_child(access_dialog)
-
 
 func _start_game() -> void:
-	if OS.has_feature("web"):
-		UserMessages.request_browser_folder_access()
-		return
 	_enter_game()
-
-
-func _on_browser_access_checked(success: bool, detail: String) -> void:
-	if success:
-		_enter_game()
-	else:
-		_show_access_dialog("To save messages in a folder, choose a folder and approve read and write access. %s\n\nTry again, or continue with browser downloads." % detail)
-
-
-func _show_access_dialog(message: String) -> void:
-	access_dialog.dialog_text = message
-	access_dialog.popup_centered()
-
-
-func _retry_folder_access() -> void:
-	_start_game()
-
-
-func _on_access_dialog_action(action: StringName) -> void:
-	if action == &"continue":
-		UserMessages.use_browser_downloads()
-		_enter_game()
-
-
-func _on_browser_write_failed(file_name: String) -> void:
-	_show_access_dialog("Could not save %s. Choose a writable folder or continue with browser downloads." % file_name)
 
 
 func _enter_game() -> void:

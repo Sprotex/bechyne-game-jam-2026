@@ -1,90 +1,29 @@
 extends Node
-## Delivers game-generated messages into a folder the player can open in Explorer.
-
-signal browser_access_checked(success: bool, detail: String)
-signal browser_write_failed(file_name: String)
+## Stores game-generated messages in user data and downloads them in web builds.
 
 const USER_MESSAGES_FOLDER := "user_messages"
-
-var _browser_access_callback: JavaScriptObject
-var _browser_write_callback: JavaScriptObject
 
 
 func _ready() -> void:
 	if OS.has_feature("web"):
-		_browser_access_callback = JavaScriptBridge.create_callback(_on_browser_access_checked)
-		_browser_write_callback = JavaScriptBridge.create_callback(_on_browser_write_failed)
-		JavaScriptBridge.get_interface("window").set("godotFolderAccessResult", _browser_access_callback)
-		JavaScriptBridge.get_interface("window").set("godotFolderWriteFailed", _browser_write_callback)
 		JavaScriptBridge.eval(_browser_bridge_script())
-
-
-func request_browser_folder_access() -> void:
-	if not OS.has_feature("web"):
-		browser_access_checked.emit(false, "Folder access is only available in a web build.")
-		return
-	JavaScriptBridge.eval("window.godotRequestFolderAccess()")
-
-
-func _on_browser_access_checked(args: Array) -> void:
-	var success := bool(args[0]) if not args.is_empty() else false
-	var detail := str(args[1]) if args.size() > 1 else "Folder access was not granted."
-	browser_access_checked.emit(success, detail)
-
-
-func _on_browser_write_failed(args: Array) -> void:
-	var file_name := str(args[0]) if not args.is_empty() else "A message"
-	browser_write_failed.emit(file_name)
 
 
 func _browser_bridge_script() -> String:
 	return """
-	window.godotRequestFolderAccess = async () => {
-	  if (!window.showDirectoryPicker) {
-		window.godotFolderAccessResult(false, "This browser cannot grant folder access. You can continue with downloads.");
-	    return;
-	  }
-	  try {
-		const handle = await window.showDirectoryPicker({mode: "readwrite"});
-		let permission = await handle.queryPermission({mode: "readwrite"});
-		if (permission !== "granted") permission = await handle.requestPermission({mode: "readwrite"});
-		if (permission !== "granted") throw new Error("Write permission was not granted.");
-	    window.godotMessagesFolder = handle;
-		const file = await handle.getFileHandle("Field Communications access test.txt", {create: true});
-	    const writer = await file.createWritable();
-		await writer.write("Folder access test. You can delete this file.");
-	    await writer.close();
-		window.godotFolderAccessResult(true, "Folder access granted. A test file was saved.");
-	  } catch (error) {
-		window.godotFolderAccessResult(false, error.name === "AbortError" ? "Folder selection was cancelled." : error.message);
-	  }
-	};
 	window.godotSaveMessage = async (name, base64) => {
 	  try {
-	    if (window.godotMessagesFolder) {
-	      const file = await window.godotMessagesFolder.getFileHandle(name, {create: true});
-	      const writer = await file.createWritable();
-	      const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
-	      await writer.write(bytes);
-	      await writer.close();
-	    } else {
-	      const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
-		  const link = document.createElement("a");
-	      link.href = URL.createObjectURL(new Blob([bytes]));
-	      link.download = name;
-	      link.click();
-	      URL.revokeObjectURL(link.href);
-	    }
+	    const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+	    const link = document.createElement("a");
+	    link.href = URL.createObjectURL(new Blob([bytes]));
+	    link.download = name;
+	    link.click();
+	    setTimeout(() => URL.revokeObjectURL(link.href), 1000);
 	  } catch (error) {
-	    window.godotFolderWriteFailed(name);
+	    console.error(`Could not download message ${name}:`, error);
 	  }
 	};
 	"""
-
-
-func use_browser_downloads() -> void:
-	if OS.has_feature("web"):
-		JavaScriptBridge.eval("window.godotMessagesFolder = null")
 
 
 func get_user_messages_folder() -> String:
@@ -144,7 +83,7 @@ func open_user_messages_folder() -> Error:
 	var directory_error := DirAccess.make_dir_recursive_absolute(folder_path)
 	if directory_error != OK:
 		return directory_error
-	return OS.shell_show_in_file_manager(folder_path)
+	return OS.shell_show_in_file_manager(folder_path, true)
 
 
 func _write_user_message(file_name: String, content: PackedByteArray) -> Error:
@@ -161,12 +100,23 @@ func _write_user_message(file_name: String, content: PackedByteArray) -> Error:
 	file.flush()
 	var write_error := file.get_error()
 	file.close()
+	if write_error != OK:
+		return write_error
 	if OS.has_feature("web"):
 		var safe_name := target_path.get_file()
 		var base64 := Marshalls.raw_to_base64(content)
 		var script := "window.godotSaveMessage(%s, %s)" % [JSON.stringify(safe_name), JSON.stringify(base64)]
 		JavaScriptBridge.eval(script)
-	return write_error
+		DialogManager.show_generated_file(safe_name, content)
+	elif _is_desktop_platform():
+		var open_error := open_user_messages_folder()
+		if open_error != OK:
+			push_warning("Could not open user messages folder: %s" % error_string(open_error))
+	return OK
+
+
+func _is_desktop_platform() -> bool:
+	return OS.has_feature("editor") or OS.get_name() in ["Windows", "macOS", "Linux", "FreeBSD", "NetBSD", "OpenBSD", "BSD"]
 
 
 func _get_available_message_path(file_name: String) -> String:
