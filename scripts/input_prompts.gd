@@ -10,7 +10,7 @@ static func action_label(action: StringName) -> String:
 		return String(action).capitalize()
 	var labels: PackedStringArray = []
 	for event in events:
-		var label := event.as_text().replace(" (Physical)", "")
+		var label := event.as_text().replace(" - Physical", "").replace("(Physical)", "").strip_edges()
 		if not labels.has(label):
 			labels.append(label)
 	return " / ".join(labels)
