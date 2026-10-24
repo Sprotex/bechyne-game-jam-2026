@@ -13,8 +13,19 @@ func _ready() -> void:
 	_build_hint()
 
 
+func _process(_delta: float) -> void:
+	if nearby:
+		_update_hint()
+
+
 func _unhandled_input(event: InputEvent) -> void:
-	if nearby and level != null and level.player_controls_enabled() and event.is_action_pressed("interact"):
+	if (
+		nearby
+		and level != null
+		and not level.has_flag(Level.BEDROOM_KEYPAD_FLAG)
+		and level.player_controls_enabled()
+		and event.is_action_pressed("interact")
+	):
 		level.open_keypad()
 		get_viewport().set_input_as_handled()
 
@@ -22,7 +33,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _on_body_entered(body: Node2D) -> void:
 	if body is CharacterBody2D:
 		nearby = true
-		hint.show()
+		_update_hint()
 
 
 func _on_body_exited(body: Node2D) -> void:
@@ -43,3 +54,10 @@ func _build_hint() -> void:
 	hint.add_theme_font_size_override("font_size", 16)
 	hint.hide()
 	add_child(hint)
+
+
+func _update_hint() -> void:
+	if level == null or level.has_flag(Level.BEDROOM_KEYPAD_FLAG):
+		hint.hide()
+	else:
+		hint.show()

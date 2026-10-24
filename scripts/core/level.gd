@@ -3,6 +3,7 @@ class_name Level
 
 const OPTIONS_SCENE := preload("res://scenes/ui/options.tscn")
 const KEYPAD_SCENE := preload("res://scenes/ui/keypad.tscn")
+const BEDROOM_KEYPAD_FLAG := "puzzle.bedroom_keypad_unlocked"
 const INITIAL_ROOM := "res://scenes/rooms/main_entrance.tscn"
 const AFTER_SLEEP_ROOM := "res://scenes/rooms/hall.tscn"
 const AFTER_SLEEP_ARRIVAL := "from_bedroom"
@@ -102,7 +103,7 @@ func player_controls_enabled() -> bool:
 
 
 func open_keypad() -> void:
-	if is_instance_valid(keypad) or not player_controls_enabled():
+	if has_flag(BEDROOM_KEYPAD_FLAG) or is_instance_valid(keypad) or not player_controls_enabled():
 		return
 	keypad = KEYPAD_SCENE.instantiate() as Control
 	keypad.submitted.connect(_on_keypad_submitted)
@@ -165,6 +166,7 @@ func _on_keypad_submitted(is_correct: bool) -> void:
 	keypad.queue_free()
 	keypad = null
 	if is_correct:
+		set_flag(BEDROOM_KEYPAD_FLAG)
 		dialog_manager.show_dialog(["Zámek cvakl. Kód je správný."])
 	else:
 		dialog_manager.show_dialog(["Zámek kód odmítl."])
