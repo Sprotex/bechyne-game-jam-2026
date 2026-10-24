@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://c4vmnxn4hu5ak"]
+
+[ext_resource type="Script" uid="uid://d8q6cwun2fc0" path="res://scripts/audio/audio_manager.gd" id="1_audio_manager"]
+[ext_resource type="AudioStreamWAV" uid="uid://dpv84lxe5jd6m" path="res://assets/audio/voice_message.wav" id="2_voice_message"]
+[ext_resource type="AudioStreamOggVorbis" path="res://assets/audio/creepy.ogg" id="3_music"]
+[ext_resource type="AudioStreamOggVorbis" path="res://assets/audio/not_creepy.ogg" id="4_alternate_music"]
+
+[node name="AudioManager" type="Node" unique_id=1251892382]
+script = ExtResource("1_audio_manager")
+voice_message = ExtResource("2_voice_message")
+music = ExtResource("3_music")
+alternate_music = ExtResource("4_alternate_music")
+loop_music = true

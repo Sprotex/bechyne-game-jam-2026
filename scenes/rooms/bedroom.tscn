@@ -1,0 +1,65 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/room.gd" id="1_room"]
+[ext_resource type="Texture2D" path="res://assets/gfx/loznice.png" id="2_background"]
+[ext_resource type="PackedScene" path="res://scenes/objects/room_exit.tscn" id="2_exit"]
+
+[sub_resource type="RectangleShape2D" id="BedroomBed"]
+size = Vector2(430, 145)
+
+[sub_resource type="RectangleShape2D" id="BedroomDesk"]
+size = Vector2(410, 90)
+
+[sub_resource type="RectangleShape2D" id="BedroomChair"]
+size = Vector2(180, 150)
+
+[sub_resource type="RectangleShape2D" id="BedroomWardrobe"]
+size = Vector2(360, 210)
+
+[node name="Bedroom" type="Node2D"]
+script = ExtResource("1_room")
+room_title = "LOŽNICE"
+room_color = Color(0.78824, 0.81176, 0.8549, 1)
+walkable_outline = PackedVector2Array(150, 280, 1850, 280, 2000, 563, 0, 563)
+
+[node name="FloorFill" type="Polygon2D" parent="."]
+z_index = -2
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(0, 0, 2000, 0, 2000, 563, 0, 563)
+
+[node name="Background" type="Sprite2D" parent="."]
+texture = ExtResource("2_background")
+centered = false
+z_index = -1
+
+[node name="FurnitureCollisions" type="StaticBody2D" parent="."]
+
+[node name="BedCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
+position = Vector2(345, 230)
+shape = SubResource("BedroomBed")
+
+[node name="DeskCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
+position = Vector2(1100, 270)
+shape = SubResource("BedroomDesk")
+
+[node name="ChairCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
+position = Vector2(1100, 375)
+shape = SubResource("BedroomChair")
+
+[node name="WardrobeCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
+position = Vector2(1800, 300)
+shape = SubResource("BedroomWardrobe")
+
+[node name="ExitToHall" parent="." instance=ExtResource("2_exit")]
+position = Vector2(1450, 280)
+destination_scene_path = "res://scenes/rooms/hall.tscn"
+destination_arrival_id = "from_bedroom"
+wall_side = "north"
+
+[node name="Arrivals" type="Node2D" parent="."]
+
+[node name="start" type="Marker2D" parent="Arrivals"]
+position = Vector2(900, 500)
+
+[node name="from_hall" type="Marker2D" parent="Arrivals"]
+position = Vector2(1450, 365)

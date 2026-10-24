@@ -1,28 +1,69 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/room.gd" id="1_room"]
-[ext_resource type="PackedScene" path="res://scenes/room_exit.tscn" id="2_exit"]
-[ext_resource type="PackedScene" path="res://scenes/house_key.tscn" id="3_key"]
+[ext_resource type="Script" path="res://scripts/rooms/room.gd" id="1_room"]
+[ext_resource type="Texture2D" path="res://assets/gfx/obyvak.png" id="4_background"]
+[ext_resource type="PackedScene" path="res://scenes/objects/room_exit.tscn" id="2_exit"]
+[ext_resource type="PackedScene" path="res://scenes/objects/house_key.tscn" id="3_key"]
+
+[sub_resource type="RectangleShape2D" id="LivingSofa"]
+size = Vector2(470, 95)
+
+[sub_resource type="RectangleShape2D" id="LivingBookcase"]
+size = Vector2(310, 85)
+
+[sub_resource type="RectangleShape2D" id="LivingConsole"]
+size = Vector2(400, 75)
+
+[sub_resource type="RectangleShape2D" id="LivingTable"]
+size = Vector2(230, 65)
 
 [node name="LivingRoom" type="Node2D"]
-scale = Vector2(1.666667, 1.666667)
 script = ExtResource("1_room")
-room_title = "LIVING ROOM"
+room_title = "OBÝVACÍ POKOJ"
 room_color = Color(0.82745, 0.76863, 0.71373, 1)
+walkable_outline = PackedVector2Array(0, 238, 2000, 238, 2000, 375, 0, 375)
+
+[node name="FloorFill" type="Polygon2D" parent="."]
+z_index = -2
+color = Color(0.6902, 0.6157, 0.451, 1)
+polygon = PackedVector2Array(0, 0, 2000, 0, 2000, 375, 0, 375)
+
+[node name="Background" type="Sprite2D" parent="."]
+texture = ExtResource("4_background")
+centered = false
+z_index = -1
+
+[node name="FurnitureCollisions" type="StaticBody2D" parent="."]
+
+[node name="SofaCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
+position = Vector2(560, 215)
+shape = SubResource("LivingSofa")
+
+[node name="BookcaseCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
+position = Vector2(1000, 205)
+shape = SubResource("LivingBookcase")
+
+[node name="ConsoleCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
+position = Vector2(1640, 220)
+shape = SubResource("LivingConsole")
+
+[node name="TableCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
+position = Vector2(1500, 320)
+shape = SubResource("LivingTable")
 
 [node name="HouseKey" parent="." instance=ExtResource("3_key")]
-position = Vector2(500, 420)
+position = Vector2(1190, 320)
 
 [node name="ExitToEntrance" parent="." instance=ExtResource("2_exit")]
-position = Vector2(820, 608)
+position = Vector2(1180, 238)
 destination_scene_path = "res://scenes/rooms/main_entrance.tscn"
 destination_arrival_id = "from_living_room"
-wall_side = "south"
+wall_side = "north"
 
 [node name="Arrivals" type="Node2D" parent="."]
 
 [node name="start" type="Marker2D" parent="Arrivals"]
-position = Vector2(820, 150)
+position = Vector2(1100, 320)
 
 [node name="from_entrance" type="Marker2D" parent="Arrivals"]
-position = Vector2(820, 150)
+position = Vector2(1100, 320)

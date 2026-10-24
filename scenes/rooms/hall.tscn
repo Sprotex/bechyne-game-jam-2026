@@ -1,34 +1,74 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/room.gd" id="1_room"]
-[ext_resource type="PackedScene" path="res://scenes/room_exit.tscn" id="2_exit"]
+[ext_resource type="Script" path="res://scripts/rooms/room.gd" id="1_room"]
+[ext_resource type="Texture2D" path="res://assets/gfx/chodba.png" id="3_background"]
+[ext_resource type="PackedScene" path="res://scenes/objects/room_exit.tscn" id="2_exit"]
+
+[sub_resource type="RectangleShape2D" id="HallCloset"]
+size = Vector2(340, 110)
+
+[sub_resource type="RectangleShape2D" id="HallChest"]
+size = Vector2(290, 95)
+
+[sub_resource type="RectangleShape2D" id="HallConsole"]
+size = Vector2(250, 85)
+
+[sub_resource type="CircleShape2D" id="HallPlant"]
+radius = 66.0
 
 [node name="Hall" type="Node2D"]
-scale = Vector2(1.666667, 1.666667)
 script = ExtResource("1_room")
-room_title = "CORRIDOR"
+room_title = "CHODBA"
 room_color = Color(0.84706, 0.78039, 0.71765, 1)
-staircase_position = Vector2(120, 130)
+walkable_outline = PackedVector2Array(145, 280, 1855, 280, 2000, 563, 0, 563)
+
+[node name="FloorFill" type="Polygon2D" parent="."]
+z_index = -2
+color = Color(0.6902, 0.6157, 0.451, 1)
+polygon = PackedVector2Array(0, 0, 2000, 0, 2000, 563, 0, 563)
+
+[node name="Background" type="Sprite2D" parent="."]
+texture = ExtResource("3_background")
+centered = false
+z_index = -1
+
+[node name="FurnitureCollisions" type="StaticBody2D" parent="."]
+
+[node name="ClosetCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
+position = Vector2(650, 270)
+shape = SubResource("HallCloset")
+
+[node name="ChestCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
+position = Vector2(1030, 305)
+shape = SubResource("HallChest")
+
+[node name="ConsoleCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
+position = Vector2(1640, 300)
+shape = SubResource("HallConsole")
+
+[node name="PlantCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
+position = Vector2(420, 300)
+shape = SubResource("HallPlant")
 
 [node name="ExitToEntrance" parent="." instance=ExtResource("2_exit")]
-position = Vector2(1112, 550)
+position = Vector2(1940, 440)
 destination_scene_path = "res://scenes/rooms/main_entrance.tscn"
 destination_arrival_id = "from_hall"
 wall_side = "east"
 
-[node name="ExitToOffice" parent="." instance=ExtResource("2_exit")]
-position = Vector2(650, 608)
-destination_scene_path = "res://scenes/rooms/office.tscn"
+[node name="ExitToBedroom" parent="." instance=ExtResource("2_exit")]
+position = Vector2(1650, 555)
+destination_scene_path = "res://scenes/rooms/bedroom.tscn"
 destination_arrival_id = "from_hall"
 wall_side = "south"
 
 [node name="Arrivals" type="Node2D" parent="."]
 
 [node name="start" type="Marker2D" parent="Arrivals"]
-position = Vector2(120, 550)
+position = Vector2(200, 500)
 
 [node name="from_entrance" type="Marker2D" parent="Arrivals"]
-position = Vector2(1030, 550)
+position = Vector2(1780, 420)
 
-[node name="from_office" type="Marker2D" parent="Arrivals"]
-position = Vector2(650, 500)
+[node name="from_bedroom" type="Marker2D" parent="Arrivals"]
+position = Vector2(1650, 475)

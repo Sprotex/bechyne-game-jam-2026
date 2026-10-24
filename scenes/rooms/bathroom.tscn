@@ -1,0 +1,78 @@
+[gd_scene format=3 uid="uid://dg6niglmsdck2"]
+
+[ext_resource type="Script" uid="uid://dxu1rm7tuyuq2" path="res://scripts/rooms/room.gd" id="1_room"]
+[ext_resource type="Texture2D" uid="uid://1naryonr8t3k" path="res://assets/gfx/koupelna.png" id="2_background"]
+[ext_resource type="Script" uid="uid://drusxli3u1h67" path="res://scripts/rooms/test_interactor.gd" id="3_interactor"]
+[ext_resource type="PackedScene" path="res://scenes/objects/room_exit.tscn" id="4_exit"]
+[ext_resource type="PackedScene" path="res://scenes/objects/photo_camera.tscn" id="5_camera"]
+[ext_resource type="PackedScene" path="res://scenes/objects/camera_photo_spot.tscn" id="6_photo_spot"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_interactor"]
+radius = 78.0
+
+[sub_resource type="RectangleShape2D" id="BathroomVanity"]
+size = Vector2(340, 130)
+
+[sub_resource type="RectangleShape2D" id="BathroomTub"]
+size = Vector2(620, 190)
+
+[sub_resource type="RectangleShape2D" id="BathroomToilet"]
+size = Vector2(220, 135)
+
+[node name="Bathroom" type="Node2D" unique_id=1178015887]
+script = ExtResource("1_room")
+room_title = "KOUPELNA"
+room_color = Color(0.78431, 0.83529, 0.77647, 1)
+walkable_outline = PackedVector2Array(0, 300, 1900, 290, 2000, 563, 0, 563)
+
+[node name="FloorFill" type="Polygon2D" parent="." unique_id=1376171251]
+z_index = -2
+color = Color(0.8863, 0.8863, 0.8863, 1)
+polygon = PackedVector2Array(0, 0, 2000, 0, 2000, 563, 0, 563)
+
+[node name="Background" type="Sprite2D" parent="." unique_id=2138796393]
+z_index = -1
+texture = ExtResource("2_background")
+centered = false
+
+[node name="TestInteractor" type="Area2D" parent="." unique_id=1227427533]
+position = Vector2(760, 405)
+collision_layer = 0
+script = ExtResource("3_interactor")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TestInteractor" unique_id=1272749704]
+shape = SubResource("CircleShape2D_interactor")
+
+[node name="FurnitureCollisions" type="StaticBody2D" parent="." unique_id=1368197858]
+
+[node name="VanityCollision" type="CollisionShape2D" parent="FurnitureCollisions" unique_id=771240103]
+position = Vector2(770, 275)
+shape = SubResource("BathroomVanity")
+
+[node name="TubCollision" type="CollisionShape2D" parent="FurnitureCollisions" unique_id=737769797]
+position = Vector2(1510, 425)
+shape = SubResource("BathroomTub")
+
+[node name="ToiletCollision" type="CollisionShape2D" parent="FurnitureCollisions" unique_id=846439522]
+position = Vector2(120, 470)
+shape = SubResource("BathroomToilet")
+
+[node name="PhotoCamera" parent="." unique_id=1267620424 instance=ExtResource("5_camera")]
+position = Vector2(1020, 435)
+scale = Vector2(0.28651762, 0.28651762)
+
+[node name="CameraPhotoSpot" parent="." unique_id=2020537783 instance=ExtResource("6_photo_spot")]
+position = Vector2(1220, 430)
+
+[node name="ExitToEntrance" parent="." unique_id=1441039457 instance=ExtResource("4_exit")]
+position = Vector2(350, 300)
+destination_scene_path = "res://scenes/rooms/main_entrance.tscn"
+destination_arrival_id = "from_bathroom"
+
+[node name="Arrivals" type="Node2D" parent="." unique_id=1548141687]
+
+[node name="start" type="Marker2D" parent="Arrivals" unique_id=94144269]
+position = Vector2(1050, 500)
+
+[node name="from_entrance" type="Marker2D" parent="Arrivals" unique_id=1586926254]
+position = Vector2(350, 375)

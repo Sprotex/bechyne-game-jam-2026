@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bxkf4sikqa4jd"]
 
-[ext_resource type="PackedScene" uid="uid://ciig10qyo8xdm" path="res://scenes/player.tscn" id="1_player"]
-[ext_resource type="Script" uid="uid://bqo2g03bag4xq" path="res://scripts/level.gd" id="2_level"]
+[ext_resource type="PackedScene" uid="uid://ciig10qyo8xdm" path="res://scenes/objects/player.tscn" id="1_player"]
+[ext_resource type="Script" uid="uid://bqo2g03bag4xq" path="res://scripts/core/level.gd" id="2_level"]
 
 [node name="Level" type="Node2D" unique_id=644383136]
 script = ExtResource("2_level")
@@ -20,7 +20,7 @@ offset_right = 360.0
 offset_bottom = 52.0
 theme_override_colors/font_color = Color(0.19, 0.16, 0.07, 1)
 theme_override_font_sizes/font_size = 20
-text = "MAIN ENTRANCE"
+text = "VSTUPNÍ HALA"
 
 [node name="Hint" type="Label" parent="HUD" unique_id=2037976642]
 anchors_preset = 5
