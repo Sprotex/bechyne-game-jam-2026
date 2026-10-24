@@ -2,11 +2,15 @@
 
 [ext_resource type="Script" path="res://scripts/room.gd" id="1_room"]
 [ext_resource type="PackedScene" path="res://scenes/room_exit.tscn" id="2_exit"]
+[ext_resource type="PackedScene" path="res://scenes/house_key.tscn" id="3_key"]
 
 [node name="LivingRoom" type="Node2D"]
 script = ExtResource("1_room")
 room_title = "LIVING ROOM"
 room_color = Color(0.82745, 0.76863, 0.71373, 1)
+
+[node name="HouseKey" parent="." instance=ExtResource("3_key")]
+position = Vector2(500, 420)
 
 [node name="ExitToEntrance" parent="." instance=ExtResource("2_exit")]
 position = Vector2(820, 608)

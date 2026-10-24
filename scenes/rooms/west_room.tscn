@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" path="res://assets/gfx/koupelna.png" id="2_background"]
 [ext_resource type="Script" path="res://scripts/test_interactor.gd" id="3_interactor"]
 [ext_resource type="PackedScene" path="res://scenes/room_exit.tscn" id="4_exit"]
+[ext_resource type="PackedScene" path="res://scenes/photo_camera.tscn" id="5_camera"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_interactor"]
 radius = 78.0
@@ -38,6 +39,9 @@ shape = SubResource("BathroomVanity")
 [node name="TubCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
 position = Vector2(980, 500)
 shape = SubResource("BathroomTub")
+
+[node name="PhotoCamera" parent="." instance=ExtResource("5_camera")]
+position = Vector2(650, 300)
 
 [node name="ExitToEntrance" parent="." instance=ExtResource("4_exit")]
 position = Vector2(650, 40)

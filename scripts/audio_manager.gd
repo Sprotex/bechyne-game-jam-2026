@@ -6,14 +6,21 @@ extends Node
 
 @export_group("Music")
 @export var music: AudioStream
+@export var alternate_music: AudioStream
 @export var loop_music: bool = true
 
 var music_player: AudioStreamPlayer
+var alternate_music_selected := false
 
 
 func _ready() -> void:
 	EventBus.audio_play_requested.connect(_play_audio)
 	_start_music()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed(&"toggle_music") and not event.is_echo():
+		_toggle_music()
 
 
 func _play_audio(sound_id: StringName, volume_db: float, bus: StringName) -> void:
@@ -51,6 +58,18 @@ func _start_music() -> void:
 	music_player.bus = &"Music"
 	music_player.finished.connect(_on_music_finished)
 	add_child(music_player)
+	music_player.play()
+
+
+func _toggle_music() -> void:
+	if music_player == null or alternate_music == null:
+		return
+
+	alternate_music_selected = not alternate_music_selected
+	var selected_music := alternate_music if alternate_music_selected else music
+	if selected_music is AudioStreamOggVorbis:
+		selected_music.loop = loop_music
+	music_player.stream = selected_music
 	music_player.play()
 
 

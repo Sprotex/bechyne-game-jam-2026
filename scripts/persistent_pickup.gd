@@ -3,6 +3,8 @@ class_name PersistentPickup
 
 @export var item_id := ""
 @export var item_label := "Item"
+@export var draw_default_icon := true
+@export_multiline var pickup_message := ""
 
 var level: Level
 var nearby := false
@@ -30,10 +32,14 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	level.set_flag(item_id)
 	_hide_pickup()
+	if not pickup_message.is_empty():
+		level.dialog_manager.show_dialog([pickup_message])
 	get_viewport().set_input_as_handled()
 
 
 func _draw() -> void:
+	if not draw_default_icon:
+		return
 	draw_circle(Vector2.ZERO, 15.0, Color("#d5ae22"))
 	draw_circle(Vector2.ZERO, 8.0, Color("#fff8df"))
 

@@ -10,4 +10,4 @@ Room boundaries and door openings create physical wall collisions. The player po
 
 ## Persistent pickups and flags
 
-Instance `scenes/persistent_pickup.tscn` for a collectible, give it a stable unique `item_id`, and set the displayed `item_label`. Interacting sets that ID in the level's flag store and hides the pickup. Other gameplay code can check `Level.has_flag("key.front_door")` to gate a door or dialog. Flags are saved to `user://game_progress.cfg`, so collected items remain gone after room changes and game restarts. To reset local progress during development, delete that file from the Godot user data directory.
+Instance `scenes/persistent_pickup.tscn` for a collectible, give it a stable unique `item_id`, and set the displayed `item_label`. Interacting sets that ID in the level's flag store and hides the pickup. Other gameplay code can check `Level.has_flag("key.front_door")` to gate a door or dialog. Flags persist while the level is active, including across room changes, and reset when a new game session starts.

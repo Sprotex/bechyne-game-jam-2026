@@ -3,7 +3,6 @@ class_name Level
 
 const OPTIONS_SCENE := preload("res://scenes/options.tscn")
 const INITIAL_ROOM := "res://scenes/rooms/main_entrance.tscn"
-const SAVE_PATH := "user://game_progress.cfg"
 const START_POSITION := Vector2(1080, 560)
 
 var room: Room
@@ -14,7 +13,6 @@ var flags: Dictionary = {}
 
 
 func _ready() -> void:
-	_load_flags()
 	_load_room(INITIAL_ROOM, "start")
 	options_screen = OPTIONS_SCENE.instantiate()
 	options_screen.hide()
@@ -33,6 +31,23 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		options_screen.visible = not options_screen.visible
 		_refresh_controls()
 		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("take_photo"):
+		_take_photo()
+		get_viewport().set_input_as_handled()
+
+
+func _take_photo() -> void:
+	if not has_flag("item.camera") or not player_controls_enabled():
+		return
+	$HUD.hide()
+	await RenderingServer.frame_post_draw
+	var photo := get_viewport().get_texture().get_image()
+	$HUD.show()
+	var result := UserMessages.deliver_user_picture(photo, "room_photo.png")
+	if result == OK and not OS.has_feature("web"):
+		dialog_manager.show_dialog(["Photo saved to your user messages folder."])
+	elif result != OK:
+		dialog_manager.show_dialog(["The photo could not be saved. Error code: %d" % result])
 
 
 func _close_options() -> void:
@@ -73,10 +88,6 @@ func set_flag(flag_id: String, value: bool = true) -> void:
 	if flag_id.is_empty():
 		return
 	flags[flag_id] = value
-	var config := ConfigFile.new()
-	for key in flags:
-		config.set_value("flags", key, flags[key])
-	config.save(SAVE_PATH)
 
 
 func _load_room(scene_path: String, arrival_id: String) -> void:
@@ -106,13 +117,6 @@ func _refresh_controls() -> void:
 
 func _on_message_delivered(file_name: String, content: PackedByteArray) -> void:
 	dialog_manager.show_generated_file(file_name, content)
-
-
-func _load_flags() -> void:
-	var config := ConfigFile.new()
-	if config.load(SAVE_PATH) == OK:
-		for key in config.get_section_keys("flags"):
-			flags[key] = config.get_value("flags", key, false)
 
 
 func _update_room_label() -> void:
