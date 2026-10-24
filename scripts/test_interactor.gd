@@ -36,6 +36,8 @@ func _on_body_exited(body: Node2D) -> void:
 
 func _build_hint() -> void:
 	hint = Label.new()
+	hint.z_index = 4096
+	hint.z_as_relative = false
 	hint.text = "%s  Interact" % InputPrompts.action_label(&"interact")
 	hint.position = Vector2(-48, -55)
 	hint.add_theme_color_override("font_color", Color("#fff8df"))

@@ -60,6 +60,8 @@ func _on_body_exited(body: Node2D) -> void:
 
 func _build_hint() -> void:
 	hint = Label.new()
+	hint.z_index = 4096
+	hint.z_as_relative = false
 	hint.position = Vector2(-90, -55)
 	hint.add_theme_color_override("font_color", Color("#fff8df"))
 	hint.add_theme_color_override("font_outline_color", Color.BLACK)

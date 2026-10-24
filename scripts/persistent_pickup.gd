@@ -16,6 +16,8 @@ func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
 	hint = Label.new()
+	hint.z_index = 4096
+	hint.z_as_relative = false
 	hint.position = Vector2(-60, -48)
 	hint.add_theme_color_override("font_color", Color("#fff8df"))
 	hint.add_theme_color_override("font_outline_color", Color.BLACK)
