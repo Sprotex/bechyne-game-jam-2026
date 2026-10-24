@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://1naryonr8t3k"
-path="res://.godot/imported/koupelna.png-8943627184cdd76dfbf66a3c0214bf98.ctex"
+path="res://.godot/imported/koupelna.png-707365cad668fd19a43b6ede15f2fd23.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/koupelna.png"
-dest_files=["res://.godot/imported/koupelna.png-8943627184cdd76dfbf66a3c0214bf98.ctex"]
+source_file="res://assets/gfx/koupelna.png"
+dest_files=["res://.godot/imported/koupelna.png-707365cad668fd19a43b6ede15f2fd23.ctex"]
 
 [params]
 

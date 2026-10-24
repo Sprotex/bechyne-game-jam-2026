@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c6lv65jttmw8d"
-path="res://.godot/imported/signal_tower.svg-e13b8964260bad51eb485692ca992466.ctex"
+uid="uid://bpu36tkbyeqsh"
+path="res://.godot/imported/room_layout.png-198ef04a64f598d303c083c485a89eaa.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/signal_tower.svg"
-dest_files=["res://.godot/imported/signal_tower.svg-e13b8964260bad51eb485692ca992466.ctex"]
+source_file="res://assets/gfx/room_layout.png"
+dest_files=["res://.godot/imported/room_layout.png-198ef04a64f598d303c083c485a89eaa.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

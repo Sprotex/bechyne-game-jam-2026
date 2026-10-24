@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://doggdgo52gtdj"
-path="res://.godot/imported/predsin.png-dbbb80a0f0873d2ec0d4fc6ba85bc542.ctex"
+path="res://.godot/imported/predsin.png-72aae78fc5fb0b466660e1ec2241afad.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/predsin.png"
-dest_files=["res://.godot/imported/predsin.png-dbbb80a0f0873d2ec0d4fc6ba85bc542.ctex"]
+source_file="res://assets/gfx/predsin.png"
+dest_files=["res://.godot/imported/predsin.png-72aae78fc5fb0b466660e1ec2241afad.ctex"]
 
 [params]
 

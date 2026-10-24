@@ -1,7 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/room.gd" id="1_room"]
-[ext_resource type="Texture2D" path="res://assets/predsin.png" id="2_background"]
+[ext_resource type="Texture2D" path="res://assets/gfx/predsin.png" id="2_background"]
 
 [node name="MainEntrance" type="Node2D"]
 script = ExtResource("1_room")

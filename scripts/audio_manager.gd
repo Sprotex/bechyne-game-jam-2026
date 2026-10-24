@@ -43,6 +43,9 @@ func _start_music() -> void:
 	if music == null:
 		return
 
+	if music is AudioStreamOggVorbis:
+		music.loop = loop_music
+
 	music_player = AudioStreamPlayer.new()
 	music_player.stream = music
 	music_player.finished.connect(_on_music_finished)
