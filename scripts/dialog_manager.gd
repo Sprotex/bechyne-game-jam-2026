@@ -29,6 +29,17 @@ func _ready() -> void:
 	hide_dialog()
 
 
+func _process(_delta: float) -> void:
+	if not OS.is_debug_build() or not Input.is_key_pressed(KEY_CTRL):
+		return
+	if not input_enabled or not is_dialog_open():
+		return
+	if _is_revealing():
+		_finish_reveal()
+	else:
+		advance_dialog()
+
+
 func _input(event: InputEvent) -> void:
 	if input_enabled and event.is_action_pressed("interact"):
 		if image_overlay != null and image_overlay.visible:
