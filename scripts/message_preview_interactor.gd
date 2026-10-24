@@ -33,10 +33,11 @@ func _preview_next_file() -> void:
 			)
 		1:
 			var current_room := get_parent() as Room
-			if current_room.background_texture == null:
+			var background := current_room.get_node_or_null("Background") as Sprite2D
+			if background == null or background.texture == null:
 				result = ERR_UNAVAILABLE
 			else:
-				result = UserMessages.deliver_user_picture(current_room.background_texture.get_image(), "entrance_test_picture.png")
+				result = UserMessages.deliver_user_picture(background.texture.get_image(), "entrance_test_picture.png")
 		2:
 			result = UserMessages.deliver_user_message_file(AUDIO_PATH, "entrance_test_audio.wav")
 	if result != OK:

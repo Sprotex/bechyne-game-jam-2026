@@ -1,6 +1,6 @@
 # Room authoring
 
-Each room scene attaches `room.gd` and declares its `room_title`. The level reads that title for the HUD. Add a `RoomExit` instance for every traversable door; exits are independent, so multiple exits can use the same wall and lead to different rooms.
+Each room scene attaches `room.gd` and declares its `room_title`. The level reads that title for the HUD. To give a room an image background, add a `Sprite2D` named `Background` to the room scene and assign its texture there; the room script draws its walls and keeps the background behind room objects. The shared room drawing is visible in the editor. Add a `RoomExit` instance for every traversable door; exits are independent, so multiple exits can use the same wall and lead to different rooms.
 
 To add a door, drag `scenes/room_exit.tscn` into the room, set its wall side and position over the threshold, then set its destination scene path and destination arrival ID. Add a `Marker2D` below the room's `Arrivals` node with that ID as its name. The reverse door is a separate exit in the destination room. Destination scene paths avoid cyclic `PackedScene` references while keeping the room links directly editable in the Inspector.
 

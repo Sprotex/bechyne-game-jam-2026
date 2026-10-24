@@ -1,3 +1,4 @@
+@tool
 extends Node2D
 class_name Room
 
@@ -5,7 +6,6 @@ signal exit_entered(exit: RoomExit)
 
 @export var room_title := "ROOM"
 @export var room_color := Color("#e8dfc6")
-@export var background_texture: Texture2D
 @export var staircase_position := Vector2.ZERO
 
 const SIZE := Vector2(1152, 648)
@@ -14,6 +14,9 @@ const WALL_THICKNESS := 20.0
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		queue_redraw()
+		return
 	for exit in find_children("*", "RoomExit", true, false):
 		exit.exit_entered.connect(_on_exit_entered)
 	_build_collisions()
@@ -31,9 +34,7 @@ func _on_exit_entered(exit: RoomExit) -> void:
 
 
 func _draw() -> void:
-	if background_texture:
-		draw_texture_rect(background_texture, Rect2(Vector2.ZERO, SIZE), false)
-	else:
+	if not has_node("Background"):
 		draw_rect(Rect2(Vector2.ZERO, SIZE), room_color)
 		draw_rect(Rect2(Vector2(EDGE, EDGE), SIZE - Vector2(EDGE * 2.0, EDGE * 2.0)), room_color.lightened(0.08))
 		draw_string(ThemeDB.fallback_font, Vector2(52, 78), room_title, HORIZONTAL_ALIGNMENT_LEFT, -1, 22, Color("#665f4d"))
@@ -91,7 +92,7 @@ func _build_collisions() -> void:
 	_add_wall_segments(walls, "south", Vector2(EDGE, SIZE.y - EDGE), Vector2(SIZE.x - EDGE, SIZE.y - EDGE))
 	_add_wall_segments(walls, "west", Vector2(EDGE, EDGE), Vector2(EDGE, SIZE.y - EDGE))
 	_add_wall_segments(walls, "east", Vector2(SIZE.x - EDGE, EDGE), Vector2(SIZE.x - EDGE, SIZE.y - EDGE))
-	if background_texture == null:
+	if not has_node("Background"):
 		_add_obstacle(walls, RectangleShape2D.new(), Vector2(290, 238), Vector2(230, 96))
 		_add_obstacle(walls, RectangleShape2D.new(), Vector2(862, 451), Vector2(225, 82))
 		_add_obstacle(walls, CircleShape2D.new(), Vector2(575, 300), Vector2(34, 34))
