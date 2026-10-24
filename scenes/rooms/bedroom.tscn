@@ -3,9 +3,13 @@
 [ext_resource type="Script" path="res://scripts/rooms/room.gd" id="1_room"]
 [ext_resource type="Texture2D" path="res://assets/gfx/loznice.png" id="2_background"]
 [ext_resource type="PackedScene" path="res://scenes/objects/room_exit.tscn" id="2_exit"]
+[ext_resource type="PackedScene" path="res://scenes/objects/light_source.tscn" id="3_light"]
+[ext_resource type="PackedScene" path="res://scenes/objects/light_switch.tscn" id="4_switch"]
+[ext_resource type="PackedScene" path="res://scenes/objects/keypad_interactor.tscn" id="4_keypad"]
+[ext_resource type="Script" path="res://scripts/objects/bed_interactor.gd" id="5_bed"]
 
-[sub_resource type="RectangleShape2D" id="BedroomBed"]
-size = Vector2(430, 145)
+[sub_resource type="ConvexPolygonShape2D" id="BedroomBed"]
+points = PackedVector2Array(160, 135, 545, 140, 555, 563, 0, 563)
 
 [sub_resource type="RectangleShape2D" id="BedroomDesk"]
 size = Vector2(410, 90)
@@ -15,6 +19,9 @@ size = Vector2(180, 150)
 
 [sub_resource type="RectangleShape2D" id="BedroomWardrobe"]
 size = Vector2(360, 210)
+
+[sub_resource type="CircleShape2D" id="BedInteractionRange"]
+radius = 150.0
 
 [node name="Bedroom" type="Node2D"]
 script = ExtResource("1_room")
@@ -32,11 +39,28 @@ texture = ExtResource("2_background")
 centered = false
 z_index = -1
 
+[node name="CeilingLightLeft" parent="." instance=ExtResource("3_light")]
+position = Vector2(650, 60)
+
+[node name="CeilingLightRight" parent="." instance=ExtResource("3_light")]
+position = Vector2(1450, 60)
+
+[node name="LightSwitch" parent="." instance=ExtResource("4_switch")]
+position = Vector2(250, 330)
+
 [node name="FurnitureCollisions" type="StaticBody2D" parent="."]
 
 [node name="BedCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
-position = Vector2(345, 230)
 shape = SubResource("BedroomBed")
+
+[node name="BedInteractor" type="Area2D" parent="."]
+position = Vector2(510, 420)
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("5_bed")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BedInteractor"]
+shape = SubResource("BedInteractionRange")
 
 [node name="DeskCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
 position = Vector2(1100, 270)
@@ -45,6 +69,9 @@ shape = SubResource("BedroomDesk")
 [node name="ChairCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
 position = Vector2(1100, 375)
 shape = SubResource("BedroomChair")
+
+[node name="Keypad" parent="." instance=ExtResource("4_keypad")]
+position = Vector2(1100, 445)
 
 [node name="WardrobeCollision" type="CollisionShape2D" parent="FurnitureCollisions"]
 position = Vector2(1800, 300)

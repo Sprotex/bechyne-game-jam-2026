@@ -26,9 +26,17 @@ func get_background_bounds() -> Rect2:
 	var background := get_node_or_null("Background") as Sprite2D
 	if background == null or background.texture == null:
 		return Rect2()
-	var first := background.to_global(Vector2.ZERO)
-	var last := background.to_global(background.texture.get_size())
-	return Rect2(first, last - first)
+	var sprite_rect := background.get_rect()
+	var corners := [
+		background.to_global(sprite_rect.position),
+		background.to_global(sprite_rect.position + Vector2(sprite_rect.size.x, 0.0)),
+		background.to_global(sprite_rect.position + sprite_rect.size),
+		background.to_global(sprite_rect.position + Vector2(0.0, sprite_rect.size.y)),
+	]
+	var bounds := Rect2(corners[0], Vector2.ZERO)
+	for corner in corners:
+		bounds = bounds.expand(corner)
+	return bounds
 
 
 func _on_exit_entered(exit: RoomExit) -> void:

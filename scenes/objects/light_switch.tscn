@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/light_switch.gd" id="1_script"]
+
+[sub_resource type="CircleShape2D" id="SwitchInteraction"]
+radius = 72.0
+
+[node name="LightSwitch" type="Area2D"]
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("1_script")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("SwitchInteraction")

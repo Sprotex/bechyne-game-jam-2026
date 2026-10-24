@@ -23,6 +23,7 @@ func _run() -> void:
 	_check(level.dialog_manager.is_dialog_open(), "opening dialog is shown on arrival")
 	_check(not level.player_controls_enabled(), "opening dialog blocks controls")
 	_check_room_links()
+	await _check_lights_persist(level)
 	await _check_camera_and_art_bounds(level)
 	await _check_duplicate_exit()
 	await _check_room_collisions(level)
@@ -59,6 +60,35 @@ func _check_room_links() -> void:
 			count += 1
 		room.free()
 	_check(count == 8, "all eight existing directed room links are present")
+
+
+func _check_lights_persist(level: Level) -> void:
+	EventBus.set_lights_enabled(false)
+	var paths := [
+		"res://scenes/rooms/main_entrance.tscn",
+		"res://scenes/rooms/hall.tscn",
+		"res://scenes/rooms/living_room.tscn",
+		"res://scenes/rooms/bedroom.tscn",
+		"res://scenes/rooms/bathroom.tscn",
+	]
+	for path in paths:
+		level._load_room(path, "start")
+		await get_tree().process_frame
+		var lights := level.room.find_children("*", "PointLight2D", true, false)
+		var switch := level.room.get_node("LightSwitch/Sprite2D") as Sprite2D
+		_check(not EventBus.lights_are_on, "%s keeps shared lights off" % path.get_file())
+		_check(not lights.is_empty(), "%s creates room lights" % path.get_file())
+		for light in lights:
+			_check(not (light as PointLight2D).enabled, "%s initializes each light off" % path.get_file())
+		_check(switch.texture.resource_path.ends_with("vypinac_vypnuto.png"), "%s switch shows off state" % path.get_file())
+	EventBus.set_lights_enabled(true)
+	await get_tree().process_frame
+	var enabled_lights := level.room.find_children("*", "PointLight2D", true, false)
+	var enabled_switch := level.room.get_node("LightSwitch/Sprite2D") as Sprite2D
+	_check(EventBus.lights_are_on, "shared lights can be turned on in a room")
+	for light in enabled_lights:
+		_check((light as PointLight2D).enabled, "new room lights receive on state")
+	_check(enabled_switch.texture.resource_path.ends_with("vypinac_zapnuto.png"), "room switch shows on state")
 
 
 func _check_camera_and_art_bounds(level: Level) -> void:

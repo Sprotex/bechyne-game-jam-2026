@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/light_source.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/gfx/light_glow.svg" id="2_texture"]
+
+[node name="LightSource" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+texture = ExtResource("2_texture")
+texture_scale = 5.0
+color = Color(1, 0.94, 0.8, 1)
+energy = 0.3

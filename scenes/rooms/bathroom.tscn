@@ -6,6 +6,8 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/room_exit.tscn" id="4_exit"]
 [ext_resource type="PackedScene" path="res://scenes/objects/photo_camera.tscn" id="5_camera"]
 [ext_resource type="PackedScene" path="res://scenes/objects/camera_photo_spot.tscn" id="6_photo_spot"]
+[ext_resource type="PackedScene" path="res://scenes/objects/light_source.tscn" id="7_light"]
+[ext_resource type="PackedScene" path="res://scenes/objects/light_switch.tscn" id="8_switch"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_interactor"]
 radius = 78.0
@@ -13,8 +15,8 @@ radius = 78.0
 [sub_resource type="RectangleShape2D" id="BathroomVanity"]
 size = Vector2(340, 130)
 
-[sub_resource type="RectangleShape2D" id="BathroomTub"]
-size = Vector2(620, 190)
+[sub_resource type="ConvexPolygonShape2D" id="BathroomTub"]
+points = PackedVector2Array(-180, -75, 155, -90, 190, 60, -180, 80)
 
 [sub_resource type="RectangleShape2D" id="BathroomToilet"]
 size = Vector2(220, 135)
@@ -35,6 +37,15 @@ z_index = -1
 texture = ExtResource("2_background")
 centered = false
 
+[node name="CeilingLightLeft" parent="." instance=ExtResource("7_light")]
+position = Vector2(650, 60)
+
+[node name="CeilingLightRight" parent="." instance=ExtResource("7_light")]
+position = Vector2(1450, 60)
+
+[node name="LightSwitch" parent="." instance=ExtResource("8_switch")]
+position = Vector2(500, 400)
+
 [node name="TestInteractor" type="Area2D" parent="." unique_id=1227427533]
 position = Vector2(760, 405)
 collision_layer = 0
@@ -50,7 +61,7 @@ position = Vector2(770, 275)
 shape = SubResource("BathroomVanity")
 
 [node name="TubCollision" type="CollisionShape2D" parent="FurnitureCollisions" unique_id=737769797]
-position = Vector2(1510, 425)
+position = Vector2(1710, 360)
 shape = SubResource("BathroomTub")
 
 [node name="ToiletCollision" type="CollisionShape2D" parent="FurnitureCollisions" unique_id=846439522]

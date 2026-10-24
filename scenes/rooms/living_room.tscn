@@ -4,9 +4,11 @@
 [ext_resource type="Texture2D" path="res://assets/gfx/obyvak.png" id="4_background"]
 [ext_resource type="PackedScene" path="res://scenes/objects/room_exit.tscn" id="2_exit"]
 [ext_resource type="PackedScene" path="res://scenes/objects/house_key.tscn" id="3_key"]
+[ext_resource type="PackedScene" path="res://scenes/objects/light_source.tscn" id="5_light"]
+[ext_resource type="PackedScene" path="res://scenes/objects/light_switch.tscn" id="6_switch"]
 
-[sub_resource type="RectangleShape2D" id="LivingSofa"]
-size = Vector2(470, 95)
+[sub_resource type="ConvexPolygonShape2D" id="LivingSofa"]
+points = PackedVector2Array(340, 135, 755, 135, 790, 277, 325, 277)
 
 [sub_resource type="RectangleShape2D" id="LivingBookcase"]
 size = Vector2(310, 85)
@@ -32,6 +34,15 @@ polygon = PackedVector2Array(0, 0, 2000, 0, 2000, 375, 0, 375)
 texture = ExtResource("4_background")
 centered = false
 z_index = -1
+
+[node name="CeilingLightLeft" parent="." instance=ExtResource("5_light")]
+position = Vector2(650, 60)
+
+[node name="CeilingLightRight" parent="." instance=ExtResource("5_light")]
+position = Vector2(1450, 60)
+
+[node name="LightSwitch" parent="." instance=ExtResource("6_switch")]
+position = Vector2(250, 285)
 
 [node name="FurnitureCollisions" type="StaticBody2D" parent="."]
 

@@ -4,6 +4,8 @@
 [ext_resource type="Texture2D" path="res://assets/gfx/predsin.png" id="2_background"]
 [ext_resource type="Script" path="res://scripts/rooms/message_preview_interactor.gd" id="3_message_preview"]
 [ext_resource type="PackedScene" path="res://scenes/objects/room_exit.tscn" id="4_exit"]
+[ext_resource type="PackedScene" path="res://scenes/objects/light_switch.tscn" id="5_switch"]
+[ext_resource type="PackedScene" path="res://scenes/objects/light_source.tscn" id="6_light"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_message_preview"]
 radius = 78.0
@@ -24,6 +26,15 @@ walkable_outline = PackedVector2Array(0, 560, 1920, 560, 1920, 1080, 0, 1080)
 texture = ExtResource("2_background")
 centered = false
 z_index = -1
+
+[node name="CeilingLightLeft" parent="." instance=ExtResource("6_light")]
+position = Vector2(500, 80)
+
+[node name="CeilingLightRight" parent="." instance=ExtResource("6_light")]
+position = Vector2(1450, 80)
+
+[node name="LightSwitch" parent="." instance=ExtResource("5_switch")]
+position = Vector2(1740, 590)
 
 [node name="MessagePreviewInteractor" type="Area2D" parent="."]
 position = Vector2(850, 520)

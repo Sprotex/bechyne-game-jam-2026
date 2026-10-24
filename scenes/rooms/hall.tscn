@@ -3,6 +3,8 @@
 [ext_resource type="Script" path="res://scripts/rooms/room.gd" id="1_room"]
 [ext_resource type="Texture2D" path="res://assets/gfx/chodba.png" id="3_background"]
 [ext_resource type="PackedScene" path="res://scenes/objects/room_exit.tscn" id="2_exit"]
+[ext_resource type="PackedScene" path="res://scenes/objects/light_source.tscn" id="5_light"]
+[ext_resource type="PackedScene" path="res://scenes/objects/light_switch.tscn" id="6_switch"]
 
 [sub_resource type="RectangleShape2D" id="HallCloset"]
 size = Vector2(340, 110)
@@ -31,6 +33,15 @@ polygon = PackedVector2Array(0, 0, 2000, 0, 2000, 563, 0, 563)
 texture = ExtResource("3_background")
 centered = false
 z_index = -1
+
+[node name="CeilingLightLeft" parent="." instance=ExtResource("5_light")]
+position = Vector2(650, 60)
+
+[node name="CeilingLightRight" parent="." instance=ExtResource("5_light")]
+position = Vector2(1450, 60)
+
+[node name="LightSwitch" parent="." instance=ExtResource("6_switch")]
+position = Vector2(1830, 320)
 
 [node name="FurnitureCollisions" type="StaticBody2D" parent="."]
 

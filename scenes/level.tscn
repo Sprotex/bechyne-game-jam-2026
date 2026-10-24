@@ -6,6 +6,8 @@
 [node name="Level" type="Node2D" unique_id=644383136]
 script = ExtResource("2_level")
 
+[node name="LightDimmer" type="CanvasModulate" parent="." unique_id=2063879510]
+
 [node name="RoomHolder" type="Node2D" parent="." unique_id=1992615337]
 
 [node name="Player" parent="." unique_id=1458469355 instance=ExtResource("1_player")]
