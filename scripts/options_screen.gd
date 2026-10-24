@@ -24,9 +24,9 @@ func _ready() -> void:
 	title.add_theme_color_override("font_color", Color("#fff8df"))
 	title.add_theme_font_size_override("font_size", 42)
 	panel.add_child(title)
+	_add_volume_control(panel, "Master volume", &"Master")
 	_add_volume_control(panel, "Music volume", &"Music")
 	_add_volume_control(panel, "Sound volume", &"Sound")
-	_add_volume_control(panel, "Master volume", &"Master")
 
 	var back := Button.new()
 	back.text = "BACK"

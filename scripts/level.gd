@@ -45,6 +45,10 @@ func request_room_transition(destination_scene_path: String, arrival_id: String)
 		return
 	transition_locked = true
 	_refresh_controls()
+	_perform_room_transition(destination_scene_path, arrival_id)
+
+
+func _perform_room_transition(destination_scene_path: String, arrival_id: String) -> void:
 	var destination := load(destination_scene_path) as PackedScene
 	$HUD/Fade.color.a = 1.0
 	_load_room(destination.resource_path, arrival_id)
@@ -86,7 +90,11 @@ func _load_room(scene_path: String, arrival_id: String) -> void:
 
 
 func _on_exit_entered(exit: RoomExit) -> void:
-	request_room_transition(exit.destination_scene_path, exit.destination_arrival_id)
+	if transition_locked or not $Player.controls_enabled:
+		return
+	transition_locked = true
+	_refresh_controls()
+	_perform_room_transition.call_deferred(exit.destination_scene_path, exit.destination_arrival_id)
 
 
 func _refresh_controls() -> void:

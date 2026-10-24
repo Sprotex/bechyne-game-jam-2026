@@ -23,6 +23,7 @@ func _run() -> void:
 	_check(level.player_controls_enabled(), "controls start enabled")
 	_check_room_links()
 	await _check_duplicate_exit()
+	await _check_room_collisions(level)
 	await _check_modal_controls(level)
 	await _check_fade_and_arrival(level)
 	await _check_pickup_persistence(level)
@@ -79,6 +80,26 @@ func _check_duplicate_exit() -> void:
 	await get_tree().process_frame
 
 
+func _check_room_collisions(level: Level) -> void:
+	var player: CharacterBody2D = level.get_node("Player")
+	var sprite: Sprite2D = player.get_node("Sprite2D")
+	var body_shape: CollisionShape2D = player.get_node("CollisionShape2D")
+	_check(sprite.position.y < body_shape.position.y and body_shape.position.y < 0.0, "player art and hit shape align above the feet anchor")
+	_check(player.vertical_speed_ratio < 1.0, "vertical speed is tunable below horizontal speed")
+	player.global_position = Vector2(290, 360)
+	Input.action_press("move_up")
+	await get_tree().create_timer(0.5).timeout
+	Input.action_release("move_up")
+	_check(player.global_position.y >= 310, "furniture collision blocks walking through the cabinet")
+	player.global_position = Vector2(290, 100)
+	Input.action_press("move_up")
+	await get_tree().create_timer(0.5).timeout
+	Input.action_release("move_up")
+	_check(player.global_position.y >= 60, "physical room wall blocks a closed threshold")
+	player.global_position = Vector2(1080, 560)
+	await get_tree().physics_frame
+
+
 func _check_modal_controls(level: Level) -> void:
 	var movement: CharacterBody2D = level.get_node("Player")
 	var preview = level.room.get_node("MessagePreviewInteractor")
@@ -120,6 +141,16 @@ func _check_fade_and_arrival(level: Level) -> void:
 	await get_tree().create_timer(0.32).timeout
 	_check(level.room.room_title == "MAIN ENTRANCE", "reverse exit returns to entrance")
 	_check(level.get_node("Player").global_position == Vector2(120, 550), "arrival marker positions player at return doorway")
+	Input.action_press("move_left")
+	await get_tree().create_timer(0.16).timeout
+	Input.action_release("move_left")
+	await get_tree().create_timer(0.32).timeout
+	_check(level.room.room_title == "CORRIDOR", "player can cross a configured exit threshold")
+	Input.action_press("move_right")
+	await get_tree().create_timer(0.16).timeout
+	Input.action_release("move_right")
+	await get_tree().create_timer(0.32).timeout
+	_check(level.room.room_title == "MAIN ENTRANCE", "player can return through the paired threshold")
 
 
 func _check_pickup_persistence(level: Level) -> void:
