@@ -18,6 +18,8 @@ config/icon="res://icon.svg"
 [autoload]
 
 UserMessages="*res://scripts/user_messages.gd"
+EventBus="*res://scripts/event_bus.gd"
+AudioManager="*res://scenes/audio_manager.tscn"
 
 [display]
 
