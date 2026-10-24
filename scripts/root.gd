@@ -1,164 +1,109 @@
 extends Node2D
 
-var delivery_status: Label
+const LEVEL_SCENE := "res://scenes/level.tscn"
+const ROOM_LAYOUT := preload("res://assets/room_layout.png")
+
+var access_dialog: AcceptDialog
 
 
 func _ready() -> void:
-	_build_message_terminal()
+	UserMessages.browser_access_checked.connect(_on_browser_access_checked)
+	UserMessages.browser_write_failed.connect(_on_browser_write_failed)
+	_build_menu()
 
 
-func _build_message_terminal() -> void:
-	var canvas := $HUD
-	var panel := PanelContainer.new()
-	panel.name = "MessageTerminal"
-	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	panel.offset_left = -440.0
-	panel.offset_top = -215.0
-	panel.offset_right = 440.0
-	panel.offset_bottom = 215.0
-	panel.add_theme_stylebox_override("panel", _panel_style(Color("#101b25"), Color("#315261"), 2, 18, 22))
-	canvas.add_child(panel)
+func _build_menu() -> void:
+	var background := TextureRect.new()
+	background.texture = ROOM_LAYOUT
+	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	background.stretch_mode = TextureRect.STRETCH_SCALE
+	background.modulate = Color(0.42, 0.42, 0.42, 1.0)
+	$HUD.add_child(background)
 
-	var content := VBoxContainer.new()
-	content.add_theme_constant_override("separation", 14)
-	panel.add_child(content)
+	var shade := ColorRect.new()
+	shade.color = Color(0.055, 0.07, 0.08, 0.72)
+	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	$HUD.add_child(shade)
+
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	$HUD.add_child(center)
+
+	var menu := VBoxContainer.new()
+	menu.custom_minimum_size = Vector2(520, 280)
+	menu.add_theme_constant_override("separation", 18)
+	center.add_child(menu)
 
 	var eyebrow := Label.new()
-	eyebrow.text = "FIELD COMMUNICATIONS  /  USER DIRECTORY"
-	eyebrow.add_theme_color_override("font_color", Color("#64d6c4"))
-	eyebrow.add_theme_font_size_override("font_size", 12)
-	content.add_child(eyebrow)
+	eyebrow.text = "A ROOM TO EXPLORE"
+	eyebrow.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	eyebrow.add_theme_color_override("font_color", Color("#d5ae22"))
+	eyebrow.add_theme_font_size_override("font_size", 16)
+	menu.add_child(eyebrow)
 
 	var title := Label.new()
-	title.text = "Deliver a user message"
-	title.add_theme_color_override("font_color", Color("#f0f5f6"))
-	title.add_theme_font_size_override("font_size", 30)
-	content.add_child(title)
+	title.text = "THE ROOMS"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_color_override("font_color", Color("#fff8df"))
+	title.add_theme_font_size_override("font_size", 54)
+	menu.add_child(title)
 
-	var intro := Label.new()
-	intro.text = "Messages appear as real files in your User Messages folder."
-	intro.add_theme_color_override("font_color", Color("#a9bbc3"))
-	intro.add_theme_font_size_override("font_size", 15)
-	content.add_child(intro)
+	var prompt := Label.new()
+	prompt.text = "Move with WASD or the arrow keys.\nChoose where messages can be saved when you start."
+	prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	prompt.add_theme_color_override("font_color", Color("#e1ded3"))
+	prompt.add_theme_font_size_override("font_size", 17)
+	menu.add_child(prompt)
 
-	var cards := HBoxContainer.new()
-	cards.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	cards.add_theme_constant_override("separation", 12)
-	content.add_child(cards)
+	var start := Button.new()
+	start.text = "ENTER THE FIRST ROOM"
+	start.custom_minimum_size = Vector2(0, 54)
+	start.add_theme_font_size_override("font_size", 18)
+	start.pressed.connect(_start_game)
+	menu.add_child(start)
 
-	cards.add_child(_make_message_card(
-		"01  TEXT NOTE",
-		"A short transmission, delivered as a readable .txt file.",
-		"Deliver text message",
-		_deliver_demo_text
-	))
-	cards.add_child(_make_message_card(
-		"02  PICTURE",
-		"A field photograph, copied in its original image format.",
-		"Deliver picture",
-		_deliver_demo_picture
-	))
-	cards.add_child(_make_message_card(
-		"03  AUDIO",
-		"A spoken voice memo, delivered as a .wav file.",
-		"Deliver audio message",
-		_deliver_demo_audio
-	))
-
-	delivery_status = Label.new()
-	delivery_status.text = "Choose a message to deliver."
-	delivery_status.add_theme_color_override("font_color", Color("#9db0b8"))
-	delivery_status.add_theme_font_size_override("font_size", 13)
-	content.add_child(delivery_status)
+	access_dialog = AcceptDialog.new()
+	access_dialog.title = "MESSAGE FOLDER ACCESS"
+	access_dialog.ok_button_text = "TRY AGAIN"
+	access_dialog.add_button("CONTINUE ANYWAY", true, "continue")
+	access_dialog.confirmed.connect(_retry_folder_access)
+	access_dialog.custom_action.connect(_on_access_dialog_action)
+	$HUD.add_child(access_dialog)
 
 
-func _make_message_card(
-		heading: String,
-		description: String,
-		button_text: String,
-		action: Callable
-) -> PanelContainer:
-	var card := PanelContainer.new()
-	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	card.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	card.add_theme_stylebox_override("panel", _panel_style(Color("#172833"), Color("#29414c"), 1, 12, 16))
-
-	var layout := VBoxContainer.new()
-	layout.add_theme_constant_override("separation", 12)
-	card.add_child(layout)
-
-	var type_label := Label.new()
-	type_label.text = heading
-	type_label.add_theme_color_override("font_color", Color("#70d8c8"))
-	type_label.add_theme_font_size_override("font_size", 13)
-	layout.add_child(type_label)
-
-	var description_label := Label.new()
-	description_label.text = description
-	description_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	description_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	description_label.add_theme_color_override("font_color", Color("#c5d1d5"))
-	description_label.add_theme_font_size_override("font_size", 14)
-	layout.add_child(description_label)
-
-	var deliver_button := Button.new()
-	deliver_button.text = button_text
-	deliver_button.custom_minimum_size.y = 42
-	deliver_button.add_theme_color_override("font_color", Color("#08211f"))
-	deliver_button.add_theme_stylebox_override("normal", _panel_style(Color("#70d8c8"), Color("#70d8c8"), 0, 8, 10))
-	deliver_button.add_theme_stylebox_override("hover", _panel_style(Color("#9aeadf"), Color("#9aeadf"), 0, 8, 10))
-	deliver_button.add_theme_stylebox_override("pressed", _panel_style(Color("#50b7a8"), Color("#50b7a8"), 0, 8, 10))
-	deliver_button.pressed.connect(action)
-	layout.add_child(deliver_button)
-	return card
-
-
-func _panel_style(fill: Color, border: Color, border_size: int, radius: int, margin: int) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = fill
-	style.border_color = border
-	style.set_border_width_all(border_size)
-	style.set_corner_radius_all(radius)
-	style.set_content_margin_all(margin)
-	return style
-
-
-func _deliver_demo_text() -> void:
-	_deliver_and_report(
-		UserMessages.deliver_user_message_text(
-			"If you can read this, the line is open. Meet me where the old signal tower touches the clouds.",
-			"incoming_transmission.txt"
-		),
-		"Text message"
-	)
-
-
-func _deliver_demo_picture() -> void:
-	_deliver_and_report(
-		UserMessages.deliver_user_picture("res://assets/signal_tower.svg"),
-		"Picture"
-	)
-
-
-func _deliver_demo_audio() -> void:
-	_deliver_and_report(
-		UserMessages.deliver_user_audio("res://assets/voice_message.wav"),
-		"Audio message"
-	)
-
-
-func _deliver_and_report(error: Error, message_type: String) -> void:
-	if error != OK:
-		delivery_status.text = "%s could not be delivered: %s" % [message_type, error_string(error)]
-		delivery_status.add_theme_color_override("font_color", Color("#ff8a83"))
+func _start_game() -> void:
+	if OS.has_feature("web"):
+		UserMessages.request_browser_folder_access()
 		return
-
-	delivery_status.text = "%s delivered to User Messages. Open the folder to see it." % message_type
-	delivery_status.add_theme_color_override("font_color", Color("#70d8c8"))
+	_enter_game()
 
 
-func _on_open_user_messages_pressed() -> void:
-	var error := UserMessages.open_user_messages_folder()
-	if error != OK:
-		delivery_status.text = "Could not open User Messages folder: " + error_string(error)
-		delivery_status.add_theme_color_override("font_color", Color("#ff8a83"))
+func _on_browser_access_checked(success: bool, detail: String) -> void:
+	if success:
+		_enter_game()
+	else:
+		_show_access_dialog("To save messages in a folder, choose a folder and approve read and write access. %s\n\nTry again, or continue with browser downloads." % detail)
+
+
+func _show_access_dialog(message: String) -> void:
+	access_dialog.dialog_text = message
+	access_dialog.popup_centered()
+
+
+func _retry_folder_access() -> void:
+	_start_game()
+
+
+func _on_access_dialog_action(action: StringName) -> void:
+	if action == &"continue":
+		UserMessages.use_browser_downloads()
+		_enter_game()
+
+
+func _on_browser_write_failed(file_name: String) -> void:
+	_show_access_dialog("Could not save %s. Choose a writable folder or continue with browser downloads." % file_name)
+
+
+func _enter_game() -> void:
+	get_tree().change_scene_to_file(LEVEL_SCENE)
