@@ -3,7 +3,7 @@ class_name Level
 
 const OPTIONS_SCENE := preload("res://scenes/options.tscn")
 const INITIAL_ROOM := "res://scenes/rooms/main_entrance.tscn"
-const START_POSITION := Vector2(1080, 560)
+const START_POSITION := Vector2(1800, 933.333)
 
 var room: Room
 var transition_locked := false

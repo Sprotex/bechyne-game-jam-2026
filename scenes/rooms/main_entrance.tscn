@@ -15,6 +15,7 @@ size = Vector2(150, 130)
 size = Vector2(190, 80)
 
 [node name="MainEntrance" type="Node2D"]
+scale = Vector2(1.666667, 1.666667)
 script = ExtResource("1_room")
 room_title = "MAIN ENTRANCE"
 room_color = Color(0.87451, 0.82353, 0.68235, 1)

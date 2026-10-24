@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" path="res://scenes/room_exit.tscn" id="2_exit"]
 
 [node name="Office" type="Node2D"]
+scale = Vector2(1.666667, 1.666667)
 script = ExtResource("1_room")
 room_title = "BEDROOM"
 room_color = Color(0.78824, 0.81176, 0.8549, 1)

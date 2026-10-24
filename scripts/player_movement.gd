@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-@export var horizontal_speed: float = 260.0
+@export var horizontal_speed: float = 433.333
 @export_range(0.1, 1.0, 0.05) var vertical_speed_ratio: float = 0.55
 const SPRINT_SPEED_MULTIPLIER := 2.0
 var controls_enabled := true

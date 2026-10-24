@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" path="res://scenes/house_key.tscn" id="3_key"]
 
 [node name="LivingRoom" type="Node2D"]
+scale = Vector2(1.666667, 1.666667)
 script = ExtResource("1_room")
 room_title = "LIVING ROOM"
 room_color = Color(0.82745, 0.76863, 0.71373, 1)
