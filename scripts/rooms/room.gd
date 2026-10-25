@@ -12,6 +12,7 @@ const WALL_THICKNESS := 18.0
 const EXIT_EDGE_TOLERANCE := 100.0
 
 var lights_are_on := false
+var exit_gates: Array[Dictionary] = []
 
 
 func toggle_lights() -> void:
@@ -26,9 +27,13 @@ func set_lights_enabled(is_on: bool) -> void:
 
 
 func _ready() -> void:
+	var level := _get_level()
+	if level != null:
+		level.flag_changed.connect(_on_level_flag_changed)
 	for exit in find_children("*", "RoomExit", true, false):
 		exit.exit_entered.connect(_on_exit_entered)
 	_build_walkable_boundary()
+	_refresh_exit_gates()
 
 
 func get_arrival_position(arrival_id: String, fallback: Vector2) -> Vector2:
@@ -58,9 +63,30 @@ func _on_exit_entered(exit: RoomExit) -> void:
 		exit_entered.emit(exit)
 
 
+func _on_level_flag_changed(_flag_id: String, _value: bool) -> void:
+	_refresh_exit_gates()
+
+
+func _get_level() -> Level:
+	var ancestor := get_parent()
+	while ancestor != null:
+		if ancestor is Level:
+			return ancestor as Level
+		ancestor = ancestor.get_parent()
+	return get_tree().current_scene as Level
+
+
+func _refresh_exit_gates() -> void:
+	var level := _get_level()
+	for gate in exit_gates:
+		var shape := gate["shape"] as CollisionShape2D
+		shape.disabled = level != null and level.has_flag(gate["flag"])
+
+
 func _build_walkable_boundary() -> void:
 	if walkable_outline.size() < 3:
 		return
+	exit_gates.clear()
 	var walls := StaticBody2D.new()
 	walls.name = "RoomWalls"
 	add_child(walls)
@@ -86,23 +112,50 @@ func _add_outline_edge(walls: StaticBody2D, first: Vector2, last: Vector2, clock
 	if edge_length <= 1.0:
 		return
 	var direction := edge / edge_length
-	var openings: Array[Vector2] = []
+	var openings: Array[Dictionary] = []
 	for node in find_children("*", "RoomExit", true, false):
 		var exit := node as RoomExit
 		var along := clampf((exit.position - first).dot(direction), 0.0, edge_length)
 		var nearest := first + direction * along
 		if nearest.distance_to(exit.position) > EXIT_EDGE_TOLERANCE:
 			continue
-		openings.append(Vector2(
-			maxf(0.0, along - exit.opening_half_width),
-			minf(edge_length, along + exit.opening_half_width)
-		))
-	openings.sort_custom(func(a: Vector2, b: Vector2) -> bool: return a.x < b.x)
+		openings.append({
+			"range": Vector2(
+				maxf(0.0, along - exit.opening_half_width),
+				minf(edge_length, along + exit.opening_half_width)
+			),
+			"exit": exit,
+		})
+	openings.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a["range"].x < b["range"].x)
 	var cursor := 0.0
 	for opening in openings:
-		_add_wall_segment(walls, first, direction, cursor, opening.x, clockwise)
-		cursor = maxf(cursor, opening.y)
+		var opening_range: Vector2 = opening["range"]
+		var exit := opening["exit"] as RoomExit
+		_add_wall_segment(walls, first, direction, cursor, opening_range.x, clockwise)
+		if not exit.required_flag.is_empty():
+			_add_exit_gate(walls, first, direction, opening_range, clockwise, exit.required_flag)
+		cursor = maxf(cursor, opening_range.y)
 	_add_wall_segment(walls, first, direction, cursor, edge_length, clockwise)
+
+
+func _add_exit_gate(
+	parent: StaticBody2D,
+	first: Vector2,
+	direction: Vector2,
+	opening: Vector2,
+	clockwise: bool,
+	flag: String
+) -> void:
+	var outward := Vector2(direction.y, -direction.x) if clockwise else Vector2(-direction.y, direction.x)
+	var center := first + direction * ((opening.x + opening.y) * 0.5) + outward * (WALL_THICKNESS * 0.5)
+	var collision := CollisionShape2D.new()
+	var rectangle := RectangleShape2D.new()
+	rectangle.size = Vector2(opening.y - opening.x + WALL_THICKNESS, WALL_THICKNESS)
+	collision.shape = rectangle
+	collision.position = center
+	collision.rotation = direction.angle()
+	parent.add_child(collision)
+	exit_gates.append({"shape": collision, "flag": flag})
 
 
 func _add_wall_segment(

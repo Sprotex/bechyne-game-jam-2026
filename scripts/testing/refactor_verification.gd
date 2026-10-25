@@ -211,22 +211,22 @@ func _check_room_collisions(level: Level) -> void:
 	player.global_position = Vector2(1750, 440)
 	await get_tree().physics_frame
 
-
 func _check_modal_controls(level: Level) -> void:
 	var movement: CharacterBody2D = level.get_node("Player")
-	var preview = level.room.get_node("MessagePreviewInteractor")
-	level.dialog_manager.show_dialog(["one", "two"])
+	var light_switch := level.room.get_node("LightSwitch")
+	var lights_before := level.room.lights_are_on
+	level.dialog_manager.show_dialog(["První zpráva.", "Druhá zpráva."])
 	_check(not level.player_controls_enabled(), "dialog blocks controls")
 	movement.velocity = Vector2(100, 0)
 	await get_tree().physics_frame
 	await get_tree().physics_frame
 	_check(movement.velocity == Vector2.ZERO, "blocked movement zeroes player velocity")
-	preview.nearby = true
+	light_switch.nearby = true
 	var event := InputEventAction.new()
 	event.action = "interact"
 	event.pressed = true
-	preview._unhandled_input(event)
-	_check(preview.preview_index == 0, "modal dialog blocks world interactions")
+	light_switch._unhandled_input(event)
+	_check(level.room.lights_are_on == lights_before, "modal dialog blocks world interactions")
 	level.request_room_transition("res://scenes/rooms/hall.tscn", "from_entrance")
 	_check(level.room.room_title == "VSTUPNÍ HALA", "modal dialog blocks exit transitions")
 	level.dialog_manager._input(event)

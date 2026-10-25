@@ -1,22 +1,23 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/rooms/room.gd" id="1_room"]
-[ext_resource type="Texture2D" path="res://assets/gfx/predsin.png" id="2_background"]
-[ext_resource type="Script" path="res://scripts/rooms/message_preview_interactor.gd" id="3_message_preview"]
+[ext_resource type="Texture2D" path="res://assets/gfx/chodba.png" id="2_background"]
 [ext_resource type="PackedScene" path="res://scenes/objects/room_exit.tscn" id="4_exit"]
 [ext_resource type="PackedScene" path="res://scenes/objects/light_switch.tscn" id="5_switch"]
 [ext_resource type="PackedScene" path="res://scenes/objects/light_source.tscn" id="6_light"]
 [ext_resource type="PackedScene" path="res://scenes/rooms/collisions/main_entrance_collisions.tscn" id="7_collisions"]
 [ext_resource type="PackedScene" path="res://scenes/rooms/arrivals/main_entrance_arrivals.tscn" id="8_arrivals"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_message_preview"]
-radius = 78.0
-
 [node name="MainEntrance" type="Node2D"]
 script = ExtResource("1_room")
 room_title = "VSTUPNÍ HALA"
-room_color = Color(0.87451, 0.82353, 0.68235, 1)
-walkable_outline = PackedVector2Array(0, 560, 1920, 560, 1920, 1080, 0, 1080)
+room_color = Color(0.84706, 0.78039, 0.71765, 1)
+walkable_outline = PackedVector2Array(165, 285, 1805, 298, 2000, 550, 2000, 563, 0, 563, 0, 540)
+
+[node name="FloorFill" type="Polygon2D" parent="."]
+z_index = -2
+color = Color(0.6902, 0.6157, 0.451, 1)
+polygon = PackedVector2Array(0, 0, 2000, 0, 2000, 563, 0, 563)
 
 [node name="Background" type="Sprite2D" parent="."]
 texture = ExtResource("2_background")
@@ -24,39 +25,30 @@ centered = false
 z_index = -1
 
 [node name="CeilingLightLeft" parent="." instance=ExtResource("6_light")]
-position = Vector2(500, 80)
+position = Vector2(650, 60)
 
 [node name="CeilingLightRight" parent="." instance=ExtResource("6_light")]
-position = Vector2(1450, 80)
+position = Vector2(1450, 60)
 
 [node name="LightSwitch" parent="." instance=ExtResource("5_switch")]
-position = Vector2(1740, 590)
-
-[node name="MessagePreviewInteractor" type="Area2D" parent="."]
-position = Vector2(850, 520)
-collision_layer = 0
-collision_mask = 1
-script = ExtResource("3_message_preview")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MessagePreviewInteractor"]
-shape = SubResource("CircleShape2D_message_preview")
+position = Vector2(1850, 390)
 
 [node name="FurnitureCollisions" parent="." instance=ExtResource("7_collisions")]
 
 [node name="ExitToHall" parent="." instance=ExtResource("4_exit")]
-position = Vector2(1900, 850)
+position = Vector2(55, 430)
 destination_scene_path = "res://scenes/rooms/hall.tscn"
 destination_arrival_id = "from_entrance"
-wall_side = "east"
+wall_side = "west"
 
 [node name="ExitToLivingRoom" parent="." instance=ExtResource("4_exit")]
-position = Vector2(820, 560)
+position = Vector2(1450, 298)
 destination_scene_path = "res://scenes/rooms/living_room.tscn"
 destination_arrival_id = "from_entrance"
 wall_side = "north"
 
 [node name="ExitToBathroom" parent="." instance=ExtResource("4_exit")]
-position = Vector2(1250, 1060)
+position = Vector2(1650, 555)
 destination_scene_path = "res://scenes/rooms/bathroom.tscn"
 destination_arrival_id = "from_entrance"
 wall_side = "south"

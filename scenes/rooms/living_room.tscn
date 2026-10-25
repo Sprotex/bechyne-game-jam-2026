@@ -39,10 +39,10 @@ position = Vector2(250, 285)
 position = Vector2(1190, 320)
 
 [node name="ExitToEntrance" parent="." instance=ExtResource("2_exit")]
-position = Vector2(1180, 238)
+position = Vector2(1180, 375)
 destination_scene_path = "res://scenes/rooms/main_entrance.tscn"
 destination_arrival_id = "from_living_room"
-wall_side = "north"
+wall_side = "south"
 
 [node name="Arrivals" type="Node2D" parent="."]
 

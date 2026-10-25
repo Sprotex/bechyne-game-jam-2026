@@ -3,13 +3,13 @@
 [node name="Arrivals" type="Node2D"]
 
 [node name="start" type="Marker2D" parent="."]
-position = Vector2(900, 850)
+position = Vector2(1750, 440)
 
 [node name="from_hall" type="Marker2D" parent="."]
-position = Vector2(1640, 850)
+position = Vector2(240, 440)
 
 [node name="from_living_room" type="Marker2D" parent="."]
-position = Vector2(820, 650)
+position = Vector2(1450, 400)
 
 [node name="from_bathroom" type="Marker2D" parent="."]
-position = Vector2(1250, 920)
+position = Vector2(1650, 475)

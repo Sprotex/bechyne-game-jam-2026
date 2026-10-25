@@ -46,6 +46,15 @@ destination_scene_path = "res://scenes/rooms/bedroom.tscn"
 destination_arrival_id = "from_hall"
 wall_side = "south"
 
+[node name="ExitToAttic" parent="." instance=ExtResource("2_exit")]
+position = Vector2(1450, 298)
+destination_scene_path = "res://scenes/rooms/attic.tscn"
+destination_arrival_id = "from_hall"
+wall_side = "north"
+opening_half_width = 190.0
+required_flag = "story.attic_unlocked"
+locked_message = "Je zamčeno."
+
 [node name="Arrivals" type="Node2D" parent="."]
 
 [node name="start" type="Marker2D" parent="Arrivals"]
@@ -56,3 +65,6 @@ position = Vector2(1780, 420)
 
 [node name="from_bedroom" type="Marker2D" parent="Arrivals"]
 position = Vector2(1650, 475)
+
+[node name="from_attic" type="Marker2D" parent="Arrivals"]
+position = Vector2(1450, 415)

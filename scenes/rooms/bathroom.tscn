@@ -59,6 +59,7 @@ position = Vector2(1220, 430)
 position = Vector2(350, 300)
 destination_scene_path = "res://scenes/rooms/main_entrance.tscn"
 destination_arrival_id = "from_bathroom"
+wall_side = "north"
 
 [node name="Arrivals" type="Node2D" parent="." unique_id=1548141687]
 

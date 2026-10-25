@@ -1,16 +1,27 @@
 [gd_scene format=3]
 
-[sub_resource type="RectangleShape2D" id="EntranceCabinet"]
-size = Vector2(300, 240)
+[sub_resource type="ConvexPolygonShape2D" id="EntrancePlantFootprint"]
+points = PackedVector2Array(385, 282, 481, 282, 486, 319, 470, 339, 420, 343, 389, 327)
+
+[sub_resource type="ConvexPolygonShape2D" id="EntranceClosetFootprint"]
+points = PackedVector2Array(510, 280, 833, 280, 840, 331, 685, 339, 520, 337)
 
 [sub_resource type="ConvexPolygonShape2D" id="EntranceChestFootprint"]
-points = PackedVector2Array(1040, 552, 1380, 550, 1400, 606, 1392, 632, 1040, 632)
+points = PackedVector2Array(884, 280, 1145, 280, 1150, 335, 1020, 339, 882, 333)
+
+[sub_resource type="ConvexPolygonShape2D" id="EntranceCabinetFootprint"]
+points = PackedVector2Array(1552, 278, 1740, 278, 1746, 325, 1739, 343, 1565, 339, 1555, 322)
 
 [node name="FurnitureCollisions" type="StaticBody2D"]
 
-[node name="CabinetCollision" type="CollisionShape2D" parent="."]
-position = Vector2(460, 330)
-shape = SubResource("EntranceCabinet")
+[node name="PlantCollision" type="CollisionShape2D" parent="."]
+shape = SubResource("EntrancePlantFootprint")
+
+[node name="ClosetCollision" type="CollisionShape2D" parent="."]
+shape = SubResource("EntranceClosetFootprint")
 
 [node name="ChestCollision" type="CollisionShape2D" parent="."]
 shape = SubResource("EntranceChestFootprint")
+
+[node name="CabinetCollision" type="CollisionShape2D" parent="."]
+shape = SubResource("EntranceCabinetFootprint")
