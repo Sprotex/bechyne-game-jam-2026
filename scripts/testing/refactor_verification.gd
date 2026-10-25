@@ -39,6 +39,11 @@ func _run() -> void:
 		restore.store_buffer(saved_progress)
 	else:
 		DirAccess.remove_absolute(progress_path)
+	AudioManager.music_player.queue_free()
+	AudioManager.music_player = null
+	AudioManager.music = null
+	await get_tree().process_frame
+	await get_tree().create_timer(0.15).timeout
 	print("Refactor verification: %d failures" % failures)
 	get_tree().quit(1 if failures > 0 else 0)
 
@@ -50,6 +55,7 @@ func _check_room_links() -> void:
 		"res://scenes/rooms/bathroom.tscn",
 		"res://scenes/rooms/bedroom.tscn",
 		"res://scenes/rooms/living_room.tscn",
+		"res://scenes/rooms/attic.tscn",
 	]
 	var count := 0
 	for path in paths:
@@ -61,7 +67,7 @@ func _check_room_links() -> void:
 			destination.free()
 			count += 1
 		room.free()
-	_check(count == 8, "all eight existing directed room links are present")
+	_check(count == 10, "all ten existing directed room links are present")
 	var bathroom := (load("res://scenes/rooms/bathroom.tscn") as PackedScene).instantiate() as Room
 	_check(bathroom.has_node("PhotoCamera") and bathroom.has_node("CameraPhotoSpot"), "bathroom camera and photo spot remain present")
 	_check(bathroom.get_node("PhotoCamera").position == Vector2(1020, 435), "bathroom camera keeps its authored position")
@@ -106,11 +112,12 @@ func _check_lights_persist(level: Level) -> void:
 
 func _check_camera_and_art_bounds(level: Level) -> void:
 	var room_cases := [
-		{"path": "res://scenes/rooms/main_entrance.tscn", "probe": Vector2(1700, 650), "native_size": Vector2(1920, 1080)},
+		{"path": "res://scenes/rooms/main_entrance.tscn", "probe": Vector2(1750, 440), "native_size": Vector2(2000, 563)},
 		{"path": "res://scenes/rooms/bathroom.tscn", "probe": Vector2(1050, 390), "native_size": Vector2(2000, 563)},
 		{"path": "res://scenes/rooms/bedroom.tscn", "probe": Vector2(800, 370), "native_size": Vector2(2000, 563)},
 		{"path": "res://scenes/rooms/hall.tscn", "probe": Vector2(1300, 370), "native_size": Vector2(2000, 563)},
 		{"path": "res://scenes/rooms/living_room.tscn", "probe": Vector2(1300, 328), "native_size": Vector2(2000, 375)},
+		{"path": "res://scenes/rooms/attic.tscn", "probe": Vector2(275, 320), "native_size": Vector2(2000, 377)},
 	]
 	var player: CharacterBody2D = level.get_node("Player")
 	var camera: Camera2D = player.get_node("Camera2D")
@@ -152,13 +159,16 @@ func _check_camera_and_art_bounds(level: Level) -> void:
 
 
 func _check_duplicate_exit() -> void:
-	var room := (load("res://scenes/rooms/main_entrance.tscn") as PackedScene).instantiate() as Room
+	var main_scene := load("res://scenes/rooms/main_entrance.tscn") as PackedScene
+	var baseline := main_scene.instantiate() as Room; get_tree().root.add_child(baseline)
+	await get_tree().process_frame
+	var baseline_segments := baseline.get_node("RoomWalls").get_child_count()
+	baseline.queue_free(); await get_tree().process_frame
+	var room := main_scene.instantiate() as Room
 	var second := (load("res://scenes/objects/room_exit.tscn") as PackedScene).instantiate() as RoomExit
-	second.name = "SecondSouthExit"
-	second.position = Vector2(1100, 1060)
-	second.wall_side = "south"
-	second.destination_scene_path = "res://scenes/rooms/bedroom.tscn"
-	second.destination_arrival_id = "from_hall"
+	second.name = "SecondSouthExit"; second.position = Vector2(650, 555)
+	second.wall_side = "south"; second.destination_scene_path = "res://scenes/rooms/living_room.tscn"
+	second.destination_arrival_id = "from_entrance"
 	room.add_child(second)
 	get_tree().root.add_child(room)
 	await get_tree().process_frame
@@ -167,7 +177,9 @@ func _check_duplicate_exit() -> void:
 		if (node as RoomExit).wall_side == "south":
 			south_count += 1
 	_check(south_count == 2, "two south exits retain independent destinations and arrivals")
-	_check(room.get_node("RoomWalls").get_child_count() >= 7, "room builds physical wall segments around both south openings")
+	var wall_segments := room.get_node("RoomWalls").get_child_count()
+	_check(second.destination_scene_path == "res://scenes/rooms/living_room.tscn" and second.destination_arrival_id == "from_entrance", "second exit keeps its own destination and arrival")
+	_check(wall_segments == baseline_segments + 1, "second separated opening adds one physical wall segment")
 	room.queue_free()
 	await get_tree().process_frame
 
@@ -179,7 +191,7 @@ func _check_room_collisions(level: Level) -> void:
 	_check(sprite.position.y < body_shape.position.y and body_shape.position.y < 0.0, "player art and hit shape align above the feet anchor")
 	_check(player.vertical_speed_ratio < 1.0, "vertical speed is tunable below horizontal speed")
 	var cases := [
-		{"path": "res://scenes/rooms/main_entrance.tscn", "origin": Vector2(1225, 700), "motion": Vector2(0, -100), "description": "entrance chest footprint blocks the walk path"},
+		{"path": "res://scenes/rooms/main_entrance.tscn", "origin": Vector2(1225, 500), "motion": Vector2(0, 100), "description": "entrance chest footprint blocks the walk path"},
 		{"path": "res://scenes/rooms/hall.tscn", "origin": Vector2(650, 400), "motion": Vector2(0, -120), "description": "hall closet footprint blocks the walk path"},
 		{"path": "res://scenes/rooms/bedroom.tscn", "origin": Vector2(700, 450), "motion": Vector2(-180, 0), "description": "bed footprint blocks the walk path"},
 		{"path": "res://scenes/rooms/living_room.tscn", "origin": Vector2(560, 340), "motion": Vector2(0, -150), "description": "living room sofa footprint blocks the walk path"},
@@ -193,10 +205,10 @@ func _check_room_collisions(level: Level) -> void:
 		_check(player.test_move(player.global_transform, collision_case.motion), collision_case.description)
 	level._load_room("res://scenes/rooms/main_entrance.tscn", "start")
 	await get_tree().physics_frame
-	player.global_position = Vector2(1700, 650)
+	player.global_position = Vector2(1000, 400)
 	await get_tree().physics_frame
-	_check(player.test_move(player.global_transform, Vector2(0, -120)), "entrance outline blocks a closed threshold")
-	player.global_position = Vector2(1500, 700)
+	_check(player.test_move(player.global_transform, Vector2(0, -120)), "entrance outline blocks the upper walkable edge")
+	player.global_position = Vector2(1750, 440)
 	await get_tree().physics_frame
 
 
@@ -244,13 +256,16 @@ func _check_fade_and_arrival(level: Level) -> void:
 	level.request_room_transition("res://scenes/rooms/main_entrance.tscn", "from_hall")
 	await get_tree().create_timer(0.32).timeout
 	_check(level.room.room_title == "VSTUPNÍ HALA", "reverse exit returns to entrance")
-	_check(level.get_node("Player").global_position == Vector2(200, 916), "arrival marker positions player at return doorway")
-	_check(level.get_world_render_rect().size.y == 1080.0, "transition restores the full-height entrance frame")
+	_check(level.get_node("Player").global_position == Vector2(240, 440), "arrival marker positions player at the west doorway")
+	_check(level.get_world_render_rect().size.y == 563.0, "transition restores the native entrance frame")
+	var player: CharacterBody2D = level.get_node("Player")
+	player.global_position = Vector2(170, 440)
 	Input.action_press("move_left")
 	await get_tree().create_timer(0.16).timeout
 	Input.action_release("move_left")
 	await get_tree().create_timer(0.32).timeout
 	_check(level.room.room_title == "CHODBA", "player can cross a configured exit threshold")
+	player.global_position = Vector2(1900, 440)
 	Input.action_press("move_right")
 	await get_tree().create_timer(0.16).timeout
 	Input.action_release("move_right")

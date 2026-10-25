@@ -14,6 +14,7 @@ func _run() -> void:
 	AudioManager.music_player = null
 	AudioManager.music = null
 	await get_tree().process_frame
+	await get_tree().create_timer(0.15).timeout
 	print("Spinning lock verification: %d failures" % failures)
 	get_tree().quit(1 if failures > 0 else 0)
 

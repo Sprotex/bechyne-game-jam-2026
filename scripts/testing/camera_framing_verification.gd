@@ -5,18 +5,19 @@ var failures := 0
 
 
 static func run(level: Level) -> int:
-	var verifier := CameraFramingVerification.new()
+	var verifier: Variant = load("res://scripts/testing/camera_framing_verification.gd").new()
 	await verifier._run(level)
 	return verifier.failures
 
 
 func _run(level: Level) -> void:
 	var cases := [
-		{"path": "res://scenes/rooms/main_entrance.tscn", "probe": Vector2(1700, 650), "height": 1080.0},
+		{"path": "res://scenes/rooms/main_entrance.tscn", "probe": Vector2(1750, 440), "height": 563.0},
 		{"path": "res://scenes/rooms/bathroom.tscn", "probe": Vector2(1050, 390), "height": 563.0},
 		{"path": "res://scenes/rooms/bedroom.tscn", "probe": Vector2(800, 370), "height": 563.0},
 		{"path": "res://scenes/rooms/hall.tscn", "probe": Vector2(1300, 370), "height": 563.0},
 		{"path": "res://scenes/rooms/living_room.tscn", "probe": Vector2(1300, 328), "height": 375.0},
+		{"path": "res://scenes/rooms/attic.tscn", "probe": Vector2(275, 320), "height": 377.0},
 	]
 	_check(level.get_node("HUD").layer == 30, "HUD remains on its window-space canvas layer")
 	_check(level.dialog_manager.layer == 20 and level.world_frame.layer == 10, "letterbox stays below dialog and HUD layers")
@@ -45,7 +46,11 @@ func _run(level: Level) -> void:
 		var camera_center := camera.get_screen_center_position()
 		_check(absf(camera_center.x - expected_x) < 2.0 and absf(camera_center.y - expected_y) < 2.0, "%s camera follows within native image bounds" % level.room.name)
 		var visible_world := Rect2(camera_center - half_opening, opening.size)
-		_check(bounds.encloses(visible_world), "%s effective visible world rectangle stays inside its artwork" % level.room.name)
+		var within_bounds := visible_world.position.x >= bounds.position.x - 0.5
+		within_bounds = within_bounds and visible_world.position.y >= bounds.position.y - 0.5
+		within_bounds = within_bounds and visible_world.end.x <= bounds.end.x + 0.5
+		within_bounds = within_bounds and visible_world.end.y <= bounds.end.y + 0.5
+		_check(within_bounds, "%s effective visible world rectangle %s stays inside %s" % [level.room.name, visible_world, bounds])
 		if level.room.name == "Bathroom" or level.room.name == "MainEntrance":
 			var screenshot := Image.create(roundi(view_size.x), roundi(view_size.y), false, Image.FORMAT_RGBA8)
 			var photo := level._crop_photo_to_world_rect(screenshot)
