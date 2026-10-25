@@ -4,11 +4,10 @@ var failures := 0
 var saved_progress := PackedByteArray()
 var had_progress := false
 const CAMERA_FRAMING_VERIFICATION = preload("res://scripts/testing/camera_framing_verification.gd")
-
+const ROOM_EXIT_VERIFICATION = preload("res://scripts/testing/room_exit_verification_helper.gd")
 
 func _ready() -> void:
 	call_deferred("_run")
-
 
 func _run() -> void:
 	var progress_path := ProjectSettings.globalize_path("user://game_progress.cfg")
@@ -47,7 +46,6 @@ func _run() -> void:
 	print("Refactor verification: %d failures" % failures)
 	get_tree().quit(1 if failures > 0 else 0)
 
-
 func _check_room_links() -> void:
 	var paths := [
 		"res://scenes/rooms/main_entrance.tscn",
@@ -73,8 +71,6 @@ func _check_room_links() -> void:
 	_check(bathroom.get_node("PhotoCamera").position == Vector2(1020, 435), "bathroom camera keeps its authored position")
 	_check(bathroom.get_node("CameraPhotoSpot").position == Vector2(1220, 430), "bathroom photo spot keeps its authored position")
 	bathroom.free()
-
-
 func _check_lights_persist(level: Level) -> void:
 	var paths := [
 		"res://scenes/rooms/main_entrance.tscn",
@@ -108,14 +104,12 @@ func _check_lights_persist(level: Level) -> void:
 		_check((light as PointLight2D).enabled, "revisited room lights restore their state")
 	_check(revisited_switch.texture.resource_path.ends_with("vypinac_zapnuto.png"), "revisited switch restores its state")
 	level.room.set_lights_enabled(false)
-
-
 func _check_camera_and_art_bounds(level: Level) -> void:
 	var room_cases := [
 		{"path": "res://scenes/rooms/main_entrance.tscn", "probe": Vector2(1750, 440), "native_size": Vector2(2000, 563)},
 		{"path": "res://scenes/rooms/bathroom.tscn", "probe": Vector2(1050, 390), "native_size": Vector2(2000, 563)},
 		{"path": "res://scenes/rooms/bedroom.tscn", "probe": Vector2(800, 370), "native_size": Vector2(2000, 563)},
-		{"path": "res://scenes/rooms/hall.tscn", "probe": Vector2(1300, 370), "native_size": Vector2(2000, 563)},
+		{"path": "res://scenes/rooms/hall.tscn", "probe": Vector2(1000, 300), "native_size": Vector2(2000, 377)},
 		{"path": "res://scenes/rooms/living_room.tscn", "probe": Vector2(1300, 328), "native_size": Vector2(2000, 375)},
 		{"path": "res://scenes/rooms/attic.tscn", "probe": Vector2(275, 320), "native_size": Vector2(2000, 377)},
 	]
@@ -156,8 +150,6 @@ func _check_camera_and_art_bounds(level: Level) -> void:
 		await get_tree().physics_frame
 		var hits_top_boundary := player.test_move(player.global_transform, Vector2(0, -120))
 		_check(hits_top_boundary, "%s top walkable edge blocks the player" % room.name)
-
-
 func _check_duplicate_exit() -> void:
 	var main_scene := load("res://scenes/rooms/main_entrance.tscn") as PackedScene
 	var baseline := main_scene.instantiate() as Room; get_tree().root.add_child(baseline)
@@ -178,12 +170,12 @@ func _check_duplicate_exit() -> void:
 			south_count += 1
 	_check(south_count == 2, "two south exits retain independent destinations and arrivals")
 	var wall_segments := room.get_node("RoomWalls").get_child_count()
+	_check(second.position == Vector2(650, 555), "exit root keeps its authored position for wall topology")
+	_check(second.get_node("CollisionShape2D").position == Vector2(0, -65), "south exit interaction area stays on the walkable side")
 	_check(second.destination_scene_path == "res://scenes/rooms/living_room.tscn" and second.destination_arrival_id == "from_entrance", "second exit keeps its own destination and arrival")
-	_check(wall_segments == baseline_segments + 1, "second separated opening adds one physical wall segment")
+	_check(wall_segments == baseline_segments, "adding an exit leaves the continuous room perimeter unchanged")
 	room.queue_free()
 	await get_tree().process_frame
-
-
 func _check_room_collisions(level: Level) -> void:
 	var player: CharacterBody2D = level.get_node("Player")
 	var sprite: Sprite2D = player.get_node("Sprite2D")
@@ -192,9 +184,9 @@ func _check_room_collisions(level: Level) -> void:
 	_check(player.vertical_speed_ratio < 1.0, "vertical speed is tunable below horizontal speed")
 	var cases := [
 		{"path": "res://scenes/rooms/main_entrance.tscn", "origin": Vector2(1225, 500), "motion": Vector2(0, 100), "description": "entrance chest footprint blocks the walk path"},
-		{"path": "res://scenes/rooms/hall.tscn", "origin": Vector2(650, 400), "motion": Vector2(0, -120), "description": "hall closet footprint blocks the walk path"},
+		{"path": "res://scenes/rooms/hall.tscn", "origin": Vector2(765, 320), "motion": Vector2(0, -80), "description": "hall laundry footprint blocks the walk path"},
 		{"path": "res://scenes/rooms/bedroom.tscn", "origin": Vector2(700, 450), "motion": Vector2(-180, 0), "description": "bed footprint blocks the walk path"},
-		{"path": "res://scenes/rooms/living_room.tscn", "origin": Vector2(560, 340), "motion": Vector2(0, -150), "description": "living room sofa footprint blocks the walk path"},
+		{"path": "res://scenes/rooms/living_room.tscn", "origin": Vector2(700, 330), "motion": Vector2(0, -100), "description": "living room sofa footprint blocks the walk path"},
 		{"path": "res://scenes/rooms/bathroom.tscn", "origin": Vector2(770, 420), "motion": Vector2(0, -160), "description": "bathroom vanity footprint blocks the walk path"},
 	]
 	for collision_case in cases:
@@ -244,7 +236,6 @@ func _check_modal_controls(level: Level) -> void:
 	level.dialog_manager._input(event)
 	_check(not level.dialog_manager.is_modal_open() and level.player_controls_enabled(), "image close restores controls")
 
-
 func _check_fade_and_arrival(level: Level) -> void:
 	level.request_room_transition("res://scenes/rooms/hall.tscn", "from_entrance")
 	_check(not level.player_controls_enabled(), "fade transition locks controls")
@@ -260,18 +251,27 @@ func _check_fade_and_arrival(level: Level) -> void:
 	_check(is_equal_approx(level.get_world_render_rect().size.y, level.get_viewport_rect().size.y), "transition fills viewport height with entrance artwork")
 	var player: CharacterBody2D = level.get_node("Player")
 	player.global_position = Vector2(170, 440)
+	await get_tree().physics_frame
+	_check(player.test_move(player.global_transform, Vector2(-200, 0)), "entrance doorway remains physically blocked outward")
 	Input.action_press("move_left")
 	await get_tree().create_timer(0.16).timeout
 	Input.action_release("move_left")
 	await get_tree().create_timer(0.32).timeout
+	_check(level.room.room_title == "VSTUPNÍ HALA", "walking through a doorway does not transition automatically")
+	ROOM_EXIT_VERIFICATION.interact(level.room.get_node("ExitToHall"), player)
+	await get_tree().create_timer(0.32).timeout
 	_check(level.room.room_title == "CHODBA", "player can cross a configured exit threshold")
-	player.global_position = Vector2(1900, 440)
+	player.global_position = Vector2(1850, 270)
+	await get_tree().physics_frame
+	_check(player.test_move(player.global_transform, Vector2(200, 0)), "hall doorway remains physically blocked outward")
 	Input.action_press("move_right")
 	await get_tree().create_timer(0.16).timeout
 	Input.action_release("move_right")
 	await get_tree().create_timer(0.32).timeout
+	_check(level.room.room_title == "CHODBA", "walking through a paired doorway does not transition automatically")
+	ROOM_EXIT_VERIFICATION.interact(level.room.get_node("ExitToEntrance"), player)
+	await get_tree().create_timer(0.32).timeout
 	_check(level.room.room_title == "VSTUPNÍ HALA", "player can return through the paired threshold")
-
 
 func _check_pickup_persistence(level: Level) -> void:
 	var pickup := (load("res://scenes/objects/persistent_pickup.tscn") as PackedScene).instantiate() as PersistentPickup

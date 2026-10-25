@@ -71,20 +71,43 @@ func _check_story_interactor(level: Level) -> void:
 
 
 func _check_locked_exit(level: Level) -> void:
+	level.dialog_manager.hide_dialog()
+	level._refresh_controls()
 	var exit := (load("res://scenes/objects/room_exit.tscn") as PackedScene).instantiate() as RoomExit
 	exit.required_flag = "exit.unlocked"
 	exit.locked_message = "Dveře jsou zamčené."
 	level.room.add_child(exit)
 	await get_tree().process_frame
 	var entered := [0]
+	var sounds: Array[StringName] = []
+	var callback := func(sound_id: StringName, _volume: float, _bus: StringName): sounds.append(sound_id)
+	EventBus.audio_play_requested.connect(callback)
 	exit.exit_entered.connect(func(_room_exit: RoomExit): entered[0] += 1)
-	exit._on_body_entered(level.get_node("Player"))
+	var player := level.get_node("Player") as CharacterBody2D
+	exit._on_body_entered(player)
+	_check(exit.nearby and exit.hint.visible, "room exit shows its interaction hint on approach")
+	_check(entered[0] == 0 and sounds.is_empty(), "approaching a locked room exit does not transition or play a sound")
+	var other_body := CharacterBody2D.new()
+	exit._on_body_entered(other_body)
+	_check(exit.nearby, "room exit ignores character bodies that are not the player")
+	exit._on_body_entered(player)
+	var event := InputEventAction.new()
+	event.action = "interact"
+	event.pressed = true
+	exit._unhandled_input(event)
 	_check(entered[0] == 0, "locked room exit blocks entry without its required flag")
 	_check(level.dialog_manager.messages.size() == 1 and level.dialog_manager.messages[0] == exit.locked_message, "locked room exit shows its configured message")
+	_check(sounds.is_empty(), "locked room exit does not play the door sound")
 	level.dialog_manager.hide_dialog()
 	level.set_flag(exit.required_flag)
-	exit._on_body_entered(level.get_node("Player"))
+	level._refresh_controls()
+	exit._unhandled_input(event)
 	_check(entered[0] == 1, "room exit allows entry after its required flag is set")
+	_check(sounds == [&"door"], "successful room exit interaction plays one door sound")
+	exit._unhandled_input(event)
+	_check(entered[0] == 1 and sounds == [&"door"], "one approach cannot activate a room exit twice")
+	EventBus.audio_play_requested.disconnect(callback)
+	other_body.free()
 	exit.queue_free()
 	await get_tree().process_frame
 
