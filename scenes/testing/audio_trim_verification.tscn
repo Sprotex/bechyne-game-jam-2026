@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/testing/audio_trim_verification.gd" id="1"]
+
+[node name="AudioTrimVerification" type="Node"]
+script = ExtResource("1")

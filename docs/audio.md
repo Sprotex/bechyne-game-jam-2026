@@ -1,5 +1,7 @@
 # Zvuky
 
+Zálohy, přesné ořezy nahrávek a výměna hudby jsou popsané v `docs/audio-editing.md`.
+
 Dodané nahrávky M4A jsou převedené do mono WAV (PCM 16 bitů, 44 100 Hz):
 
 | Původní nahrávka | Asset | Použití |
