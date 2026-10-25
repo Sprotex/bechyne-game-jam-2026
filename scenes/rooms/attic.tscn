@@ -1,0 +1,50 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/room.gd" id="1_room"]
+[ext_resource type="Texture2D" path="res://assets/gfx/attic.png" id="2_background"]
+[ext_resource type="PackedScene" path="res://scenes/objects/room_exit.tscn" id="3_exit"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/collisions/attic_collisions.tscn" id="4_collisions"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/arrivals/attic_arrivals.tscn" id="5_arrivals"]
+[ext_resource type="Script" path="res://scripts/rooms/attic_entry.gd" id="6_entry"]
+[ext_resource type="PackedScene" path="res://scenes/objects/identity_card.tscn" id="7_identity"]
+
+[sub_resource type="RectangleShape2D" id="AtticEntryTrigger"]
+size = Vector2(180, 180)
+
+[node name="Attic" type="Node2D"]
+script = ExtResource("1_room")
+room_title = "PŮDA"
+room_color = Color(0.86, 0.82, 0.75, 1)
+walkable_outline = PackedVector2Array(200, 230, 2000, 230, 2000, 377, 0, 377, 0, 355)
+
+[node name="FloorFill" type="Polygon2D" parent="."]
+z_index = -2
+color = Color(0.72, 0.66, 0.55, 1)
+polygon = PackedVector2Array(0, 230, 2000, 230, 2000, 377, 0, 377)
+
+[node name="Background" type="Sprite2D" parent="."]
+texture = ExtResource("2_background")
+centered = false
+z_index = -1
+
+[node name="FurnitureCollisions" parent="." instance=ExtResource("4_collisions")]
+
+[node name="EntryInteractor" type="Area2D" parent="."]
+position = Vector2(225, 300)
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("6_entry")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="EntryInteractor"]
+shape = SubResource("AtticEntryTrigger")
+
+[node name="ExitToHall" parent="." instance=ExtResource("3_exit")]
+position = Vector2(80, 338)
+destination_scene_path = "res://scenes/rooms/hall.tscn"
+destination_arrival_id = "from_attic"
+wall_side = "west"
+
+[node name="IdentityCard" parent="." instance=ExtResource("7_identity")]
+position = Vector2(1385, 330)
+
+[node name="Arrivals" parent="." instance=ExtResource("5_arrivals")]

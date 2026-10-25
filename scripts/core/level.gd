@@ -7,19 +7,16 @@ const BEDROOM_KEYPAD_FLAG := "puzzle.bedroom_keypad_unlocked"
 const INITIAL_ROOM := "res://scenes/rooms/main_entrance.tscn"
 const AFTER_SLEEP_ROOM := "res://scenes/rooms/hall.tscn"
 const AFTER_SLEEP_ARRIVAL := "from_bedroom"
-const START_POSITION := Vector2(1800, 933.333)
+const START_POSITION := Vector2(1000, 281.5)
+const STORY_DAY_TWO := "story.day_two"
+const STORY_WAKE_SHOWN := "story.day_two_wake_shown"
 const INITIAL_ROOM_MESSAGES: Array[String] = [
 	"TETO!! Už jsem tady!",
 	"Neodpovídá.",
 	"Asi mě neslyšela.",
 	"Měla bych ji najít a říct jí že už jsem tady.",
 ]
-const BED_DIALOG_MESSAGES: Array[String] = [
-	"Už se stmívá a TETA furt nikde. Asi zase někde bloudí jako vždycky.",
-	"Moc ráda se procházela po přírodě a naslouchala lesu.",
-	"Byla trochu divná.",
-	"Asi si půjdu schrupnout, mám za sebou dlouhou cestu. Na TETU nemá cenu čekat, stejně se ze svého toulání po přírodě vracela často až ráno.",
-]
+signal flag_changed(flag_id: String, value: bool)
 
 var room: Room
 var room_scene_path := ""
@@ -75,7 +72,6 @@ func _close_options() -> void:
 	options_screen.hide()
 	_refresh_controls()
 
-
 func request_room_transition(destination_scene_path: String, arrival_id: String) -> void:
 	if transition_locked or not $Player.controls_enabled:
 		return
@@ -116,10 +112,10 @@ func open_keypad() -> void:
 
 
 func start_sleep_dialog() -> void:
-	if transition_locked or not player_controls_enabled():
+	if transition_locked or has_flag(STORY_DAY_TWO) or not player_controls_enabled():
 		return
 	dialog_manager.dialog_finished.connect(_on_sleep_dialog_finished, CONNECT_ONE_SHOT)
-	dialog_manager.show_dialog(BED_DIALOG_MESSAGES)
+	dialog_manager.show_dialog(DialogueCatalog.get_messages(&"act1.sleep"))
 	_refresh_controls()
 
 
@@ -161,8 +157,12 @@ func _run_sleep_transition() -> void:
 	var fade_out := create_tween()
 	fade_out.tween_property(fade, "color:a", 0.0, 1.0)
 	await fade_out.finished
+	set_flag(STORY_DAY_TWO)
 	transition_locked = false
 	_refresh_controls()
+	if not has_flag(STORY_WAKE_SHOWN):
+		set_flag(STORY_WAKE_SHOWN)
+		dialog_manager.show_dialog(DialogueCatalog.get_messages(&"act2.wake"))
 
 
 func _on_keypad_submitted(is_correct: bool) -> void:
@@ -185,7 +185,11 @@ func _on_keypad_cancelled() -> void:
 func set_flag(flag_id: String, value: bool = true) -> void:
 	if flag_id.is_empty():
 		return
+	if has_flag(flag_id) == value:
+		return
 	flags[flag_id] = value
+	flag_changed.emit(flag_id, value)
+	StoryProgression.update_attic_readiness(self)
 
 
 func _load_room(scene_path: String, arrival_id: String) -> void:
@@ -250,7 +254,6 @@ func _update_world_frame() -> void:
 	_set_letterbox_bar("BottomLetterbox", Rect2(0, render_rect.end.y, viewport_size.x, viewport_size.y - render_rect.end.y))
 	_set_letterbox_bar("LeftLetterbox", Rect2(0, render_rect.position.y, render_rect.position.x, render_rect.size.y))
 	_set_letterbox_bar("RightLetterbox", Rect2(render_rect.end.x, render_rect.position.y, viewport_size.x - render_rect.end.x, render_rect.size.y))
-
 func _set_letterbox_bar(bar_name: String, rect: Rect2) -> void:
 	var bar := letterbox_bars[bar_name] as ColorRect
 	bar.position = rect.position
@@ -287,7 +290,6 @@ func _refresh_controls() -> void:
 
 func _on_message_delivered(file_name: String, content: PackedByteArray) -> void:
 	dialog_manager.show_generated_file(file_name, content)
-
 
 func _on_lights_state_changed(is_on: bool) -> void:
 	$LightDimmer.color = Color("#e9e5d8") if is_on else Color("#77756d")

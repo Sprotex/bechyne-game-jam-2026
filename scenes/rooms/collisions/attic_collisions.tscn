@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[sub_resource type="ConvexPolygonShape2D" id="AtticCabinetFootprint"]
+points = PackedVector2Array(1140, 244, 1350, 244, 1350, 270, 1140, 270)
+
+[sub_resource type="ConvexPolygonShape2D" id="AtticBoxLeftFootprint"]
+points = PackedVector2Array(1040, 318, 1140, 318, 1140, 342, 1040, 342)
+
+[sub_resource type="ConvexPolygonShape2D" id="AtticBoxesRightFootprint"]
+points = PackedVector2Array(1420, 270, 1590, 270, 1590, 294, 1420, 294)
+
+[node name="FurnitureCollisions" type="StaticBody2D"]
+
+[node name="CabinetCollision" type="CollisionShape2D" parent="."]
+shape = SubResource("AtticCabinetFootprint")
+
+[node name="LeftBoxCollision" type="CollisionShape2D" parent="."]
+shape = SubResource("AtticBoxLeftFootprint")
+
+[node name="RightBoxesCollision" type="CollisionShape2D" parent="."]
+shape = SubResource("AtticBoxesRightFootprint")

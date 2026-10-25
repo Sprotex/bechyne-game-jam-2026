@@ -1,0 +1,25 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/evidence_document.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/gfx/diagnosis.png" id="2_texture"]
+
+[sub_resource type="CircleShape2D" id="InteractionRange"]
+radius = 80.0
+
+[node name="Diagnosis" type="Area2D"]
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("1_script")
+document_texture = ExtResource("2_texture")
+story_id = &"act3.diagnosis"
+required_flags = PackedStringArray("story.day_two")
+completed_flag = "story.diagnosis_read"
+hint_text = "Přečíst lékařskou zprávu"
+
+[node name="Artwork" type="Sprite2D" parent="."]
+texture = ExtResource("2_texture")
+scale = Vector2(0.35, 0.35)
+
+[node name="InteractionRange" type="CollisionShape2D" parent="."]
+shape = SubResource("InteractionRange")
+

@@ -5,8 +5,10 @@ class_name GameDialogManager
 signal modal_changed
 signal message_changed(message_index: int)
 signal dialog_finished
+signal document_closed
 
 const DIALOG_BOX_SCENE := preload("res://scenes/ui/dialog_box.tscn")
+const IMAGE_OVERLAY_SCENE := preload("res://scenes/ui/document_overlay.tscn")
 
 @export_range(1.0, 100.0, 1.0, "or_greater") var characters_per_second := 20.0
 
@@ -20,6 +22,10 @@ var image_preview: TextureRect
 var image_hint: Label
 var generated_audio: AudioStreamPlayer
 var input_enabled := true
+var showing_document := false
+var document_messages: Array[String] = []
+var document_generation := 0
+var generated_image_visible := false
 
 
 func _ready() -> void:
@@ -43,10 +49,19 @@ func _process(_delta: float) -> void:
 
 
 func _input(event: InputEvent) -> void:
+	if not input_enabled and event.is_action_pressed("interact") and is_modal_open():
+		var viewport := get_viewport()
+		if viewport != null:
+			viewport.set_input_as_handled()
+		return
 	if input_enabled and event.is_action_pressed("interact"):
-		if image_overlay != null and image_overlay.visible:
+		if image_overlay != null and image_overlay.visible and (generated_image_visible or showing_document):
 			image_overlay.hide()
-			modal_changed.emit()
+			generated_image_visible = false
+			if showing_document:
+				_open_document_dialog()
+			else:
+				modal_changed.emit()
 		elif is_dialog_open():
 			if _is_revealing():
 				_finish_reveal()
@@ -66,6 +81,10 @@ func set_input_enabled(enabled: bool) -> void:
 func show_dialog(dialog_messages: Array[String]) -> void:
 	if dialog_messages.is_empty():
 		return
+	if showing_document and image_overlay != null:
+		image_overlay.hide()
+	generated_image_visible = false
+	_cancel_document()
 	messages = dialog_messages
 	current_message = 0
 	_set_message(messages[current_message])
@@ -77,8 +96,14 @@ func show_dialog(dialog_messages: Array[String]) -> void:
 func advance_dialog() -> void:
 	current_message += 1
 	if current_message >= messages.size():
+		var close_document := showing_document
+		showing_document = false
+		document_messages.clear()
 		hide_dialog()
-		dialog_finished.emit()
+		if close_document:
+			document_closed.emit()
+		else:
+			dialog_finished.emit()
 		return
 	_set_message(messages[current_message])
 	message_changed.emit(current_message)
@@ -89,7 +114,49 @@ func is_dialog_open() -> bool:
 
 
 func is_modal_open() -> bool:
-	return is_dialog_open() or (image_overlay != null and image_overlay.visible)
+	return is_dialog_open() or (image_overlay != null and image_overlay.visible and (generated_image_visible or showing_document))
+
+
+func show_document(texture: Texture2D, dialog_messages: Array[String]) -> void:
+	document_generation += 1
+	var generation := document_generation
+	_stop_reveal()
+	if generated_audio != null:
+		generated_audio.stop()
+	if image_overlay == null:
+		_build_image_overlay()
+	generated_image_visible = false
+	showing_document = true
+	document_messages = dialog_messages.duplicate()
+	image_preview.texture = texture
+	image_hint.text = "Zavřít dokument: %s" % InputPrompts.action_label(&"interact")
+	image_overlay.show()
+	hide_dialog()
+	if generation != document_generation:
+		return
+	modal_changed.emit()
+
+
+func _open_document_dialog() -> void:
+	if not showing_document:
+		return
+	if document_messages.is_empty():
+		showing_document = false
+		modal_changed.emit()
+		document_closed.emit()
+		return
+	messages = document_messages
+	current_message = 0
+	_set_message(messages[current_message])
+	message_changed.emit(current_message)
+	panel.show()
+	modal_changed.emit()
+
+
+func _cancel_document() -> void:
+	document_generation += 1
+	showing_document = false
+	document_messages.clear()
 
 
 func hide_dialog() -> void:
@@ -137,6 +204,8 @@ func show_generated_file(file_name: String, content: PackedByteArray) -> void:
 		return
 	if image_overlay != null:
 		image_overlay.hide()
+	generated_image_visible = false
+	_cancel_document()
 	if generated_audio != null:
 		generated_audio.stop()
 	var extension := file_name.get_extension().to_lower()
@@ -164,6 +233,7 @@ func _show_generated_image(file_name: String, content: PackedByteArray) -> void:
 	image_preview.texture = ImageTexture.create_from_image(image)
 	image_hint.text = "Na pozadí se něco stalo: %s  ·  Skrýt: %s" % [file_name, InputPrompts.action_label(&"interact")]
 	image_overlay.show()
+	generated_image_visible = true
 	modal_changed.emit()
 
 
@@ -188,32 +258,10 @@ func _play_generated_audio(file_name: String, content: PackedByteArray) -> void:
 
 
 func _build_image_overlay() -> void:
-	image_overlay = ColorRect.new()
-	image_overlay.name = "GeneratedImageOverlay"
-	image_overlay.color = Color(0.02, 0.02, 0.02, 0.94)
-	image_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	image_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	image_overlay = IMAGE_OVERLAY_SCENE.instantiate() as ColorRect
+	image_preview = image_overlay.get_node("Image") as TextureRect
+	image_hint = image_overlay.get_node("Hint") as Label
 	add_child(image_overlay)
-
-	image_preview = TextureRect.new()
-	image_preview.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	image_preview.offset_left = 32
-	image_preview.offset_top = 32
-	image_preview.offset_right = -32
-	image_preview.offset_bottom = -72
-	image_preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	image_preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	image_overlay.add_child(image_preview)
-
-	image_hint = Label.new()
-	image_hint.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	image_hint.offset_top = -56
-	image_hint.offset_bottom = -16
-	image_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	image_hint.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	image_hint.add_theme_color_override("font_color", Color("#fff8df"))
-	image_hint.add_theme_font_size_override("font_size", 18)
-	image_overlay.add_child(image_hint)
 
 
 func _build_dialog() -> void:
