@@ -250,8 +250,8 @@ func _check_evidence_runtime() -> void:
 	AudioManager.music = null
 	await get_tree().process_frame
 func _check_topology() -> void:
-	_check_route("main_entrance", "living_room", "from_entrance", "north")
-	_check_route("main_entrance", "bathroom", "from_entrance", "south")
+	_check_route("main_entrance", "living_room", "from_entrance", "south")
+	_check_route("main_entrance", "bathroom", "from_entrance", "north")
 	_check_route("main_entrance", "hall", "from_entrance", "west")
 	_check_route("hall", "bedroom", "from_hall", "south")
 	_check_route("hall", "main_entrance", "from_hall", "east")

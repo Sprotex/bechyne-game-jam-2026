@@ -42,15 +42,15 @@ destination_arrival_id = "from_entrance"
 wall_side = "west"
 
 [node name="ExitToLivingRoom" parent="." instance=ExtResource("4_exit")]
-position = Vector2(1450, 298)
+position = Vector2(1650, 555)
 destination_scene_path = "res://scenes/rooms/living_room.tscn"
 destination_arrival_id = "from_entrance"
-wall_side = "north"
+wall_side = "south"
 
 [node name="ExitToBathroom" parent="." instance=ExtResource("4_exit")]
-position = Vector2(1650, 555)
+position = Vector2(1450, 298)
 destination_scene_path = "res://scenes/rooms/bathroom.tscn"
 destination_arrival_id = "from_entrance"
-wall_side = "south"
+wall_side = "north"
 
 [node name="Arrivals" parent="." instance=ExtResource("8_arrivals")]

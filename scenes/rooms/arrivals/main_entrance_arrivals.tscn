@@ -9,7 +9,7 @@ position = Vector2(1750, 440)
 position = Vector2(240, 440)
 
 [node name="from_living_room" type="Marker2D" parent="."]
-position = Vector2(1450, 400)
+position = Vector2(1650, 475)
 
 [node name="from_bathroom" type="Marker2D" parent="."]
-position = Vector2(1650, 475)
+position = Vector2(1450, 400)
