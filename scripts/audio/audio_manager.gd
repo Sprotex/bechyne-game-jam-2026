@@ -8,6 +8,9 @@ extends Node
 	&"door": null,
 	&"key": null,
 	&"pickup": null,
+	&"lock": null,
+	&"footsteps": null,
+	&"washing_machine": null,
 }
 
 @export_group("Music")
@@ -17,6 +20,8 @@ extends Node
 
 var music_player: AudioStreamPlayer
 var alternate_music_selected := false
+var looping_players: Dictionary = {}
+var lock_player: AudioStreamPlayer
 
 
 func _ready() -> void:
@@ -33,6 +38,11 @@ func _play_audio(sound_id: StringName, volume_db: float, bus: StringName) -> voi
 	var stream := _get_sound_stream(sound_id)
 	if stream == null:
 		return
+	if sound_id == &"lock" and is_instance_valid(lock_player) and not lock_player.is_queued_for_deletion():
+		lock_player.volume_db = volume_db
+		lock_player.bus = _get_audio_bus(bus)
+		lock_player.play()
+		return
 
 	var player := AudioStreamPlayer.new()
 	player.stream = stream
@@ -40,7 +50,56 @@ func _play_audio(sound_id: StringName, volume_db: float, bus: StringName) -> voi
 	player.bus = _get_audio_bus(bus)
 	player.finished.connect(player.queue_free)
 	add_child(player)
+	if sound_id == &"lock":
+		lock_player = player
 	player.play()
+
+
+func set_loop_active(
+		sound_id: StringName,
+		active: bool,
+		bus: StringName = &"Sound",
+		volume_db: float = 0.0
+) -> void:
+	var player := looping_players.get(sound_id) as AudioStreamPlayer
+	if not active:
+		if is_instance_valid(player):
+			player.stop()
+			player.queue_free()
+		looping_players.erase(sound_id)
+		return
+	if is_instance_valid(player):
+		player.bus = _get_audio_bus(bus)
+		player.volume_db = volume_db
+		return
+	var source := _get_sound_stream(sound_id)
+	if source == null:
+		return
+	var stream := source.duplicate() as AudioStream
+	if stream is AudioStreamWAV:
+		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		stream.loop_begin = 0
+		stream.loop_end = roundi(stream.get_length() * stream.mix_rate)
+	elif stream is AudioStreamOggVorbis:
+		stream.loop = true
+	else:
+		return
+	player = AudioStreamPlayer.new()
+	player.stream = stream
+	player.bus = _get_audio_bus(bus)
+	player.volume_db = volume_db
+	add_child(player)
+	looping_players[sound_id] = player
+	player.play()
+
+
+func stop_sound_effects() -> void:
+	for child in get_children():
+		if child is AudioStreamPlayer and child != music_player:
+			child.stop()
+			child.queue_free()
+	looping_players.clear()
+	lock_player = null
 
 
 func _get_sound_stream(sound_id: StringName) -> AudioStream:

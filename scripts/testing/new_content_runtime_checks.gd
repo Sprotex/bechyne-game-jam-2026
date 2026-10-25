@@ -45,6 +45,7 @@ static func run(runner: Node) -> void:
 		AudioManager.music_player = null
 	AudioManager.music = null
 	await runner.get_tree().process_frame
+	await runner.get_tree().create_timer(0.15).timeout
 
 
 static func _interact_event() -> InputEventAction:

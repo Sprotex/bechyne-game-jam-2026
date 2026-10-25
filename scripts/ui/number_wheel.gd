@@ -10,7 +10,10 @@ func _ready() -> void:
 
 
 func set_digit(value: int) -> void:
-	digit = posmod(value, 10)
+	var next_digit := posmod(value, 10)
+	if next_digit != digit:
+		digit = next_digit
+		EventBus.request_audio(&"lock")
 	$Digit.text = str(digit)
 
 
