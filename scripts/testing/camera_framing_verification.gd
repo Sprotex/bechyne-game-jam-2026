@@ -29,10 +29,11 @@ func _run(level: Level) -> void:
 		var bounds := level.room.get_background_bounds()
 		var view_size := level.get_viewport_rect().size
 		var opening := level.get_world_render_rect()
-		var expected_size := Vector2(minf(view_size.x, bounds.size.x), room_case.height)
-		_check(opening.size == expected_size, "%s visible world opening is limited to native art size" % level.room.name)
+		var expected_zoom: float = view_size.y / room_case.height
+		var expected_size := Vector2(minf(view_size.x, bounds.size.x * expected_zoom), view_size.y)
+		_check(opening.size.is_equal_approx(expected_size), "%s artwork fills the viewport height" % level.room.name)
 		_check(opening.position == (view_size - opening.size) * 0.5, "%s world opening is centered in the window" % level.room.name)
-		_check(camera.zoom == Vector2.ONE, "%s camera keeps native 1x scale" % level.room.name)
+		_check(camera.zoom.is_equal_approx(Vector2.ONE * expected_zoom), "%s uniform camera zoom preserves art and collision proportions" % level.room.name)
 		var top := level.letterbox_bars["TopLetterbox"] as ColorRect
 		var bottom := level.letterbox_bars["BottomLetterbox"] as ColorRect
 		_check(top.color.a == 1.0 and top.size.y == opening.position.y, "%s top outside-art area is opaque" % level.room.name)
@@ -40,12 +41,12 @@ func _run(level: Level) -> void:
 		player.global_position = room_case.probe
 		await level.get_tree().process_frame
 		camera.force_update_scroll()
-		var half_opening := opening.size * 0.5
+		var half_opening := opening.size / camera.zoom * 0.5
 		var expected_x := clampf(player.global_position.x, bounds.position.x + half_opening.x, bounds.end.x - half_opening.x)
 		var expected_y := clampf(player.global_position.y, bounds.position.y + half_opening.y, bounds.end.y - half_opening.y)
 		var camera_center := camera.get_screen_center_position()
 		_check(absf(camera_center.x - expected_x) < 2.0 and absf(camera_center.y - expected_y) < 2.0, "%s camera follows within native image bounds" % level.room.name)
-		var visible_world := Rect2(camera_center - half_opening, opening.size)
+		var visible_world := Rect2(camera_center - half_opening, opening.size / camera.zoom)
 		var within_bounds := visible_world.position.x >= bounds.position.x - 0.5
 		within_bounds = within_bounds and visible_world.position.y >= bounds.position.y - 0.5
 		within_bounds = within_bounds and visible_world.end.x <= bounds.end.x + 0.5
@@ -55,6 +56,25 @@ func _run(level: Level) -> void:
 			var screenshot := Image.create(roundi(view_size.x), roundi(view_size.y), false, Image.FORMAT_RGBA8)
 			var photo := level._crop_photo_to_world_rect(screenshot)
 			_check(Vector2(photo.get_size()) == opening.size, "%s photo crop excludes the letterbox" % level.room.name)
+		await _check_resizing(level)
+
+
+func _check_resizing(level: Level) -> void:
+	var window := level.get_window()
+	var original_size := window.size
+	var bounds := level.room.get_background_bounds()
+	var camera := level.get_node("Player/Camera2D") as Camera2D
+	for window_size in [Vector2i(1280, 720), Vector2i(1000, 1000), Vector2i(2560, 1080)]:
+		window.size = window_size
+		await level.get_tree().process_frame
+		await level.get_tree().process_frame
+		var viewport_size := level.get_viewport_rect().size
+		_check(camera.zoom.is_equal_approx(Vector2.ONE * viewport_size.y / bounds.size.y), "%s resize to %s recalculates uniform height-fit zoom" % [level.room.name, window_size])
+		_check(is_equal_approx(level.get_world_render_rect().size.y, viewport_size.y), "%s resize keeps the full room height visible" % level.room.name)
+		_check(level.room.get_background_bounds() == bounds, "%s resize preserves world geometry and collision coordinates" % level.room.name)
+	window.size = original_size
+	await level.get_tree().process_frame
+	await level.get_tree().process_frame
 
 
 func _check(condition: bool, description: String) -> void:

@@ -213,7 +213,6 @@ func _update_camera_bounds() -> void:
 	var bounds := room.get_background_bounds()
 	if bounds.size.x <= 0.0 or bounds.size.y <= 0.0:
 		return
-	camera.zoom = Vector2.ONE
 	camera.limit_left = floori(bounds.position.x)
 	camera.limit_top = floori(bounds.position.y)
 	camera.limit_right = ceili(bounds.end.x)
@@ -239,16 +238,17 @@ func _create_world_frame() -> void:
 func get_world_render_rect() -> Rect2:
 	var viewport_size := get_viewport_rect().size
 	var bounds := room.get_background_bounds() if is_instance_valid(room) else Rect2()
-	var render_size := Vector2(
-		minf(viewport_size.x, bounds.size.x),
-		minf(viewport_size.y, bounds.size.y)
-	)
+	var render_size := bounds.size * ($Player/Camera2D as Camera2D).zoom
+	render_size = render_size.min(viewport_size)
 	return Rect2((viewport_size - render_size) * 0.5, render_size)
 
 func _update_world_frame() -> void:
 	if letterbox_bars.is_empty():
 		return
 	var viewport_size := get_viewport_rect().size
+	var bounds := room.get_background_bounds() if is_instance_valid(room) else Rect2()
+	if bounds.size.y > 0.0:
+		($Player/Camera2D as Camera2D).zoom = Vector2.ONE * viewport_size.y / bounds.size.y
 	var render_rect := get_world_render_rect()
 	_set_letterbox_bar("TopLetterbox", Rect2(0, 0, viewport_size.x, render_rect.position.y))
 	_set_letterbox_bar("BottomLetterbox", Rect2(0, render_rect.end.y, viewport_size.x, viewport_size.y - render_rect.end.y))
