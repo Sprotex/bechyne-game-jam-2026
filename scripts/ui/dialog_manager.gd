@@ -49,7 +49,7 @@ func _process(_delta: float) -> void:
 			message_label.visible_characters,
 			input_enabled and is_dialog_open()
 		)
-	if not OS.is_debug_build() or not Input.is_key_pressed(KEY_CTRL):
+	if not OS.is_debug_build() or not Input.is_key_pressed(KEY_CTRL) or Input.is_key_pressed(KEY_1) or Input.is_key_pressed(KEY_2) or Input.is_key_pressed(KEY_3):
 		return
 	if not input_enabled or not is_dialog_open():
 		return

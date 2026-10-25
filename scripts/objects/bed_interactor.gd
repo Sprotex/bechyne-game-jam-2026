@@ -11,6 +11,9 @@ func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
 	_build_hint()
+	if level != null:
+		level.flag_changed.connect(_on_flag_changed)
+	_refresh_hint()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -22,13 +25,17 @@ func _unhandled_input(event: InputEvent) -> void:
 func _on_body_entered(body: Node2D) -> void:
 	if body is CharacterBody2D:
 		nearby = true
-		hint.show()
+		_refresh_hint()
 
 
 func _on_body_exited(body: Node2D) -> void:
 	if body is CharacterBody2D:
 		nearby = false
 		hint.hide()
+
+
+func _on_flag_changed(_flag_id: String, _value: bool) -> void:
+	_refresh_hint()
 
 
 func _build_hint() -> void:
@@ -43,3 +50,7 @@ func _build_hint() -> void:
 	hint.add_theme_font_size_override("font_size", 16)
 	hint.hide()
 	add_child(hint)
+
+
+func _refresh_hint() -> void:
+	hint.visible = nearby and level != null and not level.has_flag("story.day_two")

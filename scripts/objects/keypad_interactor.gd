@@ -21,6 +21,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	if (
 		nearby
 		and level != null
+		and level.has_flag("story.act_three")
+		and level.has_flag("story.mirror_photographed")
 		and not level.has_flag(Level.ATTIC_COMBINATION_FLAG)
 		and level.player_controls_enabled()
 		and event.is_action_pressed("interact")
@@ -56,7 +58,7 @@ func _build_hint() -> void:
 
 
 func _update_hint() -> void:
-	if level == null or level.has_flag(Level.ATTIC_COMBINATION_FLAG):
+	if level == null or not level.has_flag("story.act_three") or not level.has_flag("story.mirror_photographed") or level.has_flag(Level.ATTIC_COMBINATION_FLAG):
 		hint.hide()
 	else:
 		hint.show()

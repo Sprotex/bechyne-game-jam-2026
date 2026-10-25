@@ -1,16 +1,25 @@
 [gd_scene format=3]
 
 [sub_resource type="ConvexPolygonShape2D" id="BedroomBed"]
-points = PackedVector2Array(160, 135, 545, 140, 555, 548, 170, 563)
+points = PackedVector2Array(15, 145, 525, 135, 548, 320, 455, 563, 0, 563)
 
 [sub_resource type="RectangleShape2D" id="BedroomDesk"]
-size = Vector2(410, 90)
+size = Vector2(460, 115)
 
 [sub_resource type="RectangleShape2D" id="BedroomChair"]
-size = Vector2(180, 150)
+size = Vector2(160, 135)
 
 [sub_resource type="RectangleShape2D" id="BedroomWardrobe"]
-size = Vector2(360, 210)
+size = Vector2(140, 290)
+
+[sub_resource type="RectangleShape2D" id="BedroomNightstand"]
+size = Vector2(150, 130)
+
+[sub_resource type="RectangleShape2D" id="BedroomPlant"]
+size = Vector2(110, 105)
+
+[sub_resource type="RectangleShape2D" id="BedroomDoor"]
+size = Vector2(250, 300)
 
 [node name="FurnitureCollisions" type="StaticBody2D"]
 
@@ -18,13 +27,25 @@ size = Vector2(360, 210)
 shape = SubResource("BedroomBed")
 
 [node name="DeskCollision" type="CollisionShape2D" parent="."]
-position = Vector2(1100, 270)
+position = Vector2(1130, 245)
 shape = SubResource("BedroomDesk")
 
 [node name="ChairCollision" type="CollisionShape2D" parent="."]
-position = Vector2(1100, 375)
+position = Vector2(1125, 405)
 shape = SubResource("BedroomChair")
 
-[node name="WardrobeCollision" type="CollisionShape2D" parent="."]
-position = Vector2(1800, 300)
+[node name="CurtainCollision" type="CollisionShape2D" parent="."]
+position = Vector2(1910, 300)
 shape = SubResource("BedroomWardrobe")
+
+[node name="NightstandCollision" type="CollisionShape2D" parent="."]
+position = Vector2(625, 315)
+shape = SubResource("BedroomNightstand")
+
+[node name="PlantCollision" type="CollisionShape2D" parent="."]
+position = Vector2(780, 335)
+shape = SubResource("BedroomPlant")
+
+[node name="DoorCollision" type="CollisionShape2D" parent="."]
+position = Vector2(1620, 150)
+shape = SubResource("BedroomDoor")

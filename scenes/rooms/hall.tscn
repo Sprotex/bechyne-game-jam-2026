@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" path="res://scenes/rooms/collisions/hall_collisions.tscn" id="7_collisions"]
 [ext_resource type="PackedScene" path="res://scenes/rooms/arrivals/hall_arrivals.tscn" id="8_arrivals"]
 [ext_resource type="Texture2D" path="res://assets/gfx/cellar_door_placeholder.svg" id="9_cellar_door"]
+[ext_resource type="PackedScene" path="res://scenes/objects/aunt_call_interactor.tscn" id="10_call"]
 
 [node name="Hall" type="Node2D"]
 script = ExtResource("1_room")
@@ -54,6 +55,8 @@ destination_scene_path = "res://scenes/rooms/attic.tscn"
 destination_arrival_id = "from_hall"
 wall_side = "north"
 opening_half_width = 95.0
+required_flag = "story.attic_unlocked"
+locked_message = "Na půdu zatím nemám důvod chodit."
 
 [node name="ExitToCellar" parent="." instance=ExtResource("2_exit")]
 position = Vector2(150, 211)
@@ -79,5 +82,9 @@ theme_override_colors/font_color = Color(0.94, 0.87, 0.68, 1)
 theme_override_colors/font_outline_color = Color(0.12, 0.08, 0.05, 1)
 theme_override_constants/outline_size = 3
 z_index = 2
+
+[node name="AuntCall" parent="." instance=ExtResource("10_call")]
+position = Vector2(900, 340)
+room_flag = "story.call.hall"
 
 [node name="Arrivals" parent="." instance=ExtResource("8_arrivals")]

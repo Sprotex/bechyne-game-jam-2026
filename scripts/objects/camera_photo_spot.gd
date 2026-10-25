@@ -1,5 +1,5 @@
 extends Area2D
-## Sends a picture of the current room when the player interacts nearby.
+## Uses the camera to read a code from the bathroom mirror.
 
 var level: Level
 var nearby := false
@@ -29,11 +29,13 @@ func _process(_delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not nearby or level == null or not level.has_flag("item.camera"):
+	if not nearby or level == null or not level.has_flag("item.camera") or not level.has_flag("story.act_three"):
 		return
-	if not level.player_controls_enabled() or not event.is_action_pressed("interact"):
+	if level.has_flag("story.mirror_photographed") or not level.player_controls_enabled():
 		return
-	level.send_room_photo()
+	if not event.is_action_pressed("interact"):
+		return
+	level.photograph_mirror()
 	get_viewport().set_input_as_handled()
 
 
@@ -50,7 +52,7 @@ func _on_body_exited(body: Node2D) -> void:
 
 
 func _update_hint() -> void:
-	if hint == null or not nearby or level == null or not level.has_flag("item.camera"):
+	if hint == null or not nearby or level == null or not level.has_flag("item.camera") or not level.has_flag("story.act_three") or level.has_flag("story.mirror_photographed"):
 		hint.hide()
 		return
 	hint.text = "%s  Vyfotit místnost" % InputPrompts.action_label(&"interact")

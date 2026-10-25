@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/light_switch.tscn" id="4_switch"]
 [ext_resource type="Script" path="res://scripts/objects/bed_interactor.gd" id="5_bed"]
 [ext_resource type="PackedScene" path="res://scenes/rooms/collisions/bedroom_collisions.tscn" id="6_collisions"]
+[ext_resource type="PackedScene" path="res://scenes/objects/aunt_call_interactor.tscn" id="7_call"]
 
 [sub_resource type="CircleShape2D" id="BedInteractionRange"]
 radius = 150.0
@@ -15,7 +16,7 @@ radius = 150.0
 script = ExtResource("1_room")
 room_title = "LOŽNICE"
 room_color = Color(0.78824, 0.81176, 0.8549, 1)
-walkable_outline = PackedVector2Array(150, 290, 1850, 290, 2000, 563, 0, 563)
+walkable_outline = PackedVector2Array(500, 310, 2000, 300, 2000, 563, 0, 563)
 
 [node name="FloorFill" type="Polygon2D" parent="."]
 z_index = -2
@@ -27,17 +28,14 @@ texture = ExtResource("2_background")
 centered = false
 z_index = -1
 
-[node name="CeilingLightLeft" parent="." instance=ExtResource("3_light")]
-position = Vector2(650, 60)
-
-[node name="CeilingLightRight" parent="." instance=ExtResource("3_light")]
-position = Vector2(1450, 60)
+[node name="BedsideLamp" parent="." instance=ExtResource("3_light")]
+position = Vector2(620, 210)
 
 [node name="LightSwitch" parent="." instance=ExtResource("4_switch")]
-position = Vector2(250, 330)
+position = Vector2(1435, 320)
 
 [node name="BedInteractor" type="Area2D" parent="."]
-position = Vector2(510, 420)
+position = Vector2(475, 420)
 collision_layer = 0
 collision_mask = 1
 script = ExtResource("5_bed")
@@ -47,8 +45,12 @@ shape = SubResource("BedInteractionRange")
 
 [node name="FurnitureCollisions" parent="." instance=ExtResource("6_collisions")]
 
+[node name="AuntCall" parent="." instance=ExtResource("7_call")]
+position = Vector2(1125, 405)
+room_flag = "story.call.bedroom"
+
 [node name="ExitToHall" parent="." instance=ExtResource("2_exit")]
-position = Vector2(1450, 280)
+position = Vector2(1610, 300)
 destination_scene_path = "res://scenes/rooms/hall.tscn"
 destination_arrival_id = "from_bedroom"
 wall_side = "north"
@@ -59,4 +61,4 @@ wall_side = "north"
 position = Vector2(900, 500)
 
 [node name="from_hall" type="Marker2D" parent="Arrivals"]
-position = Vector2(1450, 365)
+position = Vector2(1610, 380)

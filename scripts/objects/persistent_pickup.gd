@@ -28,11 +28,18 @@ func _ready() -> void:
 	hint.global_position = global_position + Vector2(-60, -48)
 	if level != null and level.has_flag(item_id):
 		_hide_pickup()
+	elif item_id == "item.camera" and (level == null or not level.has_flag("story.act_three")):
+		visible = false
+		monitoring = false
+	if level != null:
+		level.flag_changed.connect(_on_flag_changed)
 	queue_redraw()
 
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not nearby or item_id.is_empty() or level == null or not level.player_controls_enabled() or not event.is_action_pressed("interact"):
+		return
+	if item_id == "item.camera" and not level.has_flag("story.act_three"):
 		return
 	level.set_flag(item_id)
 	EventBus.request_audio(&"key" if item_id == "item.key" else &"pickup")
@@ -53,7 +60,7 @@ func _on_body_entered(body: Node2D) -> void:
 	if body is CharacterBody2D and visible:
 		nearby = true
 		hint.text = "%s  Seber: %s" % [InputPrompts.action_label(&"interact"), item_label]
-		hint.show()
+		_refresh_hint()
 
 
 func _on_body_exited(body: Node2D) -> void:
@@ -65,3 +72,20 @@ func _on_body_exited(body: Node2D) -> void:
 func _hide_pickup() -> void:
 	visible = false
 	monitoring = false
+
+
+func _on_flag_changed(_flag_id: String, _value: bool) -> void:
+	if item_id == "item.camera" and level != null and not level.has_flag(item_id):
+		visible = level.has_flag("story.act_three")
+		monitoring = visible
+	_refresh_hint()
+
+
+func _refresh_hint() -> void:
+	if not nearby or level == null:
+		hint.hide()
+		return
+	if item_id == "item.camera" and not level.has_flag("story.act_three"):
+		hint.hide()
+		return
+	hint.show()

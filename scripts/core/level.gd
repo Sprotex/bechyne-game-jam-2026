@@ -6,6 +6,8 @@ const KEYPAD_SCENE := preload("res://scenes/ui/keypad.tscn")
 const ATTIC_COMBINATION_FLAG := "puzzle.attic_combination_unlocked"
 const IDENTITY_CARD_TEXTURE := preload("res://assets/gfx/identity_card.png")
 const WORLD_FRAME_SCRIPT := preload("res://scripts/core/world_frame.gd")
+const STORY_TRANSITIONS_SCRIPT := preload("res://scripts/core/story_transitions.gd")
+const EDITOR_ACT_JUMP_SCRIPT := preload("res://scripts/core/editor_act_jump.gd")
 const INITIAL_ROOM := "res://scenes/rooms/main_entrance.tscn"
 const AFTER_SLEEP_ROOM := "res://scenes/rooms/hall.tscn"
 const AFTER_SLEEP_ARRIVAL := "from_bedroom"
@@ -55,6 +57,7 @@ func _ready() -> void:
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
+	EDITOR_ACT_JUMP_SCRIPT.handle_key_input(self, event)
 	if ending_started:
 		get_viewport().set_input_as_handled()
 		return
@@ -78,6 +81,16 @@ func send_room_photo() -> void:
 		dialog_manager.show_dialog(["Fotografii se nepodařilo uložit. Kód chyby: %d" % result])
 
 
+func photograph_mirror() -> void:
+	if not has_flag("story.act_three") or not has_flag("item.camera") or has_flag("story.mirror_photographed"):
+		return
+	set_flag("story.mirror_photographed")
+	dialog_manager.show_dialog([
+		"Vyfotila jsem zamlžené zrcadlo.",
+		"Na fotce jsou číslice mnohem jasnější: 1 2 3 4.",
+	])
+
+
 func _close_options() -> void:
 	options_screen.hide()
 	_refresh_controls()
@@ -91,6 +104,7 @@ func request_room_transition(destination_scene_path: String, arrival_id: String)
 
 
 func _perform_room_transition(destination_scene_path: String, arrival_id: String) -> void:
+	var leaving_cellar := is_instance_valid(room) and room.name == "Cellar" and has_flag("story.washing_machine_stopped")
 	var destination := load(destination_scene_path) as PackedScene
 	$HUD/Fade.color.a = 1.0
 	_load_room(destination.resource_path, arrival_id)
@@ -101,6 +115,8 @@ func _perform_room_transition(destination_scene_path: String, arrival_id: String
 	await tween.finished
 	transition_locked = false
 	_refresh_controls()
+	if leaving_cellar and not has_flag("story.act_three"):
+		STORY_TRANSITIONS_SCRIPT.coma_transition(self)
 
 
 func has_flag(flag_id: String) -> bool:
@@ -120,7 +136,7 @@ func _crop_photo_to_world_rect(photo: Image) -> Image:
 
 
 func open_keypad() -> void:
-	if has_flag(ATTIC_COMBINATION_FLAG) or is_instance_valid(keypad) or not player_controls_enabled():
+	if not has_flag("story.mirror_photographed") or has_flag(ATTIC_COMBINATION_FLAG) or is_instance_valid(keypad) or not player_controls_enabled():
 		return
 	keypad = KEYPAD_SCENE.instantiate() as Control
 	keypad.submitted.connect(_on_keypad_submitted)

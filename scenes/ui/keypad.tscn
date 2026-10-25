@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://7kgmlnd2kcui"]
+[gd_scene load_steps=4 format=3 uid="uid://7kgmlnd2kcui"]
 
 [ext_resource type="Script" uid="uid://b3hwlugac71l0" path="res://scripts/ui/keypad.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/ui/keypad_grid.tscn" id="2"]
@@ -9,6 +9,11 @@ content_margin_top = 24.0
 content_margin_right = 24.0
 content_margin_bottom = 24.0
 bg_color = Color(0.129412, 0.121569, 0.105882, 1)
+border_color = Color(0.72, 0.58, 0.34, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_left = 8
@@ -30,7 +35,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.015, 0.02, 0.025, 0.78)
+color = Color(0.015, 0.02, 0.025, 0.84)
 
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -52,7 +57,8 @@ alignment = 1
 
 [node name="Title" type="Label" parent="Center/Panel/Content"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(1, 0.96, 0.82, 1)
+theme_override_font_sizes/font_size = 28
 text = "ČÍSELNÝ ZÁMEK"
 horizontal_alignment = 1
 
@@ -60,7 +66,7 @@ horizontal_alignment = 1
 layout_mode = 2
 
 [node name="Submit" type="Button" parent="Center/Panel/Content"]
-custom_minimum_size = Vector2(0, 52)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Zkusit kód"

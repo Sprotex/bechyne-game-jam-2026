@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/rooms/room.gd" id="1_room"]
 [ext_resource type="Texture2D" path="res://assets/gfx/attic.png" id="2_background"]
@@ -7,9 +7,16 @@
 [ext_resource type="PackedScene" path="res://scenes/rooms/arrivals/attic_arrivals.tscn" id="5_arrivals"]
 [ext_resource type="Script" path="res://scripts/rooms/attic_entry.gd" id="6_entry"]
 [ext_resource type="PackedScene" path="res://scenes/objects/keypad_interactor.tscn" id="8_keypad"]
+[ext_resource type="PackedScene" path="res://scenes/objects/aunt_call_interactor.tscn" id="9_call"]
+[ext_resource type="PackedScene" path="res://scenes/objects/diagnosis.tscn" id="10_diagnosis"]
+[ext_resource type="Script" path="res://scripts/rooms/story_interactor.gd" id="11_story_interactor"]
+[ext_resource type="Resource" path="res://resources/dialogues/act3/moss.tres" id="12_moss_story"]
 
 [sub_resource type="RectangleShape2D" id="AtticEntryTrigger"]
 size = Vector2(180, 180)
+
+[sub_resource type="CircleShape2D" id="MossInteractionRange"]
+radius = 84.0
 
 [node name="Attic" type="Node2D"]
 script = ExtResource("1_room")
@@ -46,5 +53,28 @@ wall_side = "west"
 
 [node name="CombinationLock" parent="." instance=ExtResource("8_keypad")]
 position = Vector2(1385, 330)
+
+[node name="AuntCall" parent="." instance=ExtResource("9_call")]
+position = Vector2(900, 330)
+room_flag = "story.call.attic"
+
+[node name="Diagnosis" parent="." instance=ExtResource("10_diagnosis")]
+position = Vector2(1090, 295)
+
+[node name="MossInteractor" type="Area2D" parent="."]
+position = Vector2(1810, 245)
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("11_story_interactor")
+story = ExtResource("12_moss_story")
+hint_text = "Sníst mech"
+hide_graphics_on_complete = true
+
+[node name="Moss" type="Polygon2D" parent="MossInteractor"]
+color = Color(0.28, 0.4, 0.2, 1)
+polygon = PackedVector2Array(-20, -9, -12, -18, 1, -15, 13, -18, 20, -7, 15, 2, 20, 10, 6, 14, -7, 11, -19, 5)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MossInteractor"]
+shape = SubResource("MossInteractionRange")
 
 [node name="Arrivals" parent="." instance=ExtResource("5_arrivals")]

@@ -1,6 +1,7 @@
 extends Area2D
 
 @export var story: StoryText
+@export var hide_graphics_on_complete := false
 @export var hint_text := "Prohlédnout"
 
 var nearby := false
@@ -40,7 +41,12 @@ func _on_body_exited(body: Node2D) -> void:
 
 
 func _update_hint() -> void:
-	hint.visible = nearby and story != null and level != null and not story.is_completed(level)
+	var completed := story != null and level != null and story.is_completed(level)
+	hint.visible = nearby and story != null and level != null and not completed
+	if completed and hide_graphics_on_complete:
+		for child in get_children():
+			if child is CanvasItem and child != hint:
+				child.hide()
 
 
 func _build_hint() -> void:
