@@ -1,0 +1,31 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/number_wheel.gd" id="1"]
+
+[node name="NumberWheel" type="VBoxContainer"]
+custom_minimum_size = Vector2(68, 0)
+theme_override_constants/separation = 8
+script = ExtResource("1")
+
+[node name="Increase" type="Button" parent="."]
+custom_minimum_size = Vector2(68, 46)
+layout_mode = 2
+tooltip_text = "Zvýšit cifru"
+theme_override_font_sizes/font_size = 24
+text = "▲"
+
+[node name="Digit" type="Label" parent="."]
+custom_minimum_size = Vector2(68, 72)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.972549, 0.87451, 1)
+theme_override_font_sizes/font_size = 44
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Decrease" type="Button" parent="."]
+custom_minimum_size = Vector2(68, 46)
+layout_mode = 2
+tooltip_text = "Snížit cifru"
+theme_override_font_sizes/font_size = 24
+text = "▼"

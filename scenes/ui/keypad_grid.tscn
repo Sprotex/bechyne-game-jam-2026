@@ -1,66 +1,19 @@
-[gd_scene format=3]
+[gd_scene load_steps=2 format=3]
 
-[node name="KeypadGrid" type="GridContainer"]
-columns = 3
-theme_override_constants/h_separation = 8
-theme_override_constants/v_separation = 8
+[ext_resource type="PackedScene" path="res://scenes/ui/number_wheel.tscn" id="1"]
 
-[node name="Digit7" type="Button" parent="."]
-custom_minimum_size = Vector2(96, 72)
-theme_override_font_sizes/font_size = 20
-text = "7"
+[node name="KeypadGrid" type="HBoxContainer"]
+theme_override_constants/separation = 12
+alignment = 1
 
-[node name="Digit8" type="Button" parent="."]
-custom_minimum_size = Vector2(96, 72)
-theme_override_font_sizes/font_size = 20
-text = "8"
+[node name="Wheel1" parent="." instance=ExtResource("1")]
+layout_mode = 2
 
-[node name="Digit9" type="Button" parent="."]
-custom_minimum_size = Vector2(96, 72)
-theme_override_font_sizes/font_size = 20
-text = "9"
+[node name="Wheel2" parent="." instance=ExtResource("1")]
+layout_mode = 2
 
-[node name="Digit4" type="Button" parent="."]
-custom_minimum_size = Vector2(96, 72)
-theme_override_font_sizes/font_size = 20
-text = "4"
+[node name="Wheel3" parent="." instance=ExtResource("1")]
+layout_mode = 2
 
-[node name="Digit5" type="Button" parent="."]
-custom_minimum_size = Vector2(96, 72)
-theme_override_font_sizes/font_size = 20
-text = "5"
-
-[node name="Digit6" type="Button" parent="."]
-custom_minimum_size = Vector2(96, 72)
-theme_override_font_sizes/font_size = 20
-text = "6"
-
-[node name="Digit1" type="Button" parent="."]
-custom_minimum_size = Vector2(96, 72)
-theme_override_font_sizes/font_size = 20
-text = "1"
-
-[node name="Digit2" type="Button" parent="."]
-custom_minimum_size = Vector2(96, 72)
-theme_override_font_sizes/font_size = 20
-text = "2"
-
-[node name="Digit3" type="Button" parent="."]
-custom_minimum_size = Vector2(96, 72)
-theme_override_font_sizes/font_size = 20
-text = "3"
-
-[node name="Delete" type="Button" parent="."]
-custom_minimum_size = Vector2(96, 72)
-theme_override_font_sizes/font_size = 18
-text = "SMAZAT"
-
-[node name="Digit0" type="Button" parent="."]
-custom_minimum_size = Vector2(96, 72)
-theme_override_font_sizes/font_size = 20
-text = "0"
-
-[node name="Submit" type="Button" parent="."]
-custom_minimum_size = Vector2(96, 72)
-theme_override_font_sizes/font_size = 16
-text = "ODESLAT"
+[node name="Wheel4" parent="." instance=ExtResource("1")]
+layout_mode = 2
