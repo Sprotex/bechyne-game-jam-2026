@@ -5,3 +5,5 @@ No scene file except level scenes should be longer than 15 nodes directly (compo
 All player-facing text in the game must be in Czech.
 
 For WAV-to-OGG conversion, use `scripts/convert_wav_to_ogg.cmd` (requires FFmpeg with `libvorbis`). It writes to `assets/audio` by default; assign the OGG in the AudioManager and enable looping there when needed.
+
+When a task has independent implementation or review work, proactively delegate those parts in parallel and coordinate the results rather than doing everything alone.
