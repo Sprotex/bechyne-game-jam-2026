@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="StoryText" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/story_text.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+messages = PackedStringArray("Ten zvuk jde ze sklepa, kdo tam kurva dělá bordel ve 3 ráno?", "Smrdí tu jako…", "Jako by tu něco chcíplo!")
