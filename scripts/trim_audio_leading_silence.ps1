@@ -11,7 +11,7 @@ $backupDirectory = Join-Path $workspace "audio_sources\untrimmed\$BackupName"
 Get-Command ffmpeg, ffprobe -ErrorAction Stop | Out-Null
 New-Item -ItemType Directory -Path $backupDirectory -Force | Out-Null
 $edits = @{
-    door = @{ Start = 30572 }
+    door = @{ Start = 30572; End = 52000; Resume = 133600 }
     footsteps = @{ Start = 28175 }
     lock = @{ Start = 147460; End = 154350 }
     washing_machine = @{ Start = 15321 }
@@ -48,7 +48,13 @@ foreach ($soundName in $SoundNames) {
             $filter += ':end_sample=' + $edits[$soundName].End
         }
         $filter += ',asetpts=PTS-STARTPTS'
-        & ffmpeg -hide_banner -loglevel error -n -i $backup -af $filter -c:a pcm_s16le $temporary
+        if ($edits[$soundName].ContainsKey('Resume')) {
+            $graph = '[0:a]' + $filter + '[opening];[0:a]atrim=start_sample=' + $edits[$soundName].Resume + ',asetpts=PTS-STARTPTS[closing];[opening][closing]concat=n=2:v=0:a=1[joined]'
+            & ffmpeg -hide_banner -loglevel error -n -i $backup -filter_complex $graph -map '[joined]' -c:a pcm_s16le $temporary
+        }
+        else {
+            & ffmpeg -hide_banner -loglevel error -n -i $backup -af $filter -c:a pcm_s16le $temporary
+        }
         if ($LASTEXITCODE -ne 0) {
             throw "FFmpeg failed for $soundName."
         }

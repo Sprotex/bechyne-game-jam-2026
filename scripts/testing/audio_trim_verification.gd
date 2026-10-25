@@ -32,7 +32,12 @@ func _run() -> void:
 		var removed := original_data.size() - trimmed_data.size()
 		_check(removed > 0 and trimmed_data.size() > 0, "%s leading silence was removed without emptying the recording" % sound_name)
 		var start_byte: int = START_SAMPLES[sound_name] * trimmed.channels * 2
-		_check(original_data.slice(start_byte, start_byte + trimmed_data.size()) == trimmed_data, "%s selected waveform and internal pauses are unchanged" % sound_name)
+		var expected_data := original_data.slice(start_byte, start_byte + trimmed_data.size())
+		if sound_name == "door":
+			expected_data = original_data.slice(start_byte, 52000 * trimmed.channels * 2)
+			expected_data.append_array(original_data.slice(133600 * trimmed.channels * 2))
+			_check(trimmed_data.size() == (52000 - 30572 + original_data.size() / (trimmed.channels * 2) - 133600) * trimmed.channels * 2, "door opening and closing are joined without the long middle gap")
+		_check(expected_data == trimmed_data, "%s selected waveform is unchanged outside the requested cuts" % sound_name)
 		if sound_name == "lock":
 			_check(trimmed_data.size() == (154350 - 147460) * trimmed.channels * 2, "lock contains only the selected single take")
 		var peak := 0

@@ -19,12 +19,12 @@ Potom nech Godot soubor znovu importovat. Obdobně lze obnovit předchozí `cree
 ## Ořezy
 
 `scripts/trim_audio_leading_silence.ps1` má explicitní rozsahy po jednotlivých samplech.
-Používá FFmpeg `atrim`, nepřeskládává zvuk, nezesiluje ho a nemaže pauzy uvnitř nahrávek.
+Používá FFmpeg `atrim`, nezesiluje zvuk a zachovává vybrané samply beze změny.
 Formát zůstává PCM16 se zachovanými kanály a původním sample rate.
 
 | Zvuk | Vybraný začátek v původní nahrávce | Výsledná délka |
 | --- | ---: | ---: |
-| Dveře | 0,693 s | 3,138 s |
+| Dveře | 0,693 s | 1,288 s |
 | Kroky | 0,639 s | 6,954 s |
 | Zámek | 3,344 s | 0,156 s |
 | Pračka | 0,347 s | 7,733 s |
@@ -32,7 +32,9 @@ Formát zůstává PCM16 se zachovanými kanály a původním sample rate.
 
 Zámek obsahuje pouze jedno izolované cvaknutí z posledního plného pokusu;
 další pokusy v původní nahrávce se při změně číslice nepřehrávají.
-Ostatní nahrávky zachovávají vše za vybraným začátkem.
+Dveře spojují otevření (samply 30572–52000) a zavření (od samplu 133600)
+pomocí `concat`; dlouhá hluchá mezera mezi oběma zvuky je odstraněná.
+Ostatní nahrávky zachovávají vše za vybraným začátkem, včetně vnitřních pauz.
 
 Pro zopakování úpravy z již existující zálohy:
 
