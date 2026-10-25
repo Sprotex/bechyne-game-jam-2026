@@ -115,6 +115,7 @@ func _close_screens() -> void:
 
 
 func _start_game() -> void:
+	EventBus.reset_game_completion()
 	_show_cutscene()
 
 

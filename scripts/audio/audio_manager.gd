@@ -3,6 +3,12 @@ extends Node
 
 @export_group("Sounds")
 @export var voice_message: AudioStream
+@export var sound_registry: Dictionary = {
+	&"switch": null,
+	&"door": null,
+	&"key": null,
+	&"pickup": null,
+}
 
 @export_group("Music")
 @export var music: AudioStream
@@ -26,7 +32,6 @@ func _unhandled_input(event: InputEvent) -> void:
 func _play_audio(sound_id: StringName, volume_db: float, bus: StringName) -> void:
 	var stream := _get_sound_stream(sound_id)
 	if stream == null:
-		push_warning("No audio stream is registered for sound ID '%s'." % sound_id)
 		return
 
 	var player := AudioStreamPlayer.new()
@@ -39,11 +44,12 @@ func _play_audio(sound_id: StringName, volume_db: float, bus: StringName) -> voi
 
 
 func _get_sound_stream(sound_id: StringName) -> AudioStream:
-	match sound_id:
-		&"voice_message":
-			return voice_message
-		_:
-			return null
+	if sound_id == &"voice_message":
+		return voice_message
+	var stream: Variant = sound_registry.get(sound_id)
+	if stream == null:
+		stream = sound_registry.get(String(sound_id))
+	return stream as AudioStream
 
 
 func _start_music() -> void:

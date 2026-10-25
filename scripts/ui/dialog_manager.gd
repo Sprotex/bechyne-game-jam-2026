@@ -26,6 +26,8 @@ func _ready() -> void:
 	layer = 20
 	_build_dialog()
 	(get_node("DialogPanel/Content/CloseHint") as Label).text = "Pokračovat: %s" % InputPrompts.action_label(&"interact")
+	get_window().size_changed.connect(_update_dialog_font_size)
+	_update_dialog_font_size()
 	hide_dialog()
 
 
@@ -221,3 +223,13 @@ func _build_dialog() -> void:
 	message_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	message_label = dialog_box.get_node("Content/MessageScroll/Message") as Label
 	add_child(dialog_box)
+
+
+func _update_dialog_font_size() -> void:
+	if message_label == null:
+		return
+	var viewport_size := Vector2(get_window().size)
+	var scale := minf(viewport_size.x / 1920.0, viewport_size.y / 1080.0)
+	message_label.add_theme_font_size_override("font_size", roundi(clampf(28.0 * scale, 22.0, 28.0)))
+	var close_hint := get_node("DialogPanel/Content/CloseHint") as Label
+	close_hint.add_theme_font_size_override("font_size", roundi(clampf(17.0 * scale, 14.0, 17.0)))

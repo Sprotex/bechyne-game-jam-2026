@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://dkw1t8fwd863d"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dialog"]
-content_margin_left = 22.0
-content_margin_top = 14.0
-content_margin_right = 22.0
-content_margin_bottom = 14.0
+content_margin_left = 20.0
+content_margin_top = 12.0
+content_margin_right = 20.0
+content_margin_bottom = 12.0
 bg_color = Color(0.129412, 0.121569, 0.105882, 0.94)
 border_width_left = 2
 border_width_top = 2
@@ -18,9 +18,9 @@ corner_radius_bottom_left = 8
 
 [node name="DialogPanel" type="PanelContainer" unique_id=1512401401]
 anchors_preset = -1
-anchor_left = 0.04
-anchor_top = 0.64
-anchor_right = 0.96
+anchor_left = 0.2
+anchor_top = 0.72
+anchor_right = 0.8
 anchor_bottom = 0.98
 theme_override_styles/panel = SubResource("StyleBoxFlat_dialog")
 
@@ -29,7 +29,7 @@ layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="MessageScroll" type="ScrollContainer" parent="Content" unique_id=1202754721]
-custom_minimum_size = Vector2(0, 100)
+custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
 size_flags_vertical = 3
 
@@ -37,12 +37,12 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.972549, 0.87451, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 28
 autowrap_mode = 3
 visible_characters_behavior = 1
 
 [node name="CloseHint" type="Label" parent="Content" unique_id=1218995032]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.780392, 0.72549, 0.603922, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 17
 horizontal_alignment = 2
