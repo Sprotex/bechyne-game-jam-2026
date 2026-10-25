@@ -9,6 +9,7 @@ signal document_closed
 
 const DIALOG_BOX_SCENE := preload("res://scenes/ui/dialog_box.tscn")
 const IMAGE_OVERLAY_SCENE := preload("res://scenes/ui/document_overlay.tscn")
+const TYPEWRITER_AUDIO_SCRIPT := preload("res://scripts/ui/dialog_typewriter_audio.gd")
 
 @export_range(1.0, 100.0, 1.0, "or_greater") var characters_per_second := 20.0
 
@@ -21,6 +22,7 @@ var image_overlay: ColorRect
 var image_preview: TextureRect
 var image_hint: Label
 var generated_audio: AudioStreamPlayer
+var typewriter_audio: DialogTypewriterAudio
 var input_enabled := true
 var showing_document := false
 var document_messages: Array[String] = []
@@ -30,6 +32,9 @@ var generated_image_visible := false
 
 func _ready() -> void:
 	layer = 20
+	typewriter_audio = TYPEWRITER_AUDIO_SCRIPT.new()
+	typewriter_audio.name = "DialogTypewriterAudio"
+	add_child(typewriter_audio)
 	_build_dialog()
 	(get_node("DialogPanel/Content/CloseHint") as Label).text = "Pokračovat: %s" % InputPrompts.action_label(&"interact")
 	get_window().size_changed.connect(_update_dialog_font_size)
@@ -38,6 +43,12 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
+	if typewriter_audio != null and message_label != null:
+		typewriter_audio.update_reveal(
+			message_label.text,
+			message_label.visible_characters,
+			input_enabled and is_dialog_open()
+		)
 	if not OS.is_debug_build() or not Input.is_key_pressed(KEY_CTRL):
 		return
 	if not input_enabled or not is_dialog_open():
@@ -76,6 +87,8 @@ func _input(event: InputEvent) -> void:
 
 func set_input_enabled(enabled: bool) -> void:
 	input_enabled = enabled
+	if not enabled and typewriter_audio != null:
+		typewriter_audio.stop()
 
 
 func show_dialog(dialog_messages: Array[String]) -> void:
@@ -191,9 +204,13 @@ func _finish_reveal() -> void:
 	if reveal_tween != null and reveal_tween.is_running():
 		reveal_tween.kill()
 	message_label.visible_characters = -1
+	if typewriter_audio != null:
+		typewriter_audio.stop()
 
 
 func _stop_reveal() -> void:
+	if typewriter_audio != null:
+		typewriter_audio.stop()
 	if reveal_tween != null and reveal_tween.is_running():
 		reveal_tween.kill()
 	reveal_tween = null
