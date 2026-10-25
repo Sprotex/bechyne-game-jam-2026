@@ -1,7 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/rooms/room.gd" id="1_room"]
-[ext_resource type="Texture2D" path="res://assets/gfx/chodba.png" id="3_background"]
+[ext_resource type="Texture2D" path="res://assets/gfx/chodba2.png" id="3_background"]
 [ext_resource type="PackedScene" path="res://scenes/objects/room_exit.tscn" id="2_exit"]
 [ext_resource type="PackedScene" path="res://scenes/objects/light_source.tscn" id="5_light"]
 [ext_resource type="PackedScene" path="res://scenes/objects/light_switch.tscn" id="6_switch"]
@@ -11,12 +11,12 @@
 script = ExtResource("1_room")
 room_title = "CHODBA"
 room_color = Color(0.84706, 0.78039, 0.71765, 1)
-walkable_outline = PackedVector2Array(165, 285, 1805, 298, 2000, 550, 2000, 563, 0, 563, 0, 540)
+walkable_outline = PackedVector2Array(65, 211, 1810, 211, 2000, 300, 2000, 377, 0, 377, 0, 300)
 
 [node name="FloorFill" type="Polygon2D" parent="."]
 z_index = -2
 color = Color(0.6902, 0.6157, 0.451, 1)
-polygon = PackedVector2Array(0, 0, 2000, 0, 2000, 563, 0, 563)
+polygon = PackedVector2Array(0, 0, 2000, 0, 2000, 377, 0, 377)
 
 [node name="Background" type="Sprite2D" parent="."]
 texture = ExtResource("3_background")
@@ -24,47 +24,47 @@ centered = false
 z_index = -1
 
 [node name="CeilingLightLeft" parent="." instance=ExtResource("5_light")]
-position = Vector2(650, 60)
+position = Vector2(650, 70)
 
 [node name="CeilingLightRight" parent="." instance=ExtResource("5_light")]
-position = Vector2(1450, 60)
+position = Vector2(1450, 70)
 
 [node name="LightSwitch" parent="." instance=ExtResource("6_switch")]
-position = Vector2(1830, 320)
+position = Vector2(475, 190)
 
 [node name="FurnitureCollisions" parent="." instance=ExtResource("7_collisions")]
 
 [node name="ExitToEntrance" parent="." instance=ExtResource("2_exit")]
-position = Vector2(1940, 440)
+position = Vector2(1900, 255)
 destination_scene_path = "res://scenes/rooms/main_entrance.tscn"
 destination_arrival_id = "from_hall"
 wall_side = "east"
 
 [node name="ExitToBedroom" parent="." instance=ExtResource("2_exit")]
-position = Vector2(1650, 555)
+position = Vector2(1650, 377)
 destination_scene_path = "res://scenes/rooms/bedroom.tscn"
 destination_arrival_id = "from_hall"
 wall_side = "south"
 
 [node name="ExitToAttic" parent="." instance=ExtResource("2_exit")]
-position = Vector2(1450, 298)
+position = Vector2(350, 211)
 destination_scene_path = "res://scenes/rooms/attic.tscn"
 destination_arrival_id = "from_hall"
 wall_side = "north"
-opening_half_width = 190.0
+opening_half_width = 95.0
 required_flag = "story.attic_unlocked"
 locked_message = "Je zamčeno."
 
 [node name="Arrivals" type="Node2D" parent="."]
 
 [node name="start" type="Marker2D" parent="Arrivals"]
-position = Vector2(200, 500)
+position = Vector2(520, 320)
 
 [node name="from_entrance" type="Marker2D" parent="Arrivals"]
-position = Vector2(1780, 420)
+position = Vector2(1720, 310)
 
 [node name="from_bedroom" type="Marker2D" parent="Arrivals"]
-position = Vector2(1650, 475)
+position = Vector2(1450, 320)
 
 [node name="from_attic" type="Marker2D" parent="Arrivals"]
-position = Vector2(1450, 415)
+position = Vector2(550, 300)

@@ -1,19 +1,19 @@
 [gd_scene format=3]
 
 [sub_resource type="ConvexPolygonShape2D" id="LivingSofa"]
-points = PackedVector2Array(335, 140, 750, 140, 790, 270, 330, 278)
+points = PackedVector2Array(350, 255, 745, 255, 780, 276, 780, 290, 340, 290, 340, 273)
 
-[sub_resource type="RectangleShape2D" id="LivingBookcase"]
-size = Vector2(310, 85)
+[sub_resource type="ConvexPolygonShape2D" id="LivingBookcase"]
+points = PackedVector2Array(850, 258, 1170, 258, 1175, 295, 845, 295)
 
 [sub_resource type="ConvexPolygonShape2D" id="LivingSideboard"]
-points = PackedVector2Array(1292, 187, 1480, 182, 1492, 250, 1287, 253)
+points = PackedVector2Array(1294, 231, 1476, 231, 1480, 267, 1290, 267)
 
-[sub_resource type="ConvexPolygonShape2D" id="LivingNightstand"]
-points = PackedVector2Array(1770, 232, 1985, 226, 1995, 304, 1775, 311)
+[sub_resource type="RectangleShape2D" id="LivingTV"]
+size = Vector2(215, 25)
 
-[sub_resource type="ConvexPolygonShape2D" id="LivingCoffeeTable"]
-points = PackedVector2Array(1417, 294, 1587, 289, 1610, 330, 1405, 355)
+[sub_resource type="RectangleShape2D" id="LivingCoffeeTable"]
+size = Vector2(210, 26)
 
 [node name="FurnitureCollisions" type="StaticBody2D"]
 
@@ -21,14 +21,15 @@ points = PackedVector2Array(1417, 294, 1587, 289, 1610, 330, 1405, 355)
 shape = SubResource("LivingSofa")
 
 [node name="BookcaseCollision" type="CollisionShape2D" parent="."]
-position = Vector2(1000, 205)
 shape = SubResource("LivingBookcase")
 
 [node name="SideboardCollision" type="CollisionShape2D" parent="."]
 shape = SubResource("LivingSideboard")
 
-[node name="NightstandCollision" type="CollisionShape2D" parent="."]
-shape = SubResource("LivingNightstand")
+[node name="TVCollision" type="CollisionShape2D" parent="."]
+position = Vector2(542.5, 362.5)
+shape = SubResource("LivingTV")
 
 [node name="TableCollision" type="CollisionShape2D" parent="."]
+position = Vector2(1505, 357)
 shape = SubResource("LivingCoffeeTable")

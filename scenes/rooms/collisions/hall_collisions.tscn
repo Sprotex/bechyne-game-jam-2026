@@ -1,27 +1,15 @@
 [gd_scene format=3]
 
-[sub_resource type="ConvexPolygonShape2D" id="HallClosetFootprint"]
-points = PackedVector2Array(510, 280, 833, 280, 840, 331, 685, 339, 520, 337)
+[sub_resource type="ConvexPolygonShape2D" id="HallLaundryFootprint"]
+points = PackedVector2Array(705, 246, 822, 246, 830, 262, 800, 273, 735, 274, 700, 265)
 
-[sub_resource type="ConvexPolygonShape2D" id="HallChestFootprint"]
-points = PackedVector2Array(884, 280, 1145, 280, 1150, 335, 1020, 339, 882, 333)
-
-[sub_resource type="ConvexPolygonShape2D" id="HallConsole"]
-points = PackedVector2Array(1552, 278, 1740, 278, 1746, 325, 1739, 343, 1565, 339, 1555, 322)
-
-[sub_resource type="ConvexPolygonShape2D" id="HallPlantFootprint"]
-points = PackedVector2Array(385, 282, 481, 282, 486, 319, 470, 339, 420, 343, 389, 327)
+[sub_resource type="ConvexPolygonShape2D" id="HallForegroundFootprint"]
+points = PackedVector2Array(1295, 363, 1490, 363, 1505, 377, 1280, 377)
 
 [node name="FurnitureCollisions" type="StaticBody2D"]
 
-[node name="ClosetCollision" type="CollisionShape2D" parent="."]
-shape = SubResource("HallClosetFootprint")
+[node name="LaundryCollision" type="CollisionShape2D" parent="."]
+shape = SubResource("HallLaundryFootprint")
 
-[node name="ChestCollision" type="CollisionShape2D" parent="."]
-shape = SubResource("HallChestFootprint")
-
-[node name="ConsoleCollision" type="CollisionShape2D" parent="."]
-shape = SubResource("HallConsole")
-
-[node name="PlantCollision" type="CollisionShape2D" parent="."]
-shape = SubResource("HallPlantFootprint")
+[node name="ForegroundCollision" type="CollisionShape2D" parent="."]
+shape = SubResource("HallForegroundFootprint")

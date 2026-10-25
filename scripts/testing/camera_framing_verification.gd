@@ -15,7 +15,7 @@ func _run(level: Level) -> void:
 		{"path": "res://scenes/rooms/main_entrance.tscn", "probe": Vector2(1750, 440), "height": 563.0},
 		{"path": "res://scenes/rooms/bathroom.tscn", "probe": Vector2(1050, 390), "height": 563.0},
 		{"path": "res://scenes/rooms/bedroom.tscn", "probe": Vector2(800, 370), "height": 563.0},
-		{"path": "res://scenes/rooms/hall.tscn", "probe": Vector2(1300, 370), "height": 563.0},
+		{"path": "res://scenes/rooms/hall.tscn", "probe": Vector2(1000, 300), "height": 377.0},
 		{"path": "res://scenes/rooms/living_room.tscn", "probe": Vector2(1300, 328), "height": 375.0},
 		{"path": "res://scenes/rooms/attic.tscn", "probe": Vector2(275, 320), "height": 377.0},
 	]
