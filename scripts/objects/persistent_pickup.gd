@@ -24,6 +24,8 @@ func _ready() -> void:
 	hint.add_theme_constant_override("outline_size", 3)
 	hint.hide()
 	add_child(hint)
+	hint.set_as_top_level(true)
+	hint.global_position = global_position + Vector2(-60, -48)
 	if level != null and level.has_flag(item_id):
 		_hide_pickup()
 	queue_redraw()
@@ -33,6 +35,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not nearby or item_id.is_empty() or level == null or not level.player_controls_enabled() or not event.is_action_pressed("interact"):
 		return
 	level.set_flag(item_id)
+	EventBus.request_audio(&"key" if item_id == "item.key" else &"pickup")
 	_hide_pickup()
 	if not pickup_message.is_empty():
 		level.dialog_manager.show_dialog([pickup_message])
