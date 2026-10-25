@@ -28,6 +28,14 @@ func _run() -> void:
 	await _check_evidence_runtime()
 	_check_topology()
 	await RuntimeChecks.run(self)
+	AudioManager.stop_sound_effects()
+	if is_instance_valid(AudioManager.music_player):
+		AudioManager.music_player.stop()
+		AudioManager.music_player.queue_free()
+		AudioManager.music_player = null
+	AudioManager.music = null
+	await get_tree().process_frame
+	await get_tree().create_timer(0.15).timeout
 	for note in pending:
 		print("PENDING: " + note)
 	print("New content verification: %d failures, %d pending" % [failures, pending.size()])
@@ -53,10 +61,9 @@ func _check_story_progression() -> void:
 		_check(signal_info[0].args.size() == 2, "flag_changed carries flag id and boolean value")
 	_check(not progression.call("can_enter_attic", level), "attic starts locked")
 	level.call("set_flag", "story.day_two")
+	_check(not progression.call("can_enter_attic", level), "attic stays locked until diagnosis is read")
 	level.call("set_flag", "story.diagnosis_read")
-	_check(not progression.call("can_enter_attic", level), "attic stays locked until keypad completion")
-	level.call("set_flag", "puzzle.bedroom_keypad_unlocked")
-	_check(progression.call("can_enter_attic", level), "attic unlock requires day two, diagnosis, and keypad")
+	_check(progression.call("can_enter_attic", level), "attic unlock requires day two and diagnosis, not its own lock")
 	level.free()
 func _check_document_ui() -> void:
 	var script := load("res://scripts/ui/dialog_manager.gd") as Script
@@ -132,9 +139,9 @@ func _check_attic_scene() -> void:
 	_check(background != null and background.texture != null, "attic has a background")
 	if background != null and background.texture != null:
 		_check(Vector2i(background.texture.get_size()) == Vector2i(2000, 377), "attic background remains native 2000x377")
-	_check(room.get_node_or_null("IdentityCard") != null, "identity card is placed in attic")
-	_pending("diagnosis and entity room placements await user location decision")
-	_check(room.get_node_or_null("EntryInteractor") != null, "attic entry trigger is present")
+	_check(room.get_node_or_null("IdentityCard") == null, "identity document has no standalone attic pickup bypass")
+	_check(room.get_node_or_null("CombinationLock") != null, "attic uses a combination lock at the identity location")
+	_check(room.get_node_or_null("EntryInteractor") != null, "attic entry trigger remains present")
 	var exit := room.get_node_or_null("ExitToHall") as RoomExit
 	_check(exit != null and exit.destination_scene_path.ends_with("hall.tscn"), "attic has return route to hall")
 	if exit != null:
@@ -223,20 +230,7 @@ func _check_evidence_runtime() -> void:
 	await get_tree().process_frame
 	_check(level.has_flag("story.diagnosis_read"), "diagnosis flag is set after document dialogue")
 	_check(completions[0] == 0, "diagnosis document does not complete the game")
-	var identity := (load(IDENTITY) as PackedScene).instantiate()
-	level.room.add_child(identity)
-	await get_tree().process_frame
-	identity._on_body_entered(level.get_node("Player"))
-	identity._unhandled_input(_interact_event())
-	_check(identity.reading and completions[0] == 0, "identity document does not complete before its dialogue")
-	_send_interact(level.dialog_manager)
-	await get_tree().process_frame
-	_check(level.dialog_manager.is_dialog_open() and completions[0] == 0, "identity ending waits through its dialogue")
-	level.dialog_manager._finish_reveal()
-	level.dialog_manager.advance_dialog()
-	await get_tree().process_frame
-	_check(completions[0] == 1, "identity document completes only after its final dialogue")
-	_check(level.has_flag("story.identity_read"), "identity completion flag follows document close")
+	_check(completions[0] == 0, "reading diagnosis alone does not complete the game")
 	EventBus.game_completed.disconnect(completed_callback)
 	if not EventBus.game_completed.is_connected(completion_handler):
 		EventBus.game_completed.connect(completion_handler, CONNECT_DEFERRED)
@@ -255,7 +249,8 @@ func _check_topology() -> void:
 	_check_route("main_entrance", "hall", "from_entrance", "west")
 	_check_route("hall", "bedroom", "from_hall", "south")
 	_check_route("hall", "main_entrance", "from_hall", "east")
-	_check_route("hall", "attic", "from_hall", "north", "story.attic_unlocked")
+	_check_route("hall", "attic", "from_hall", "north")
+	_check_route("hall", "cellar", "from_hall", "north")
 func _check_route(source: String, destination: String, arrival: String, side: String, required := "") -> void:
 	var path := "res://scenes/rooms/%s.tscn" % source
 	if not ResourceLoader.exists(path):
@@ -272,8 +267,7 @@ func _check_route(source: String, destination: String, arrival: String, side: St
 		_pending("%s to %s route awaits the topology update" % [source, destination])
 	else:
 		_check(found.destination_arrival_id == arrival and found.wall_side == side, "%s to %s uses %s arrival on %s wall" % [source, destination, arrival, side])
-		if required != "":
-			_check(found.required_flag == required, "hall attic exit requires story.attic_unlocked")
+		_check(found.required_flag == required and found.locked_message.is_empty(), "%s to %s has expected gate settings" % [source, destination])
 	room.free()
 func _send_interact(manager: Node) -> void:
 	manager.call("_input", _interact_event())

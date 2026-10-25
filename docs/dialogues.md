@@ -40,9 +40,15 @@ The Act 3 wake line `Proč by TETA bydlela se mnou? Kde  Ale byl tam ten klíč 
 
 After `act2.leaving_cellar`, the supplied direction is `audio pádu a fadeout`. It is not a dialogue resource line.
 
-Sequence context supplied for documentation only: after the Act 1 sleep, the protagonist wakes around 3:15. Dark silhouettes are revealed as mundane objects when the lights turn on. A washing machine in the cellar contains a key and the protagonist then faints. Act 3 begins around 14:00. A folding ladder in the freezer provides access to the attic. The documents reveal a diagnosis; a locked cabinet has a combination related to a photographed mirror code; an ID reveals that the aunt is the protagonist. This context is not implemented as state logic.
+### Original story outline
 
-The current project does not yet contain attic or cellar room art/scenes. Importing these resources does not place interactors or change existing scene text.
+The supplied outline says that after the Act 1 sleep, the protagonist wakes around 3:15; dark silhouettes are revealed as mundane objects when the lights turn on; a washing machine in the cellar contains a key and the protagonist then faints; and Act 3 begins around 14:00. It proposes a folding ladder in the freezer leading to the attic, a diagnosis in the documents, a locked cabinet with a combination related to a photographed mirror code, and an ID revealing that the aunt is the protagonist. This is the original narrative outline, not a description of the current implemented route.
+
+### Current attic ending decisions and implementation
+
+The attic room scene and attic art exist. The staircase is temporarily unrestricted, including before day two and before the diagnosis; the hall exit no longer consumes story flags, though the progression helper may retain them for a future story gate. The combination lock remains in the attic by the cabinet, not in the bedroom. Entering the existing code `1234` immediately shows the supplied identity-card art with `act3.id_reveal`; closing that reveal completes the game and opens the final credits, whose return action leads to the menu. The combination code is not an attic-access prerequisite.
+
+The diagnosis and night entity placements remain undecided. The cellar and freezer-ladder sequence is not implemented. The attic and cellar statements in the original outline should not be read as claims that those outline sequences are already in the game.
 
 ## Catalogue verification
 

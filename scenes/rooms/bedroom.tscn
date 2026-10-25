@@ -5,7 +5,6 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/room_exit.tscn" id="2_exit"]
 [ext_resource type="PackedScene" path="res://scenes/objects/light_source.tscn" id="3_light"]
 [ext_resource type="PackedScene" path="res://scenes/objects/light_switch.tscn" id="4_switch"]
-[ext_resource type="PackedScene" path="res://scenes/objects/keypad_interactor.tscn" id="4_keypad"]
 [ext_resource type="Script" path="res://scripts/objects/bed_interactor.gd" id="5_bed"]
 [ext_resource type="PackedScene" path="res://scenes/rooms/collisions/bedroom_collisions.tscn" id="6_collisions"]
 
@@ -47,9 +46,6 @@ script = ExtResource("5_bed")
 shape = SubResource("BedInteractionRange")
 
 [node name="FurnitureCollisions" parent="." instance=ExtResource("6_collisions")]
-
-[node name="Keypad" parent="." instance=ExtResource("4_keypad")]
-position = Vector2(1100, 445)
 
 [node name="ExitToHall" parent="." instance=ExtResource("2_exit")]
 position = Vector2(1450, 280)

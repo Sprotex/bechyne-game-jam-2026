@@ -84,6 +84,7 @@ func _check_locked_exit(level: Level) -> void:
 	EventBus.audio_play_requested.connect(callback)
 	exit.exit_entered.connect(func(_room_exit: RoomExit): entered[0] += 1)
 	var player := level.get_node("Player") as CharacterBody2D
+	exit.global_position = player.global_position
 	exit._on_body_entered(player)
 	_check(exit.nearby and exit.hint.visible, "room exit shows its interaction hint on approach")
 	_check(entered[0] == 0 and sounds.is_empty(), "approaching a locked room exit does not transition or play a sound")

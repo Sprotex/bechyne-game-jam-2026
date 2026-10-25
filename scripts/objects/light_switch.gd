@@ -19,12 +19,13 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not nearby or not event.is_action_pressed("interact"):
+	if not nearby or not event.is_action_pressed("interact") or event.is_echo():
 		return
 	var level := get_tree().current_scene as Level
 	if level == null or not level.player_controls_enabled():
 		return
 	room.toggle_lights()
+	EventBus.request_audio(&"switch")
 	get_viewport().set_input_as_handled()
 
 

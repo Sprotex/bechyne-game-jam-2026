@@ -1,0 +1,49 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/gfx/borka.png" id="1_idle"]
+[ext_resource type="Texture2D" path="res://assets/gfx/player_walk/walk_01.png" id="2_walk_01"]
+[ext_resource type="Texture2D" path="res://assets/gfx/player_walk/walk_02.png" id="3_walk_02"]
+[ext_resource type="Texture2D" path="res://assets/gfx/player_walk/walk_03.png" id="4_walk_03"]
+[ext_resource type="Texture2D" path="res://assets/gfx/player_walk/walk_04.png" id="5_walk_04"]
+[ext_resource type="Texture2D" path="res://assets/gfx/player_walk/walk_05.png" id="6_walk_05"]
+[ext_resource type="Texture2D" path="res://assets/gfx/player_walk/walk_06.png" id="7_walk_06"]
+[ext_resource type="Texture2D" path="res://assets/gfx/player_walk/walk_07.png" id="8_walk_07"]
+[ext_resource type="Texture2D" path="res://assets/gfx/player_walk/walk_08.png" id="9_walk_08"]
+[ext_resource type="Texture2D" path="res://assets/gfx/player_walk/walk_09.png" id="10_walk_09"]
+[ext_resource type="Texture2D" path="res://assets/gfx/player_walk/walk_10.png" id="11_walk_10"]
+[ext_resource type="Texture2D" path="res://assets/gfx/player_walk/walk_11.png" id="12_walk_11"]
+[ext_resource type="Texture2D" path="res://assets/gfx/player_walk/walk_12.png" id="13_walk_12"]
+[ext_resource type="Texture2D" path="res://assets/gfx/player_walk/walk_13.png" id="14_walk_13"]
+[ext_resource type="Texture2D" path="res://assets/gfx/player_walk/walk_14.png" id="15_walk_14"]
+[ext_resource type="Texture2D" path="res://assets/gfx/player_walk/walk_15.png" id="16_walk_15"]
+[ext_resource type="Texture2D" path="res://assets/gfx/player_walk/walk_16.png" id="17_walk_16"]
+
+[resource]
+animations = [{
+"frames": [{"duration": 1.0, "texture": ExtResource("1_idle")}],
+"loop": true,
+"name": &"idle",
+"speed": 1.0
+}, {
+"frames": [
+{"duration": 1.0, "texture": ExtResource("2_walk_01")},
+{"duration": 1.0, "texture": ExtResource("3_walk_02")},
+{"duration": 1.0, "texture": ExtResource("4_walk_03")},
+{"duration": 1.0, "texture": ExtResource("5_walk_04")},
+{"duration": 1.0, "texture": ExtResource("6_walk_05")},
+{"duration": 1.0, "texture": ExtResource("7_walk_06")},
+{"duration": 1.0, "texture": ExtResource("8_walk_07")},
+{"duration": 1.0, "texture": ExtResource("9_walk_08")},
+{"duration": 1.0, "texture": ExtResource("10_walk_09")},
+{"duration": 1.0, "texture": ExtResource("11_walk_10")},
+{"duration": 1.0, "texture": ExtResource("12_walk_11")},
+{"duration": 1.0, "texture": ExtResource("13_walk_12")},
+{"duration": 1.0, "texture": ExtResource("14_walk_13")},
+{"duration": 1.0, "texture": ExtResource("15_walk_14")},
+{"duration": 1.0, "texture": ExtResource("16_walk_15")},
+{"duration": 1.0, "texture": ExtResource("17_walk_16")}
+],
+"loop": true,
+"name": &"walk",
+"speed": 16.0
+}]

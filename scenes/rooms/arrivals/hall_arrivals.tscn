@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[node name="Arrivals" type="Node2D"]
+
+[node name="start" type="Marker2D" parent="."]
+position = Vector2(520, 320)
+
+[node name="from_entrance" type="Marker2D" parent="."]
+position = Vector2(1720, 310)
+
+[node name="from_bedroom" type="Marker2D" parent="."]
+position = Vector2(1450, 320)
+
+[node name="from_attic" type="Marker2D" parent="."]
+position = Vector2(550, 300)
+
+[node name="from_cellar" type="Marker2D" parent="."]
+position = Vector2(150, 320)

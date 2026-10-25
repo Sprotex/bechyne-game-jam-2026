@@ -11,7 +11,6 @@ static func can_enter_attic(level: Level) -> bool:
 		level != null
 		and level.has_flag(DAY_TWO_FLAG)
 		and level.has_flag(DIAGNOSIS_READ_FLAG)
-		and level.has_flag(Level.BEDROOM_KEYPAD_FLAG)
 	)
 
 

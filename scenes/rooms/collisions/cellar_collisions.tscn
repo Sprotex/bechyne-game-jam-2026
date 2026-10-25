@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[sub_resource type="ConvexPolygonShape2D" id="CellarBicycleFootprint"]
+points = PackedVector2Array(340, 207, 354, 197, 565, 197, 580, 209, 574, 221, 347, 221)
+
+[sub_resource type="ConvexPolygonShape2D" id="CellarBroomFootprint"]
+points = PackedVector2Array(1030, 207, 1145, 207, 1145, 221, 1030, 221)
+
+[sub_resource type="ConvexPolygonShape2D" id="CellarBagsBoxesFootprint"]
+points = PackedVector2Array(1290, 216, 1455, 216, 1455, 240, 1290, 240)
+
+[sub_resource type="ConvexPolygonShape2D" id="CellarWasherFootprint"]
+points = PackedVector2Array(1670, 215, 1780, 215, 1780, 245, 1670, 245)
+
+[node name="FurnitureCollisions" type="StaticBody2D"]
+
+[node name="BicycleCollision" type="CollisionShape2D" parent="."]
+shape = SubResource("CellarBicycleFootprint")
+
+[node name="BroomCollision" type="CollisionShape2D" parent="."]
+shape = SubResource("CellarBroomFootprint")
+
+[node name="BagsBoxesCollision" type="CollisionShape2D" parent="."]
+shape = SubResource("CellarBagsBoxesFootprint")
+
+[node name="WasherCollision" type="CollisionShape2D" parent="."]
+shape = SubResource("CellarWasherFootprint")

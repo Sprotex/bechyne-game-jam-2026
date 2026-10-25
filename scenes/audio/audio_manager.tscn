@@ -6,21 +6,21 @@
 [ext_resource type="AudioStreamOggVorbis" path="res://assets/audio/not_creepy.ogg" id="4_alternate_music"]
 [ext_resource type="AudioStreamWAV" path="res://assets/audio/door.wav" id="5_door"]
 [ext_resource type="AudioStreamWAV" path="res://assets/audio/lock.wav" id="6_lock"]
-[ext_resource type="AudioStreamWAV" path="res://assets/audio/footsteps.wav" id="7_footsteps"]
 [ext_resource type="AudioStreamWAV" path="res://assets/audio/washing_machine.wav" id="8_washing_machine"]
 [ext_resource type="AudioStreamWAV" path="res://assets/audio/door_unlock.wav" id="9_door_unlock"]
+[ext_resource type="AudioStreamWAV" path="res://assets/audio/footstep_single.wav" id="10_footstep_single"]
 
 [node name="AudioManager" type="Node" unique_id=1251892382]
 script = ExtResource("1_audio_manager")
 voice_message = ExtResource("2_voice_message")
 sound_registry = {
-&"switch": null,
+&"switch": ExtResource("6_lock"),
 &"door": ExtResource("5_door"),
 &"key": null,
 &"pickup": null,
 &"lock": ExtResource("6_lock"),
 &"door_unlock": ExtResource("9_door_unlock"),
-&"footsteps": ExtResource("7_footsteps"),
+&"footsteps": ExtResource("10_footstep_single"),
 &"washing_machine": ExtResource("8_washing_machine")
 }
 music = ExtResource("3_music")

@@ -6,7 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/rooms/collisions/attic_collisions.tscn" id="4_collisions"]
 [ext_resource type="PackedScene" path="res://scenes/rooms/arrivals/attic_arrivals.tscn" id="5_arrivals"]
 [ext_resource type="Script" path="res://scripts/rooms/attic_entry.gd" id="6_entry"]
-[ext_resource type="PackedScene" path="res://scenes/objects/identity_card.tscn" id="7_identity"]
+[ext_resource type="PackedScene" path="res://scenes/objects/keypad_interactor.tscn" id="8_keypad"]
 
 [sub_resource type="RectangleShape2D" id="AtticEntryTrigger"]
 size = Vector2(180, 180)
@@ -44,7 +44,7 @@ destination_scene_path = "res://scenes/rooms/hall.tscn"
 destination_arrival_id = "from_attic"
 wall_side = "west"
 
-[node name="IdentityCard" parent="." instance=ExtResource("7_identity")]
+[node name="CombinationLock" parent="." instance=ExtResource("8_keypad")]
 position = Vector2(1385, 330)
 
 [node name="Arrivals" parent="." instance=ExtResource("5_arrivals")]

@@ -1,0 +1,29 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/room.gd" id="1_room"]
+[ext_resource type="Texture2D" path="res://assets/gfx/sklep.png" id="2_background"]
+[ext_resource type="PackedScene" path="res://scenes/objects/room_exit.tscn" id="3_exit"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/arrivals/cellar_arrivals.tscn" id="4_arrivals"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/collisions/cellar_collisions.tscn" id="5_collisions"]
+
+[node name="Cellar" type="Node2D"]
+script = ExtResource("1_room")
+room_title = "SKLEP"
+room_color = Color(0.38, 0.36, 0.33, 1)
+walkable_outline = PackedVector2Array(275, 200, 1900, 200, 1960, 377, 0, 377, 0, 300, 250, 300)
+
+[node name="Background" type="Sprite2D" parent="."]
+texture = ExtResource("2_background")
+centered = false
+z_index = -1
+
+[node name="FurnitureCollisions" parent="." instance=ExtResource("5_collisions")]
+
+[node name="ExitToHall" parent="." instance=ExtResource("3_exit")]
+position = Vector2(150, 280)
+destination_scene_path = "res://scenes/rooms/hall.tscn"
+destination_arrival_id = "from_cellar"
+wall_side = "north"
+opening_half_width = 60.0
+
+[node name="Arrivals" parent="." instance=ExtResource("4_arrivals")]

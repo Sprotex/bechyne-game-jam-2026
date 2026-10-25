@@ -6,6 +6,8 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/light_source.tscn" id="5_light"]
 [ext_resource type="PackedScene" path="res://scenes/objects/light_switch.tscn" id="6_switch"]
 [ext_resource type="PackedScene" path="res://scenes/rooms/collisions/hall_collisions.tscn" id="7_collisions"]
+[ext_resource type="PackedScene" path="res://scenes/rooms/arrivals/hall_arrivals.tscn" id="8_arrivals"]
+[ext_resource type="Texture2D" path="res://assets/gfx/cellar_door_placeholder.svg" id="9_cellar_door"]
 
 [node name="Hall" type="Node2D"]
 script = ExtResource("1_room")
@@ -52,19 +54,30 @@ destination_scene_path = "res://scenes/rooms/attic.tscn"
 destination_arrival_id = "from_hall"
 wall_side = "north"
 opening_half_width = 95.0
-required_flag = "story.attic_unlocked"
-locked_message = "Je zamčeno."
 
-[node name="Arrivals" type="Node2D" parent="."]
+[node name="ExitToCellar" parent="." instance=ExtResource("2_exit")]
+position = Vector2(150, 211)
+destination_scene_path = "res://scenes/rooms/cellar.tscn"
+destination_arrival_id = "from_hall"
+wall_side = "north"
+opening_half_width = 60.0
 
-[node name="start" type="Marker2D" parent="Arrivals"]
-position = Vector2(520, 320)
+[node name="CellarDoorPlaceholder" type="Sprite2D" parent="."]
+position = Vector2(65, 45)
+texture = ExtResource("9_cellar_door")
+centered = false
+z_index = 1
 
-[node name="from_entrance" type="Marker2D" parent="Arrivals"]
-position = Vector2(1720, 310)
+[node name="CellarDoorLabel" type="Label" parent="."]
+offset_left = 112.0
+offset_top = 116.0
+offset_right = 218.0
+offset_bottom = 144.0
+text = "SKLEP"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.94, 0.87, 0.68, 1)
+theme_override_colors/font_outline_color = Color(0.12, 0.08, 0.05, 1)
+theme_override_constants/outline_size = 3
+z_index = 2
 
-[node name="from_bedroom" type="Marker2D" parent="Arrivals"]
-position = Vector2(1450, 320)
-
-[node name="from_attic" type="Marker2D" parent="Arrivals"]
-position = Vector2(550, 300)
+[node name="Arrivals" parent="." instance=ExtResource("8_arrivals")]

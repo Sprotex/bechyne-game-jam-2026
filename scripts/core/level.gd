@@ -3,7 +3,9 @@ class_name Level
 
 const OPTIONS_SCENE := preload("res://scenes/ui/options.tscn")
 const KEYPAD_SCENE := preload("res://scenes/ui/keypad.tscn")
-const BEDROOM_KEYPAD_FLAG := "puzzle.bedroom_keypad_unlocked"
+const ATTIC_COMBINATION_FLAG := "puzzle.attic_combination_unlocked"
+const IDENTITY_CARD_TEXTURE := preload("res://assets/gfx/identity_card.png")
+const WORLD_FRAME_SCRIPT := preload("res://scripts/core/world_frame.gd")
 const INITIAL_ROOM := "res://scenes/rooms/main_entrance.tscn"
 const AFTER_SLEEP_ROOM := "res://scenes/rooms/hall.tscn"
 const AFTER_SLEEP_ARRIVAL := "from_bedroom"
@@ -26,13 +28,18 @@ var options_screen: Control
 var dialog_manager: GameDialogManager
 var flags: Dictionary = {}
 var keypad: Control
-var world_frame: CanvasLayer
-var letterbox_bars: Dictionary = {}
+var ending_started := false
+var world_frame: Variant
+var letterbox_bars: Dictionary:
+	get:
+		return world_frame.bars if is_instance_valid(world_frame) else {}
 
 
 func _ready() -> void:
-	_create_world_frame()
-	get_viewport().size_changed.connect(_update_world_frame)
+	world_frame = WORLD_FRAME_SCRIPT.new()
+	add_child(world_frame)
+	world_frame.setup($Player/Camera2D)
+	get_viewport().size_changed.connect(world_frame.update_frame)
 	_load_room(INITIAL_ROOM, "start")
 	options_screen = OPTIONS_SCENE.instantiate()
 	options_screen.hide()
@@ -48,6 +55,9 @@ func _ready() -> void:
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
+	if ending_started:
+		get_viewport().set_input_as_handled()
+		return
 	if event.is_action_pressed("menu_back"):
 		options_screen.visible = not options_screen.visible
 		_refresh_controls()
@@ -59,7 +69,7 @@ func send_room_photo() -> void:
 		return
 	$HUD.hide()
 	await RenderingServer.frame_post_draw
-	var photo := _crop_photo_to_world_rect(get_viewport().get_texture().get_image())
+	var photo: Image = world_frame.crop_photo(get_viewport().get_texture().get_image())
 	$HUD.show()
 	var result := UserMessages.deliver_user_picture(photo, "fotografie_mistnosti.png")
 	if result == OK and not OS.has_feature("web"):
@@ -101,8 +111,16 @@ func player_controls_enabled() -> bool:
 	return $Player.controls_enabled
 
 
+func get_world_render_rect() -> Rect2:
+	return world_frame.get_render_rect()
+
+
+func _crop_photo_to_world_rect(photo: Image) -> Image:
+	return world_frame.crop_photo(photo)
+
+
 func open_keypad() -> void:
-	if has_flag(BEDROOM_KEYPAD_FLAG) or is_instance_valid(keypad) or not player_controls_enabled():
+	if has_flag(ATTIC_COMBINATION_FLAG) or is_instance_valid(keypad) or not player_controls_enabled():
 		return
 	keypad = KEYPAD_SCENE.instantiate() as Control
 	keypad.submitted.connect(_on_keypad_submitted)
@@ -166,14 +184,29 @@ func _run_sleep_transition() -> void:
 
 
 func _on_keypad_submitted(is_correct: bool) -> void:
+	if not is_instance_valid(keypad):
+		return
 	keypad.queue_free()
 	keypad = null
 	if is_correct:
-		set_flag(BEDROOM_KEYPAD_FLAG)
-		dialog_manager.show_dialog(["Zámek cvakl. Kód je správný."])
+		ending_started = true
+		transition_locked = true
+		set_flag(ATTIC_COMBINATION_FLAG)
+		EventBus.request_audio(&"door_unlock")
+		dialog_manager.document_closed.connect(_on_identity_document_closed, CONNECT_ONE_SHOT)
+		dialog_manager.show_document(
+			IDENTITY_CARD_TEXTURE,
+			DialogueCatalog.get_messages(&"act3.id_reveal")
+		)
 	else:
 		dialog_manager.show_dialog(["Zámek kód odmítl."])
 	_refresh_controls()
+
+
+func _on_identity_document_closed() -> void:
+	if ending_started:
+		set_flag("story.identity_read")
+		EventBus.call_deferred("complete_game")
 
 
 func _on_keypad_cancelled() -> void:
@@ -219,58 +252,8 @@ func _update_camera_bounds() -> void:
 	camera.limit_bottom = ceili(bounds.end.y)
 	camera.reset_smoothing()
 	camera.force_update_scroll()
-	_update_world_frame()
-
-
-func _create_world_frame() -> void:
-	world_frame = CanvasLayer.new()
-	world_frame.name = "WorldFrame"
-	world_frame.layer = 10
-	add_child(world_frame)
-	for bar_name in ["TopLetterbox", "BottomLetterbox", "LeftLetterbox", "RightLetterbox"]:
-		var bar := ColorRect.new()
-		bar.name = bar_name
-		bar.color = Color.BLACK
-		bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		world_frame.add_child(bar)
-		letterbox_bars[bar_name] = bar
-
-func get_world_render_rect() -> Rect2:
-	var viewport_size := get_viewport_rect().size
-	var bounds := room.get_background_bounds() if is_instance_valid(room) else Rect2()
-	var render_size := bounds.size * ($Player/Camera2D as Camera2D).zoom
-	render_size = render_size.min(viewport_size)
-	return Rect2((viewport_size - render_size) * 0.5, render_size)
-
-func _update_world_frame() -> void:
-	if letterbox_bars.is_empty():
-		return
-	var viewport_size := get_viewport_rect().size
-	var bounds := room.get_background_bounds() if is_instance_valid(room) else Rect2()
-	if bounds.size.y > 0.0:
-		($Player/Camera2D as Camera2D).zoom = Vector2.ONE * viewport_size.y / bounds.size.y
-	var render_rect := get_world_render_rect()
-	_set_letterbox_bar("TopLetterbox", Rect2(0, 0, viewport_size.x, render_rect.position.y))
-	_set_letterbox_bar("BottomLetterbox", Rect2(0, render_rect.end.y, viewport_size.x, viewport_size.y - render_rect.end.y))
-	_set_letterbox_bar("LeftLetterbox", Rect2(0, render_rect.position.y, render_rect.position.x, render_rect.size.y))
-	_set_letterbox_bar("RightLetterbox", Rect2(render_rect.end.x, render_rect.position.y, viewport_size.x - render_rect.end.x, render_rect.size.y))
-func _set_letterbox_bar(bar_name: String, rect: Rect2) -> void:
-	var bar := letterbox_bars[bar_name] as ColorRect
-	bar.position = rect.position
-	bar.size = rect.size
-	bar.visible = rect.size.x > 0.0 and rect.size.y > 0.0
-
-func _crop_photo_to_world_rect(photo: Image) -> Image:
-	var render_rect := get_world_render_rect()
-	var crop := Rect2i(
-		floori(render_rect.position.x),
-		floori(render_rect.position.y),
-		mini(roundi(render_rect.size.x), photo.get_width()),
-		mini(roundi(render_rect.size.y), photo.get_height())
-	)
-	crop.position.x = clampi(crop.position.x, 0, photo.get_width() - crop.size.x)
-	crop.position.y = clampi(crop.position.y, 0, photo.get_height() - crop.size.y)
-	return photo.get_region(crop)
+	world_frame.set_room(room)
+	world_frame.update_frame()
 
 
 func _on_exit_entered(exit: RoomExit) -> void:

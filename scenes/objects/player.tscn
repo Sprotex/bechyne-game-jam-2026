@@ -1,24 +1,25 @@
 [gd_scene format=3 uid="uid://ciig10qyo8xdm"]
 
 [ext_resource type="Script" uid="uid://i36doeojhwd" path="res://scripts/objects/player_movement.gd" id="1_movement"]
-[ext_resource type="Texture2D" uid="uid://b0c7svalsoo30" path="res://assets/gfx/borka.png" id="2_player"]
+[ext_resource type="SpriteFrames" path="res://assets/gfx/player_walk/player_walk_frames.tres" id="2_frames"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_g2els"]
-radius = 44.0
-height = 260.0
+radius = 16.0
+height = 120.0
 
 [node name="Player" type="CharacterBody2D" unique_id=89459083]
 script = ExtResource("1_movement")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1489891802]
-position = Vector2(0, -365.351)
-texture = ExtResource("2_player")
+[node name="Sprite2D" type="AnimatedSprite2D" parent="." unique_id=1489891802]
+position = Vector2(2, -185)
+scale = Vector2(0.5, 0.5)
+sprite_frames = ExtResource("2_frames")
+animation = &"idle"
+autoplay = "idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1444064111]
 position = Vector2(6, -7)
 rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_g2els")
 
-[node name="Camera2D" type="Camera2D" parent="."]
-enabled = true
-position_smoothing_enabled = false
+[node name="Camera2D" type="Camera2D" parent="." unique_id=560180355]

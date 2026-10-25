@@ -5,10 +5,8 @@ var saved_progress := PackedByteArray()
 var had_progress := false
 const CAMERA_FRAMING_VERIFICATION = preload("res://scripts/testing/camera_framing_verification.gd")
 const ROOM_EXIT_VERIFICATION = preload("res://scripts/testing/room_exit_verification_helper.gd")
-
 func _ready() -> void:
 	call_deferred("_run")
-
 func _run() -> void:
 	var progress_path := ProjectSettings.globalize_path("user://game_progress.cfg")
 	had_progress = FileAccess.file_exists(progress_path)
@@ -45,7 +43,6 @@ func _run() -> void:
 	await get_tree().create_timer(0.15).timeout
 	print("Refactor verification: %d failures" % failures)
 	get_tree().quit(1 if failures > 0 else 0)
-
 func _check_room_links() -> void:
 	var paths := [
 		"res://scenes/rooms/main_entrance.tscn",
@@ -54,6 +51,7 @@ func _check_room_links() -> void:
 		"res://scenes/rooms/bedroom.tscn",
 		"res://scenes/rooms/living_room.tscn",
 		"res://scenes/rooms/attic.tscn",
+		"res://scenes/rooms/cellar.tscn",
 	]
 	var count := 0
 	for path in paths:
@@ -65,12 +63,13 @@ func _check_room_links() -> void:
 			destination.free()
 			count += 1
 		room.free()
-	_check(count == 10, "all ten existing directed room links are present")
+	_check(count == 12, "all twelve directed room links are present")
 	var bathroom := (load("res://scenes/rooms/bathroom.tscn") as PackedScene).instantiate() as Room
 	_check(bathroom.has_node("PhotoCamera") and bathroom.has_node("CameraPhotoSpot"), "bathroom camera and photo spot remain present")
 	_check(bathroom.get_node("PhotoCamera").position == Vector2(1020, 435), "bathroom camera keeps its authored position")
 	_check(bathroom.get_node("CameraPhotoSpot").position == Vector2(1220, 430), "bathroom photo spot keeps its authored position")
 	bathroom.free()
+
 func _check_lights_persist(level: Level) -> void:
 	var paths := [
 		"res://scenes/rooms/main_entrance.tscn",
@@ -112,6 +111,7 @@ func _check_camera_and_art_bounds(level: Level) -> void:
 		{"path": "res://scenes/rooms/hall.tscn", "probe": Vector2(1000, 300), "native_size": Vector2(2000, 377)},
 		{"path": "res://scenes/rooms/living_room.tscn", "probe": Vector2(1300, 328), "native_size": Vector2(2000, 375)},
 		{"path": "res://scenes/rooms/attic.tscn", "probe": Vector2(275, 320), "native_size": Vector2(2000, 377)},
+		{"path": "res://scenes/rooms/cellar.tscn", "probe": Vector2(1000, 320), "native_size": Vector2(2000, 377)},
 	]
 	var player: CharacterBody2D = level.get_node("Player")
 	var camera: Camera2D = player.get_node("Camera2D")
@@ -129,7 +129,7 @@ func _check_camera_and_art_bounds(level: Level) -> void:
 		_check(camera.zoom.is_equal_approx(Vector2.ONE * level.get_viewport_rect().size.y / bounds.size.y), "%s camera fits the room height uniformly" % room.name)
 		_check(camera.limit_left == floori(bounds.position.x) and camera.limit_top == floori(bounds.position.y) and camera.limit_right == ceili(bounds.end.x) and camera.limit_bottom == ceili(bounds.end.y), "%s camera limits match the native image edges" % room.name)
 		_check(room.has_node("RoomWalls") and room.get_node("RoomWalls").get_child_count() >= 4, "%s builds its authored outline collisions" % room.name)
-		_check(room.has_node("FurnitureCollisions") and room.get_node("FurnitureCollisions").get_child_count() > 0, "%s has room-specific furniture collisions" % room.name)
+		_check(room.has_node("FurnitureCollisions") and room.get_node("FurnitureCollisions").get_child_count() > 0, "%s furniture collisions match its room content" % room.name)
 		var points_inside := true
 		for point in room.walkable_outline:
 			if point.x < bounds.position.x or point.x > bounds.end.x or point.y < bounds.position.y or point.y > bounds.end.y:
@@ -178,7 +178,7 @@ func _check_duplicate_exit() -> void:
 	await get_tree().process_frame
 func _check_room_collisions(level: Level) -> void:
 	var player: CharacterBody2D = level.get_node("Player")
-	var sprite: Sprite2D = player.get_node("Sprite2D")
+	var sprite: AnimatedSprite2D = player.get_node("Sprite2D")
 	var body_shape: CollisionShape2D = player.get_node("CollisionShape2D")
 	_check(sprite.position.y < body_shape.position.y and body_shape.position.y < 0.0, "player art and hit shape align above the feet anchor")
 	_check(player.vertical_speed_ratio < 1.0, "vertical speed is tunable below horizontal speed")

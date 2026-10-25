@@ -1,5 +1,4 @@
 extends Area2D
-## Opens the bedroom keypad when the player interacts nearby.
 
 var nearby := false
 var hint: Label
@@ -22,7 +21,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if (
 		nearby
 		and level != null
-		and not level.has_flag(Level.BEDROOM_KEYPAD_FLAG)
+		and not level.has_flag(Level.ATTIC_COMBINATION_FLAG)
 		and level.player_controls_enabled()
 		and event.is_action_pressed("interact")
 	):
@@ -57,7 +56,7 @@ func _build_hint() -> void:
 
 
 func _update_hint() -> void:
-	if level == null or level.has_flag(Level.BEDROOM_KEYPAD_FLAG):
+	if level == null or level.has_flag(Level.ATTIC_COMBINATION_FLAG):
 		hint.hide()
 	else:
 		hint.show()

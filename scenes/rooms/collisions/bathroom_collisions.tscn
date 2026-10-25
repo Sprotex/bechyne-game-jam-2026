@@ -1,24 +1,38 @@
 [gd_scene format=3]
 
-[sub_resource type="RectangleShape2D" id="BathroomVanity"]
-size = Vector2(340, 130)
+[sub_resource type="RectangleShape2D" id="BathroomSinkFeet"]
+size = Vector2(300, 24)
 
-[sub_resource type="ConvexPolygonShape2D" id="BathroomTub"]
-points = PackedVector2Array(-180, -75, 155, -90, 190, 60, -180, 80)
+[sub_resource type="RectangleShape2D" id="BathroomBasketFeet"]
+size = Vector2(155, 24)
 
-[sub_resource type="RectangleShape2D" id="BathroomToilet"]
-size = Vector2(220, 135)
+[sub_resource type="RectangleShape2D" id="BathroomCabinetFeet"]
+size = Vector2(130, 24)
+
+[sub_resource type="RectangleShape2D" id="BathroomShowerFeet"]
+size = Vector2(400, 30)
+
+[sub_resource type="RectangleShape2D" id="BathroomToiletFeet"]
+size = Vector2(250, 28)
 
 [node name="FurnitureCollisions" type="StaticBody2D" unique_id=1368197858]
 
-[node name="VanityCollision" type="CollisionShape2D" parent="." unique_id=771240103]
-position = Vector2(770, 275)
-shape = SubResource("BathroomVanity")
+[node name="SinkFeetCollision" type="CollisionShape2D" parent="." unique_id=771240103]
+position = Vector2(760, 380)
+shape = SubResource("BathroomSinkFeet")
 
-[node name="TubCollision" type="CollisionShape2D" parent="." unique_id=737769797]
-position = Vector2(1710, 360)
-shape = SubResource("BathroomTub")
+[node name="BasketFeetCollision" type="CollisionShape2D" parent="." unique_id=737769797]
+position = Vector2(1042.5, 385)
+shape = SubResource("BathroomBasketFeet")
 
-[node name="ToiletCollision" type="CollisionShape2D" parent="." unique_id=846439522]
-position = Vector2(120, 470)
-shape = SubResource("BathroomToilet")
+[node name="CabinetFeetCollision" type="CollisionShape2D" parent="." unique_id=846439522]
+position = Vector2(1235, 385)
+shape = SubResource("BathroomCabinetFeet")
+
+[node name="ShowerFeetCollision" type="CollisionShape2D" parent="." unique_id=846439523]
+position = Vector2(1750, 450)
+shape = SubResource("BathroomShowerFeet")
+
+[node name="ToiletFeetCollision" type="CollisionShape2D" parent="." unique_id=846439524]
+position = Vector2(125, 545)
+shape = SubResource("BathroomToiletFeet")

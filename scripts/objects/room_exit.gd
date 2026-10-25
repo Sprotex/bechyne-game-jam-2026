@@ -22,8 +22,10 @@ func _ready() -> void:
 	shape.shape = shape.shape.duplicate()
 	var rectangle := shape.shape as RectangleShape2D
 	var horizontal_exit := wall_side in ["north", "south"]
-	rectangle.size = Vector2(300, 120) if horizontal_exit else Vector2(120, 300)
+	var opening_span := opening_half_width * 2.0
+	rectangle.size = Vector2(opening_span, 120) if horizontal_exit else Vector2(120, opening_span)
 	shape.position = _walkable_side_offset()
+	add_to_group("room_exits")
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
 	_build_hint()
@@ -34,7 +36,7 @@ func _process(_delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not nearby or activated or level == null or not level.player_controls_enabled():
+	if not nearby or activated or level == null or not level.player_controls_enabled() or not _is_nearest_exit():
 		return
 	if not event.is_action_pressed("interact") or event.is_echo():
 		return
@@ -64,6 +66,42 @@ func _on_body_exited(body: Node2D) -> void:
 
 func _is_player(body: Node2D) -> bool:
 	return body is CharacterBody2D and level != null and body == level.get_node_or_null("Player")
+
+
+func _is_nearest_exit() -> bool:
+	if not is_instance_valid(level) or is_queued_for_deletion():
+		return false
+	var player := level.get_node_or_null("Player") as CharacterBody2D
+	if player == null:
+		return false
+	var room := _get_room()
+	if room != null and (room.is_queued_for_deletion() or room != level.room):
+		return false
+	var distance := global_position.distance_squared_to(player.global_position)
+	for node in get_tree().get_nodes_in_group("room_exits"):
+		var candidate := node as RoomExit
+		if candidate == null or candidate == self or not is_instance_valid(candidate):
+			continue
+		if candidate.is_queued_for_deletion() or candidate.level != level:
+			continue
+		var candidate_room := candidate._get_room()
+		if candidate_room != room or (candidate_room != null and (candidate_room.is_queued_for_deletion() or candidate_room != level.room)):
+			continue
+		if not candidate.nearby:
+			continue
+		var candidate_distance: float = candidate.global_position.distance_squared_to(player.global_position)
+		if candidate_distance < distance or (is_equal_approx(candidate_distance, distance) and candidate.get_instance_id() < get_instance_id()):
+			return false
+	return true
+
+
+func _get_room() -> Room:
+	var ancestor := get_parent()
+	while ancestor != null:
+		if ancestor is Room:
+			return ancestor as Room
+		ancestor = ancestor.get_parent()
+	return null
 
 
 func _get_level() -> Level:
@@ -111,4 +149,4 @@ func _build_hint() -> void:
 
 
 func _update_hint() -> void:
-	hint.visible = nearby and not activated and level != null and level.player_controls_enabled()
+	hint.visible = nearby and not activated and level != null and level.player_controls_enabled() and _is_nearest_exit()

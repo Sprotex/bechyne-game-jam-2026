@@ -55,4 +55,10 @@ Přehrává se ve stávajícím AudioManageru přes bus `Music`, s `loop_music =
 Smyčku zajišťuje `AudioStreamOggVorbis.loop`, nikoli jen opakované spouštění po konci.
 Alternativní hudba `not_creepy.ogg` zůstává beze změny.
 
-Zvuk `assets/audio/door_unlock.wav` je připravený pro pozdější použití: z původního `door_unlock.m4a` v `audio_sources/untrimmed/2026-10-25/` jsem vybral rozsah 0,20–1,29 s (délka 1,09 s) a převedl jej na PCM16 mono, 44,1 kHz. Záloha M4A je bajtově shodná se zdrojem (SHA256 `70C89F21CDC1D4318E9098ED57E41AFB2B379F485D6CC3685C81E7589BB177A5`). Jde pouze o import do AudioManageru pod ID `door_unlock`; zvuk zatím nemá herní spouštěč.
+Zvuk `assets/audio/door_unlock.wav` používá správné odemčení číselného zámku na půdě: z původního `door_unlock.m4a` v `audio_sources/untrimmed/2026-10-25/` jsem vybral rozsah 0,20–1,29 s (délka 1,09 s) a převedl jej na PCM16 mono, 44,1 kHz. Záloha M4A je bajtově shodná se zdrojem (SHA256 `70C89F21CDC1D4318E9098ED57E41AFB2B379F485D6CC3685C81E7589BB177A5`). AudioManager jej přehrává pod ID `door_unlock` před zobrazením občanky.
+
+Vypínač při ručním zapnutí i vypnutí posílá požadavek `switch` na bus `Sound`. Dočasně sdílí existující krátký `lock.wav`; samostatná nahrávka vypínače není v projektu přiřazena. Načtení místnosti ani obnovení uloženého stavu světel zvuk nespouští.
+
+## Jednotlivý krok
+
+`assets/audio/footstep_single.wav` je jeden izolovaný krok vybraný z již oříznutého více-krokového `assets/audio/footsteps.wav`. Použitý rozsah původního klipu je 1,070–1,220 s (samply 47187–53801 při 44,1 kHz); výsledný soubor má délku 0,150 s, PCM16 mono, 44,1 kHz a 3ms náběh i doběh. Zdrojový WAV i jeho záloha `audio_sources/untrimmed/2026-10-25/footsteps.wav` zůstaly nezměněné. AudioManager registruje tento nový klip pod stávajícím ID `footsteps`.

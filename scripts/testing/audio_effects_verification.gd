@@ -13,7 +13,6 @@ func _run() -> void:
 	_check_audio_manager()
 	await _check_level_audio()
 	await _check_wheel_audio()
-	await _check_footsteps()
 	await _check_cleanup()
 	EventBus.audio_play_requested.disconnect(_record_audio_request)
 	_stop_all_audio()
@@ -26,6 +25,8 @@ func _run() -> void:
 func _check_audio_manager() -> void:
 	for sound_id in [&"door", &"lock", &"door_unlock", &"footsteps", &"washing_machine"]:
 		_check(AudioManager._get_sound_stream(sound_id) != null, "%s sound is registered" % sound_id)
+	var footsteps := AudioManager._get_sound_stream(&"footsteps") as AudioStreamWAV
+	_check(footsteps != null and footsteps.resource_path.ends_with("footstep_single.wav"), "footsteps uses the single contact sound clip")
 	var door_unlock := AudioManager._get_sound_stream(&"door_unlock") as AudioStreamWAV
 	_check(door_unlock != null, "door unlock sound is a WAV resource")
 	if door_unlock != null:
@@ -119,36 +120,6 @@ func _check_wheel_audio() -> void:
 		_check(_count_players_for(&"lock") == 1, "rapid lock requests do not create duplicate players")
 	keypad.queue_free()
 	await get_tree().process_frame
-
-
-func _check_footsteps() -> void:
-	var level := load("res://scenes/level.tscn").instantiate() as Level
-	get_tree().root.add_child(level)
-	await get_tree().physics_frame
-	level.dialog_manager.hide_dialog()
-	level._refresh_controls()
-	Input.action_press(&"move_right")
-	await get_tree().physics_frame
-	_check(AudioManager.looping_players.has(&"footsteps"), "movement starts footsteps")
-	level.open_keypad()
-	await get_tree().physics_frame
-	_check(not AudioManager.looping_players.has(&"footsteps"), "opening a modal lock stops footsteps")
-	level.keypad.queue_free()
-	level.keypad = null
-	level._refresh_controls()
-	Input.action_release(&"move_right")
-	await get_tree().physics_frame
-	_check(not AudioManager.looping_players.has(&"footsteps"), "releasing movement stops footsteps")
-	Input.action_press(&"move_up")
-	await get_tree().physics_frame
-	Input.action_release(&"move_up")
-	Input.action_press(&"move_down")
-	await get_tree().physics_frame
-	_check(AudioManager.looping_players.has(&"footsteps"), "movement on another axis starts footsteps")
-	Input.action_release(&"move_down")
-	level.queue_free()
-	await get_tree().process_frame
-	_check(not AudioManager.looping_players.has(&"footsteps"), "player exit stops footsteps")
 
 
 func _check_cleanup() -> void:

@@ -7,6 +7,7 @@ const ROOM_PATHS := [
 	"res://scenes/rooms/bedroom.tscn",
 	"res://scenes/rooms/bathroom.tscn",
 	"res://scenes/rooms/attic.tscn",
+	"res://scenes/rooms/cellar.tscn",
 ]
 const FEET_OFFSET := Vector2(6.0, -7.0)
 var failures := 0
@@ -46,6 +47,16 @@ func _run() -> void:
 				_check(hit_perimeter and player.global_position.distance_to(before) < 320.0, "%s %s exit blocks outward movement (%s)" % [room.name, exit.name, "unlocked" if unlocked else "locked"])
 				player.velocity = Vector2.ZERO
 				await get_tree().physics_frame
+		if room_path.ends_with("cellar.tscn"):
+			player.global_position = Vector2(150, 320)
+			await get_tree().physics_frame
+			_check(player.test_move(player.global_transform, Vector2(0, -120)), "cellar staircase edge blocks outward movement")
+			player.global_position = Vector2(1850, 320)
+			await get_tree().physics_frame
+			_check(player.test_move(player.global_transform, Vector2(150, 0)), "cellar right wall blocks outward movement")
+			player.global_position = Vector2(1800, 340)
+			await get_tree().physics_frame
+			_check(player.test_move(player.global_transform, Vector2(0, 100)), "cellar south wall blocks outward movement")
 	level.queue_free()
 	await get_tree().process_frame
 	get_tree().current_scene = self
