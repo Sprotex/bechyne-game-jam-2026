@@ -12,6 +12,8 @@ func _physics_process(_delta: float) -> void:
 		move_and_slide()
 		return
 	var direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	if not is_zero_approx(direction.x):
+		$Sprite2D.flip_h = direction.x > 0.0
 	direction.y *= vertical_speed_ratio
 	var speed := horizontal_speed * SPRINT_SPEED_MULTIPLIER if Input.is_key_pressed(KEY_SHIFT) else horizontal_speed
 	velocity = direction.normalized() * speed if direction.length_squared() > 1.0 else direction * speed
