@@ -9,9 +9,35 @@ signal lights_state_changed(is_on: bool)
 @export var walkable_outline := PackedVector2Array()
 
 const WALL_THICKNESS := 18.0
+const DARK_INTERACTION_MESSAGE := "Nevidím na to."
 
 var lights_are_on := false
 var exit_gates: Array[Dictionary] = []
+
+
+func _input(event: InputEvent) -> void:
+	if not event.is_action_pressed("interact") or lights_are_on:
+		return
+	var level := _get_level()
+	if level == null or not level.player_controls_enabled() or not _has_nearby_interaction(level):
+		return
+	get_viewport().set_input_as_handled()
+	level.dialog_manager.show_dialog([DARK_INTERACTION_MESSAGE])
+
+
+func _has_nearby_interaction(level: Level) -> bool:
+	var player := level.get_node_or_null("Player") as CharacterBody2D
+	if player == null:
+		return false
+	for area in find_children("*", "Area2D", true, false):
+		if area.is_in_group("light_switches") and (area as Area2D).get_overlapping_bodies().has(player):
+			return false
+	for area in find_children("*", "Area2D", true, false):
+		if area.is_in_group("light_switches"):
+			continue
+		if (area as Area2D).get_overlapping_bodies().has(player):
+			return true
+	return false
 
 
 func toggle_lights() -> void:

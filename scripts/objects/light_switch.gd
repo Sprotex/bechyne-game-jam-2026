@@ -1,5 +1,5 @@
 extends Interactor
-## Toggles the lights in its room.
+## Turns the lights in its room on.
 
 const OFF_TEXTURE := preload("res://assets/gfx/vypinac_vypnuto.png")
 const ON_TEXTURE := preload("res://assets/gfx/vypinac_zapnuto.png")
@@ -8,7 +8,8 @@ var room: Room
 
 
 func _ready() -> void:
-	interaction_hint = "Přepnout světla"
+	add_to_group("light_switches")
+	interaction_hint = "Zapnout světla"
 	room = get_parent() as Room
 	room.lights_state_changed.connect(_on_lights_state_changed)
 	super._ready()
@@ -16,8 +17,12 @@ func _ready() -> void:
 
 
 func _interact() -> void:
-	room.toggle_lights()
+	room.set_lights_enabled(true)
 	EventBus.request_audio(&"switch")
+
+
+func _can_interact() -> bool:
+	return not room.lights_are_on and super._can_interact()
 
 
 func _on_lights_state_changed(is_on: bool) -> void:

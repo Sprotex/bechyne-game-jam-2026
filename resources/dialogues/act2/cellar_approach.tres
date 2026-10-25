@@ -4,4 +4,3 @@
 
 [resource]
 script = ExtResource("1")
-messages = PackedStringArray("Ten zvuk jde ze sklepa, kdo tam kurva dělá bordel ve 3 ráno?", "Smrdí tu jako…", "Jako by tu něco chcíplo!")

@@ -9,30 +9,34 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/keypad_interactor.tscn" id="8_keypad"]
 [ext_resource type="PackedScene" path="res://scenes/objects/aunt_call_interactor.tscn" id="9_call"]
 [ext_resource type="PackedScene" path="res://scenes/objects/diagnosis.tscn" id="10_diagnosis"]
-[ext_resource type="Script" path="res://scripts/rooms/story_interactor.gd" id="11_story_interactor"]
-[ext_resource type="Resource" path="res://resources/dialogues/act3/moss.tres" id="12_moss_story"]
+[ext_resource type="PackedScene" path="res://scenes/objects/light_source.tscn" id="11_light"]
+[ext_resource type="PackedScene" path="res://scenes/objects/light_switch.tscn" id="12_switch"]
 
 [sub_resource type="RectangleShape2D" id="AtticEntryTrigger"]
 size = Vector2(180, 180)
 
-[sub_resource type="CircleShape2D" id="MossInteractionRange"]
-radius = 84.0
-
 [node name="Attic" type="Node2D"]
 script = ExtResource("1_room")
+scale = Vector2(1.493369, 1.493369)
 room_title = "PŮDA"
 room_color = Color(0.86, 0.82, 0.75, 1)
-walkable_outline = PackedVector2Array(200, 230, 2000, 230, 2000, 377, 0, 377, 0, 355)
+walkable_outline = PackedVector2Array(200, 233, 2000, 233, 2000, 377, 0, 377, 0, 355)
 
 [node name="FloorFill" type="Polygon2D" parent="."]
 z_index = -2
 color = Color(0.72, 0.66, 0.55, 1)
-polygon = PackedVector2Array(0, 230, 2000, 230, 2000, 377, 0, 377)
+polygon = PackedVector2Array(0, 233, 2000, 233, 2000, 377, 0, 377)
 
 [node name="Background" type="Sprite2D" parent="."]
 texture = ExtResource("2_background")
 centered = false
 z_index = -1
+
+[node name="CeilingLightLeft" parent="." instance=ExtResource("11_light")]
+position = Vector2(650, 70)
+
+[node name="CeilingLightRight" parent="." instance=ExtResource("11_light")]
+position = Vector2(1450, 70)
 
 [node name="FurnitureCollisions" parent="." instance=ExtResource("4_collisions")]
 
@@ -44,6 +48,9 @@ script = ExtResource("6_entry")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="EntryInteractor"]
 shape = SubResource("AtticEntryTrigger")
+
+[node name="LightSwitch" parent="." instance=ExtResource("12_switch")]
+position = Vector2(400, 300)
 
 [node name="ExitToHall" parent="." instance=ExtResource("3_exit")]
 position = Vector2(80, 338)
@@ -60,21 +67,5 @@ room_flag = "story.call.attic"
 
 [node name="Diagnosis" parent="." instance=ExtResource("10_diagnosis")]
 position = Vector2(1090, 295)
-
-[node name="MossInteractor" type="Area2D" parent="."]
-position = Vector2(1810, 245)
-collision_layer = 0
-collision_mask = 1
-script = ExtResource("11_story_interactor")
-story = ExtResource("12_moss_story")
-hint_text = "Sníst mech"
-hide_graphics_on_complete = true
-
-[node name="Moss" type="Polygon2D" parent="MossInteractor"]
-color = Color(0.28, 0.4, 0.2, 1)
-polygon = PackedVector2Array(-20, -9, -12, -18, 1, -15, 13, -18, 20, -7, 15, 2, 20, 10, 6, 14, -7, 11, -19, 5)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MossInteractor"]
-shape = SubResource("MossInteractionRange")
 
 [node name="Arrivals" parent="." instance=ExtResource("5_arrivals")]

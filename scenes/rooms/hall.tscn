@@ -1,90 +1,72 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://dkcn2r8haxbdr"]
 
-[ext_resource type="Script" path="res://scripts/rooms/room.gd" id="1_room"]
-[ext_resource type="Texture2D" path="res://assets/gfx/chodba2.png" id="3_background"]
+[ext_resource type="Script" uid="uid://dxu1rm7tuyuq2" path="res://scripts/rooms/room.gd" id="1_room"]
 [ext_resource type="PackedScene" path="res://scenes/objects/room_exit.tscn" id="2_exit"]
+[ext_resource type="Texture2D" uid="uid://dyf0i2x3w2xlt" path="res://assets/gfx/chodba2.png" id="3_background"]
 [ext_resource type="PackedScene" path="res://scenes/objects/light_source.tscn" id="5_light"]
-[ext_resource type="PackedScene" path="res://scenes/objects/light_switch.tscn" id="6_switch"]
+[ext_resource type="PackedScene" uid="uid://cvnwv3ofng0cr" path="res://scenes/objects/light_switch.tscn" id="6_switch"]
 [ext_resource type="PackedScene" path="res://scenes/rooms/collisions/hall_collisions.tscn" id="7_collisions"]
 [ext_resource type="PackedScene" path="res://scenes/rooms/arrivals/hall_arrivals.tscn" id="8_arrivals"]
-[ext_resource type="Texture2D" path="res://assets/gfx/cellar_door_placeholder.svg" id="9_cellar_door"]
 [ext_resource type="PackedScene" path="res://scenes/objects/aunt_call_interactor.tscn" id="10_call"]
 
-[node name="Hall" type="Node2D"]
+[node name="Hall" type="Node2D" unique_id=1357698943]
+scale = Vector2(1.4933687, 1.4933687)
 script = ExtResource("1_room")
 room_title = "CHODBA"
 room_color = Color(0.84706, 0.78039, 0.71765, 1)
-walkable_outline = PackedVector2Array(65, 211, 1810, 211, 2000, 300, 2000, 377, 0, 377, 0, 300)
+walkable_outline = PackedVector2Array(78, 210, 1807, 213, 1917, 377, 0, 377, 0, 300)
 
-[node name="FloorFill" type="Polygon2D" parent="."]
+[node name="FloorFill" type="Polygon2D" parent="." unique_id=417659106]
 z_index = -2
 color = Color(0.6902, 0.6157, 0.451, 1)
-polygon = PackedVector2Array(0, 0, 2000, 0, 2000, 377, 0, 377)
+polygon = PackedVector2Array(78, 210, 1807, 213, 1917, 377, 0, 377, 0, 300)
 
-[node name="Background" type="Sprite2D" parent="."]
+[node name="Background" type="Sprite2D" parent="." unique_id=1767350487]
+z_index = -1
 texture = ExtResource("3_background")
 centered = false
-z_index = -1
 
-[node name="CeilingLightLeft" parent="." instance=ExtResource("5_light")]
+[node name="CeilingLightLeft" parent="." unique_id=2059847293 instance=ExtResource("5_light")]
 position = Vector2(650, 70)
 
-[node name="CeilingLightRight" parent="." instance=ExtResource("5_light")]
+[node name="CeilingLightRight" parent="." unique_id=1178970073 instance=ExtResource("5_light")]
 position = Vector2(1450, 70)
 
-[node name="LightSwitch" parent="." instance=ExtResource("6_switch")]
-position = Vector2(475, 190)
+[node name="LightSwitch" parent="." unique_id=316430553 instance=ExtResource("6_switch")]
+position = Vector2(1832.769, 299.32327)
 
-[node name="FurnitureCollisions" parent="." instance=ExtResource("7_collisions")]
+[node name="FurnitureCollisions" parent="." unique_id=1910087366 instance=ExtResource("7_collisions")]
 
-[node name="ExitToEntrance" parent="." instance=ExtResource("2_exit")]
+[node name="ExitToEntrance" parent="." unique_id=1338888544 instance=ExtResource("2_exit")]
 position = Vector2(1900, 255)
 destination_scene_path = "res://scenes/rooms/main_entrance.tscn"
 destination_arrival_id = "from_hall"
 wall_side = "east"
 
-[node name="ExitToBedroom" parent="." instance=ExtResource("2_exit")]
+[node name="ExitToBedroom" parent="." unique_id=2062880388 instance=ExtResource("2_exit")]
 position = Vector2(1650, 377)
 destination_scene_path = "res://scenes/rooms/bedroom.tscn"
 destination_arrival_id = "from_hall"
 wall_side = "south"
 
-[node name="ExitToAttic" parent="." instance=ExtResource("2_exit")]
+[node name="ExitToAttic" parent="." unique_id=1888759423 instance=ExtResource("2_exit")]
 position = Vector2(350, 211)
 destination_scene_path = "res://scenes/rooms/attic.tscn"
 destination_arrival_id = "from_hall"
-wall_side = "north"
 opening_half_width = 95.0
 required_flag = "story.attic_unlocked"
 locked_message = "Na půdu zatím nemám důvod chodit."
 
-[node name="ExitToCellar" parent="." instance=ExtResource("2_exit")]
+[node name="ExitToCellar" parent="." unique_id=999443763 instance=ExtResource("2_exit")]
 position = Vector2(150, 211)
 destination_scene_path = "res://scenes/rooms/cellar.tscn"
 destination_arrival_id = "from_hall"
-wall_side = "north"
 opening_half_width = 60.0
+required_flag = "story.day_two"
+locked_message = "Do sklepa zatím nemám důvod chodit."
 
-[node name="CellarDoorPlaceholder" type="Sprite2D" parent="."]
-position = Vector2(65, 45)
-texture = ExtResource("9_cellar_door")
-centered = false
-z_index = 1
-
-[node name="CellarDoorLabel" type="Label" parent="."]
-offset_left = 112.0
-offset_top = 116.0
-offset_right = 218.0
-offset_bottom = 144.0
-text = "SKLEP"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.94, 0.87, 0.68, 1)
-theme_override_colors/font_outline_color = Color(0.12, 0.08, 0.05, 1)
-theme_override_constants/outline_size = 3
-z_index = 2
-
-[node name="AuntCall" parent="." instance=ExtResource("10_call")]
+[node name="AuntCall" parent="." unique_id=679690861 instance=ExtResource("10_call")]
 position = Vector2(900, 340)
 room_flag = "story.call.hall"
 
-[node name="Arrivals" parent="." instance=ExtResource("8_arrivals")]
+[node name="Arrivals" parent="." unique_id=615057423 instance=ExtResource("8_arrivals")]

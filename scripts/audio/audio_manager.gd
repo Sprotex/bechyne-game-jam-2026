@@ -30,11 +30,6 @@ func _ready() -> void:
 	_start_music()
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(&"toggle_music") and not event.is_echo():
-		_toggle_music()
-
-
 func _play_audio(sound_id: StringName, volume_db: float, bus: StringName) -> void:
 	var stream := _get_sound_stream(sound_id)
 	if stream == null:
@@ -113,29 +108,41 @@ func _get_sound_stream(sound_id: StringName) -> AudioStream:
 
 
 func _start_music() -> void:
-	if music == null:
+	var selected_music := alternate_music if alternate_music != null else music
+	if selected_music == null:
 		return
 
-	if music is AudioStreamOggVorbis:
-		music.loop = loop_music
+	alternate_music_selected = alternate_music != null
+	if selected_music is AudioStreamOggVorbis:
+		selected_music.loop = loop_music
 
 	music_player = AudioStreamPlayer.new()
-	music_player.stream = music
+	music_player.stream = selected_music
 	music_player.bus = &"Music"
 	music_player.finished.connect(_on_music_finished)
 	add_child(music_player)
 	music_player.play()
 
 
-func _toggle_music() -> void:
+func select_alternate_music() -> void:
 	if music_player == null or alternate_music == null:
 		return
 
-	alternate_music_selected = not alternate_music_selected
-	var selected_music := alternate_music if alternate_music_selected else music
-	if selected_music is AudioStreamOggVorbis:
-		selected_music.loop = loop_music
-	music_player.stream = selected_music
+	alternate_music_selected = true
+	if alternate_music is AudioStreamOggVorbis:
+		alternate_music.loop = loop_music
+	music_player.stream = alternate_music
+	music_player.play()
+
+
+func select_primary_music() -> void:
+	if music_player == null or music == null or not alternate_music_selected:
+		return
+
+	alternate_music_selected = false
+	if music is AudioStreamOggVorbis:
+		music.loop = loop_music
+	music_player.stream = music
 	music_player.play()
 
 

@@ -1,18 +1,19 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://cvnwv3ofng0cr"]
 
-[ext_resource type="Script" path="res://scripts/objects/light_switch.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://bwmtxwveb4vqc" path="res://scripts/objects/light_switch.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://c52gxlcm7jpds" path="res://assets/gfx/vypinac_vypnuto.png" id="2_lmdqo"]
 
 [sub_resource type="CircleShape2D" id="SwitchInteraction"]
 radius = 100.0
 
-[node name="LightSwitch" type="Area2D"]
+[node name="LightSwitch" type="Area2D" unique_id=1570598578]
 collision_layer = 0
-collision_mask = 1
 script = ExtResource("1_script")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(0, -160)
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=694121213]
 texture_filter = 1
+position = Vector2(0, -160)
+texture = ExtResource("2_lmdqo")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1945944407]
 shape = SubResource("SwitchInteraction")

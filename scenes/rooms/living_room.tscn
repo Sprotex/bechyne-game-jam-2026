@@ -1,55 +1,55 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bjubsrl4by14f"]
 
-[ext_resource type="Script" path="res://scripts/rooms/room.gd" id="1_room"]
-[ext_resource type="Texture2D" path="res://assets/gfx/obyvak.png" id="4_background"]
+[ext_resource type="Script" uid="uid://dxu1rm7tuyuq2" path="res://scripts/rooms/room.gd" id="1_room"]
 [ext_resource type="PackedScene" path="res://scenes/objects/room_exit.tscn" id="2_exit"]
+[ext_resource type="Texture2D" uid="uid://dykbctc10nkf0" path="res://assets/gfx/obyvak.png" id="4_background"]
 [ext_resource type="PackedScene" path="res://scenes/objects/light_source.tscn" id="5_light"]
-[ext_resource type="PackedScene" path="res://scenes/objects/light_switch.tscn" id="6_switch"]
+[ext_resource type="PackedScene" uid="uid://cvnwv3ofng0cr" path="res://scenes/objects/light_switch.tscn" id="6_switch"]
 [ext_resource type="PackedScene" path="res://scenes/rooms/collisions/living_room_collisions.tscn" id="7_collisions"]
 [ext_resource type="PackedScene" path="res://scenes/objects/aunt_call_interactor.tscn" id="8_call"]
 
-[node name="LivingRoom" type="Node2D"]
-script = ExtResource("1_room")
+[node name="LivingRoom" type="Node2D" unique_id=1451653059]
 scale = Vector2(1.501333, 1.501333)
+script = ExtResource("1_room")
 room_title = "OBÝVACÍ POKOJ"
 room_color = Color(0.82745, 0.76863, 0.71373, 1)
 walkable_outline = PackedVector2Array(0, 237, 2000, 240, 2000, 375, 0, 375)
 
-[node name="FloorFill" type="Polygon2D" parent="."]
+[node name="FloorFill" type="Polygon2D" parent="." unique_id=171427917]
 z_index = -2
 color = Color(0.6902, 0.6157, 0.451, 1)
 polygon = PackedVector2Array(0, 0, 2000, 0, 2000, 375, 0, 375)
 
-[node name="Background" type="Sprite2D" parent="."]
+[node name="Background" type="Sprite2D" parent="." unique_id=1158367050]
+z_index = -1
 texture = ExtResource("4_background")
 centered = false
-z_index = -1
 
-[node name="CeilingLightLeft" parent="." instance=ExtResource("5_light")]
+[node name="CeilingLightLeft" parent="." unique_id=83526511 instance=ExtResource("5_light")]
 position = Vector2(650, 60)
 
-[node name="CeilingLightRight" parent="." instance=ExtResource("5_light")]
+[node name="CeilingLightRight" parent="." unique_id=233681996 instance=ExtResource("5_light")]
 position = Vector2(1450, 60)
 
-[node name="LightSwitch" parent="." instance=ExtResource("6_switch")]
-position = Vector2(250, 285)
+[node name="LightSwitch" parent="." unique_id=1638686163 instance=ExtResource("6_switch")]
+position = Vector2(1220.2489, 291.07468)
 
-[node name="FurnitureCollisions" parent="." instance=ExtResource("7_collisions")]
+[node name="FurnitureCollisions" parent="." unique_id=1660727992 instance=ExtResource("7_collisions")]
 
-[node name="AuntCall" parent="." instance=ExtResource("8_call")]
+[node name="AuntCall" parent="." unique_id=1803707547 instance=ExtResource("8_call")]
 position = Vector2(950, 320)
 room_flag = "story.call.living_room"
 
-[node name="ExitToEntrance" parent="." instance=ExtResource("2_exit")]
+[node name="ExitToEntrance" parent="." unique_id=2056766001 instance=ExtResource("2_exit")]
 position = Vector2(1180, 375)
 destination_scene_path = "res://scenes/rooms/main_entrance.tscn"
 destination_arrival_id = "from_living_room"
 wall_side = "south"
 
-[node name="Arrivals" type="Node2D" parent="."]
+[node name="Arrivals" type="Node2D" parent="." unique_id=1499937995]
 
-[node name="start" type="Marker2D" parent="Arrivals"]
+[node name="start" type="Marker2D" parent="Arrivals" unique_id=1616919872]
 position = Vector2(1100, 320)
 
-[node name="from_entrance" type="Marker2D" parent="Arrivals"]
+[node name="from_entrance" type="Marker2D" parent="Arrivals" unique_id=693594967]
 position = Vector2(1100, 320)

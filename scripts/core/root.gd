@@ -2,10 +2,11 @@ extends Node2D
 
 const LEVEL_SCENE := "res://scenes/level.tscn"
 const DOMECEK := preload("res://assets/gfx/domecek.png")
+const MENU_BACKGROUND := preload("res://assets/gfx/barak.png")
 const CUTSCENE_BACKGROUNDS := [
-	DOMECEK,
-	DOMECEK,
-	DOMECEK,
+	MENU_BACKGROUND,
+	MENU_BACKGROUND,
+	MENU_BACKGROUND,
 ]
 const CUTSCENE_MESSAGES: Array[String] = [
 	"Věci nemusí bejt tak, jak se na první pohled zdá.",
@@ -37,7 +38,7 @@ func _ready() -> void:
 
 func _build_menu() -> void:
 	var background := TextureRect.new()
-	background.texture = DOMECEK
+	background.texture = MENU_BACKGROUND
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	background.stretch_mode = TextureRect.STRETCH_SCALE

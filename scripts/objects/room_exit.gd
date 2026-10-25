@@ -1,3 +1,4 @@
+@tool
 extends Interactor
 class_name RoomExit
 
@@ -5,8 +6,14 @@ signal exit_entered(exit: RoomExit)
 
 @export_file("*.tscn") var destination_scene_path := ""
 @export var destination_arrival_id := "start"
-@export_enum("north", "south", "west", "east") var wall_side := "north"
-@export_range(24.0, 220.0, 1.0) var opening_half_width := 150.0
+@export_enum("north", "south", "west", "east") var wall_side := "north":
+	set(value):
+		wall_side = value
+		_sync_collision_shape()
+@export_range(24.0, 220.0, 1.0) var opening_half_width := 150.0:
+	set(value):
+		opening_half_width = value
+		_sync_collision_shape()
 @export var required_flag := ""
 @export_multiline var locked_message := ""
 
@@ -15,17 +22,31 @@ var level: Level
 
 
 func _ready() -> void:
+	_sync_collision_shape()
+	if Engine.is_editor_hint():
+		return
 	interaction_hint = _get_interaction_hint()
 	level = _get_level()
 	var shape := get_node("CollisionShape2D") as CollisionShape2D
-	shape.shape = shape.shape.duplicate()
-	var rectangle := shape.shape as RectangleShape2D
-	var horizontal_exit := wall_side in ["north", "south"]
-	var opening_span := opening_half_width * 2.0
-	rectangle.size = Vector2(opening_span, 120) if horizontal_exit else Vector2(120, opening_span)
 	shape.position = _walkable_side_offset()
 	add_to_group("room_exits")
 	super._ready()
+
+
+func _sync_collision_shape() -> void:
+	var shape := get_node_or_null("CollisionShape2D") as CollisionShape2D
+	if shape == null or shape.shape == null:
+		return
+	var rectangle := shape.shape as RectangleShape2D
+	if rectangle == null:
+		return
+	var opening_span := opening_half_width * 2.0
+	var desired_size := Vector2(opening_span, 120) if wall_side in ["north", "south"] else Vector2(120, opening_span)
+	if rectangle.size == desired_size:
+		return
+	var unique_rectangle := rectangle.duplicate() as RectangleShape2D
+	unique_rectangle.size = desired_size
+	shape.shape = unique_rectangle
 
 
 func _get_interaction_hint() -> String:

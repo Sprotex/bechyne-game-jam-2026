@@ -6,11 +6,13 @@ class_name StoryTransitions
 static func coma_transition(level: Level) -> void:
 	level.transition_locked = true
 	level._refresh_controls()
+	level.dialog_manager.show_dialog(DialogueCatalog.get_messages(&"act2.leaving_cellar"))
+	await level.dialog_manager.dialog_finished
 	var fade := level.get_node("HUD/Fade") as ColorRect
 	var tween := level.create_tween()
 	tween.tween_property(fade, "color:a", 1.0, 0.8)
 	await tween.finished
-	level._load_room("res://scenes/rooms/hall.tscn", "from_bedroom")
+	level._load_room("res://scenes/rooms/hall.tscn", "from_cellar")
 	level.set_flag("story.act_three")
 	var title := Label.new()
 	title.name = "ComaTransitionText"
@@ -28,4 +30,5 @@ static func coma_transition(level: Level) -> void:
 	await fade_out.finished
 	level.transition_locked = false
 	level._refresh_controls()
+	AudioManager.select_primary_music()
 	level.dialog_manager.show_dialog(DialogueCatalog.get_messages(&"act3.wake"))

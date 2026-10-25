@@ -4,4 +4,3 @@
 
 [resource]
 script = ExtResource("1")
-messages = PackedStringArray("Už se stmívá a TETA furt nikde. Asi zase někde bloudí jako vždycky.", "Ráda se procházela po přírodě a naslouchala lesu.", "…", "Byla trochu divná.", "No asi si půjdu schrupnout, mám za sebou dlouhou cestu.", "Na TETU nemá cenu čekat, stejně se ze svého toulání po přírodě vracela často až ráno.", "Snad až se vzbudím tak tu už bude.", "Cho mi mi mi mi…")

@@ -1,40 +1,67 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene format=3 uid="uid://cmvbgtm0kl0wy"]
 
-[ext_resource type="Script" path="res://scripts/rooms/room.gd" id="1_room"]
-[ext_resource type="Texture2D" path="res://assets/gfx/sklep.png" id="2_background"]
+[ext_resource type="Script" uid="uid://dxu1rm7tuyuq2" path="res://scripts/rooms/room.gd" id="1_room"]
+[ext_resource type="Texture2D" uid="uid://bjt4qqk7fgkau" path="res://assets/gfx/sklep.png" id="2_background"]
 [ext_resource type="PackedScene" path="res://scenes/objects/room_exit.tscn" id="3_exit"]
 [ext_resource type="PackedScene" path="res://scenes/rooms/arrivals/cellar_arrivals.tscn" id="4_arrivals"]
 [ext_resource type="PackedScene" path="res://scenes/rooms/collisions/cellar_collisions.tscn" id="5_collisions"]
 [ext_resource type="PackedScene" path="res://scenes/objects/washing_machine_interactor.tscn" id="6_washer"]
 [ext_resource type="PackedScene" path="res://scenes/objects/aunt_call_interactor.tscn" id="7_call"]
+[ext_resource type="Script" uid="uid://bw3rvnyxewaos" path="res://scripts/rooms/story_interactor.gd" id="8_story_interactor"]
+[ext_resource type="Resource" path="res://resources/dialogues/act3/moss.tres" id="9_moss_story"]
+[ext_resource type="PackedScene" path="res://scenes/objects/light_source.tscn" id="10_light"]
+[ext_resource type="PackedScene" uid="uid://cvnwv3ofng0cr" path="res://scenes/objects/light_switch.tscn" id="11_switch"]
 
-[node name="Cellar" type="Node2D"]
+[sub_resource type="CircleShape2D" id="MossInteractionRange"]
+radius = 84.0
+
+[node name="Cellar" type="Node2D" unique_id=238976220]
+scale = Vector2(1.4933687, 1.4933687)
 script = ExtResource("1_room")
 room_title = "SKLEP"
 room_color = Color(0.38, 0.36, 0.33, 1)
 walkable_outline = PackedVector2Array(275, 200, 1900, 200, 1960, 377, 0, 377, 0, 300, 250, 300)
 
-[node name="Background" type="Sprite2D" parent="."]
+[node name="Background" type="Sprite2D" parent="." unique_id=472913250]
+z_index = -1
 texture = ExtResource("2_background")
 centered = false
-z_index = -1
 
-[node name="FurnitureCollisions" parent="." instance=ExtResource("5_collisions")]
+[node name="CeilingLightLeft" parent="." unique_id=1464629699 instance=ExtResource("10_light")]
+position = Vector2(650, 55)
 
-[node name="ExitToHall" parent="." instance=ExtResource("3_exit")]
-position = Vector2(150, 280)
+[node name="CeilingLightRight" parent="." unique_id=1523561893 instance=ExtResource("10_light")]
+position = Vector2(1450, 55)
+
+[node name="LightSwitch" parent="." unique_id=1016744229 instance=ExtResource("11_switch")]
+position = Vector2(360.92892, 254.45824)
+
+[node name="FurnitureCollisions" parent="." unique_id=1549750706 instance=ExtResource("5_collisions")]
+
+[node name="ExitToHall" parent="." unique_id=489105737 instance=ExtResource("3_exit")]
+position = Vector2(170.75488, 300.6625)
 destination_scene_path = "res://scenes/rooms/hall.tscn"
 destination_arrival_id = "from_cellar"
-wall_side = "north"
 opening_half_width = 60.0
 required_flag = "story.washing_machine_stopped"
 locked_message = "Nejdřív musím zjistit, co v té pračce cinká."
 
-[node name="WashingMachine" parent="." instance=ExtResource("6_washer")]
+[node name="WashingMachine" parent="." unique_id=585377268 instance=ExtResource("6_washer")]
 position = Vector2(1740, 300)
 
-[node name="AuntCall" parent="." instance=ExtResource("7_call")]
+[node name="AuntCall" parent="." unique_id=977396944 instance=ExtResource("7_call")]
 position = Vector2(900, 330)
 room_flag = "story.call.cellar"
 
-[node name="Arrivals" parent="." instance=ExtResource("4_arrivals")]
+[node name="MossInteractor" type="Area2D" parent="." unique_id=1391336169]
+position = Vector2(1915, 175)
+collision_layer = 0
+script = ExtResource("8_story_interactor")
+story = ExtResource("9_moss_story")
+hide_graphics_on_complete = true
+hint_text = "Sníst mech"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MossInteractor" unique_id=262314568]
+shape = SubResource("MossInteractionRange")
+
+[node name="Arrivals" parent="." unique_id=157088407 instance=ExtResource("4_arrivals")]

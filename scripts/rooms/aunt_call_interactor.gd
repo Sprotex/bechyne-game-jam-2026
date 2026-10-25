@@ -32,7 +32,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not nearby or not _available() or not event.is_action_pressed("interact"):
 		return
 	level.set_flag(room_flag)
-	level.dialog_manager.show_dialog(["Teto? Jsem tady!", "Odpovídá jen ticho."])
+	var messages: Array[String] = ["Teto? Jsem tady!", "...", "Nikdo se neozval."]
+	if level.register_aunt_call():
+		messages.append("Bába jedna hluchá.")
+	level.dialog_manager.show_dialog(messages)
 	_refresh_hint()
 	get_viewport().set_input_as_handled()
 

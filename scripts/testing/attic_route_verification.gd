@@ -23,13 +23,16 @@ func _run() -> void:
 	var player := level.get_node("Player") as CharacterBody2D
 	var attic_exit := hall.get_node("ExitToAttic") as RoomExit
 	_check(not level.has_flag("story.day_two") and not level.has_flag("story.diagnosis_read") and not level.has_flag("story.attic_unlocked"), "attic route starts with no story prerequisites")
-	_check(attic_exit.required_flag.is_empty() and attic_exit.locked_message.is_empty(), "hall attic stairs have no story gate or locked dialogue")
+	_check(attic_exit.required_flag == "story.attic_unlocked" and attic_exit.locked_message == "Na půdu zatím nemám důvod chodit.", "hall attic stairs keep their story gate and rejection dialogue")
 	attic_exit.nearby = true
 	_check(level.room == hall, "attic route does not transition before interaction")
 	attic_exit._unhandled_input(_interact_event())
-	_check(level.room == hall and not level.dialog_manager.is_dialog_open(), "attic stair interaction is not blocked by a locked dialogue")
+	_check(level.room == hall and level.dialog_manager.is_dialog_open(), "attic stair interaction shows its locked dialogue before unlocking")
+	level.dialog_manager.hide_dialog()
+	level.set_flag("story.attic_unlocked")
+	attic_exit._unhandled_input(_interact_event())
 	await get_tree().create_timer(0.32).timeout
-	_check(level.room.scene_file_path == ATTIC, "hall stair exit enters attic with empty story flags")
+	_check(level.room.scene_file_path == ATTIC, "hall stair exit enters attic after its story gate is unlocked")
 	var attic := level.room
 	_check(Vector2i(attic.get_node("Background").texture.get_size()) == Vector2i(2000, 377), "attic art retains native aspect dimensions")
 	var camera := player.get_node("Camera2D") as Camera2D
@@ -54,17 +57,21 @@ func _run() -> void:
 	await get_tree().create_timer(0.32).timeout
 	_check(level.room.scene_file_path == HALL, "attic return interaction transitions back to hall")
 	_check(_capsule_clear(level, level.room.get_node("Arrivals/from_attic").global_position), "hall return arrival fits the player capsule")
-	_check(not level.has_flag("story.day_two") and not level.has_flag("story.diagnosis_read") and not level.has_flag("story.attic_unlocked"), "cellar route also starts with empty story flags")
+	_check(not level.has_flag("story.day_two") and not level.has_flag("story.diagnosis_read"), "cellar route starts before the second day and diagnosis")
 	var cellar_exit := level.room.get_node("ExitToCellar") as RoomExit
-	_check(cellar_exit != null and cellar_exit.required_flag.is_empty() and cellar_exit.locked_message.is_empty(), "hall cellar stairs have no story gate or locked dialogue")
+	_check(cellar_exit != null and cellar_exit.required_flag == "story.day_two" and cellar_exit.locked_message == "Do sklepa zatím nemám důvod chodit.", "hall cellar stairs are locked during the first act with a cellar-specific dialogue")
 	if cellar_exit != null:
 		cellar_exit.nearby = true
 		await get_tree().physics_frame
 		_check(level.room.scene_file_path == HALL, "cellar route does not travel on proximity alone")
 		cellar_exit._unhandled_input(_interact_event())
-		_check(level.room.scene_file_path == HALL and not level.dialog_manager.is_dialog_open(), "cellar stairs wait for E without showing locked dialogue")
+		_check(level.room.scene_file_path == HALL and level.dialog_manager.is_dialog_open(), "first-act cellar interaction shows the locked dialogue")
+		_check(level.dialog_manager.messages.size() == 1 and level.dialog_manager.messages[0] == cellar_exit.locked_message, "cellar rejection names the cellar")
+		level.dialog_manager.hide_dialog()
+		level.set_flag("story.day_two")
+		cellar_exit._unhandled_input(_interact_event())
 		await get_tree().create_timer(0.32).timeout
-		_check(level.room.scene_file_path == CELLAR, "E enters cellar with empty story flags")
+		_check(level.room.scene_file_path == CELLAR, "E enters cellar starting on the second day")
 		var cellar := level.room
 		_check(_capsule_clear(level, cellar.get_node("Arrivals/from_hall").global_position), "cellar arrival fits the player capsule")
 		var cellar_background := cellar.get_node_or_null("Background") as Sprite2D

@@ -9,11 +9,12 @@ const WORLD_FRAME_SCRIPT := preload("res://scripts/core/world_frame.gd")
 const STORY_TRANSITIONS_SCRIPT := preload("res://scripts/core/story_transitions.gd")
 const EDITOR_ACT_JUMP_SCRIPT := preload("res://scripts/core/editor_act_jump.gd")
 const INITIAL_ROOM := "res://scenes/rooms/main_entrance.tscn"
-const AFTER_SLEEP_ROOM := "res://scenes/rooms/hall.tscn"
-const AFTER_SLEEP_ARRIVAL := "from_bedroom"
+const AFTER_SLEEP_ROOM := "res://scenes/rooms/bedroom.tscn"
+const AFTER_SLEEP_ARRIVAL := "wake_after_sleep"
 const START_POSITION := Vector2(1000, 281.5)
 const STORY_DAY_TWO := "story.day_two"
 const STORY_WAKE_SHOWN := "story.day_two_wake_shown"
+const STORY_CELLAR_APPROACH_SHOWN := "story.cellar_approach_shown"
 const INITIAL_ROOM_MESSAGES: Array[String] = [
 	"TETO!! Už jsem tady!",
 	"Neodpovídá.",
@@ -31,6 +32,7 @@ var dialog_manager: GameDialogManager
 var flags: Dictionary = {}
 var keypad: Control
 var ending_started := false
+var aunt_call_count := 0
 var world_frame: Variant
 var letterbox_bars: Dictionary:
 	get:
@@ -115,6 +117,9 @@ func _perform_room_transition(destination_scene_path: String, arrival_id: String
 	await tween.finished
 	transition_locked = false
 	_refresh_controls()
+	if destination.resource_path == "res://scenes/rooms/cellar.tscn" and not has_flag(STORY_CELLAR_APPROACH_SHOWN):
+		set_flag(STORY_CELLAR_APPROACH_SHOWN)
+		dialog_manager.show_dialog(DialogueCatalog.get_messages(&"act2.cellar_approach"))
 	if leaving_cellar and not has_flag("story.act_three"):
 		STORY_TRANSITIONS_SCRIPT.coma_transition(self)
 
@@ -125,6 +130,11 @@ func has_flag(flag_id: String) -> bool:
 
 func player_controls_enabled() -> bool:
 	return $Player.controls_enabled
+
+
+func register_aunt_call() -> bool:
+	aunt_call_count += 1
+	return aunt_call_count % 2 == 0
 
 
 func get_world_render_rect() -> Rect2:
@@ -146,9 +156,10 @@ func open_keypad() -> void:
 
 
 func start_sleep_dialog() -> void:
-	if transition_locked or has_flag(STORY_DAY_TWO) or not player_controls_enabled():
+	if transition_locked or has_flag(STORY_DAY_TWO) or not player_controls_enabled() or dialog_manager.is_modal_open():
 		return
-	dialog_manager.dialog_finished.connect(_on_sleep_dialog_finished, CONNECT_ONE_SHOT)
+	if not dialog_manager.dialog_finished.is_connected(_on_sleep_dialog_finished):
+		dialog_manager.dialog_finished.connect(_on_sleep_dialog_finished, CONNECT_ONE_SHOT)
 	dialog_manager.show_dialog(DialogueCatalog.get_messages(&"act1.sleep"))
 	_refresh_controls()
 

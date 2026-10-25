@@ -4,4 +4,3 @@
 
 [resource]
 script = ExtResource("1")
-messages = PackedStringArray("TETA jsem dlouho neviděla. Jak se jí asi daří? Ani si nepamatuju kdy jsem ji viděla naposledy.")

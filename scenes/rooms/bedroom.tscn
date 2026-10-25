@@ -1,64 +1,64 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://hnltuy6j5g2"]
 
-[ext_resource type="Script" path="res://scripts/rooms/room.gd" id="1_room"]
-[ext_resource type="Texture2D" path="res://assets/gfx/loznice.png" id="2_background"]
+[ext_resource type="Script" uid="uid://dxu1rm7tuyuq2" path="res://scripts/rooms/room.gd" id="1_room"]
+[ext_resource type="Texture2D" uid="uid://jvd7oxcndqfw" path="res://assets/gfx/loznice.png" id="2_background"]
 [ext_resource type="PackedScene" path="res://scenes/objects/room_exit.tscn" id="2_exit"]
 [ext_resource type="PackedScene" path="res://scenes/objects/light_source.tscn" id="3_light"]
-[ext_resource type="PackedScene" path="res://scenes/objects/light_switch.tscn" id="4_switch"]
-[ext_resource type="Script" path="res://scripts/objects/bed_interactor.gd" id="5_bed"]
+[ext_resource type="PackedScene" uid="uid://cvnwv3ofng0cr" path="res://scenes/objects/light_switch.tscn" id="4_switch"]
+[ext_resource type="Script" uid="uid://dihmwaotasv0v" path="res://scripts/objects/bed_interactor.gd" id="5_bed"]
 [ext_resource type="PackedScene" path="res://scenes/rooms/collisions/bedroom_collisions.tscn" id="6_collisions"]
 [ext_resource type="PackedScene" path="res://scenes/objects/aunt_call_interactor.tscn" id="7_call"]
 
 [sub_resource type="CircleShape2D" id="BedInteractionRange"]
 radius = 150.0
 
-[node name="Bedroom" type="Node2D"]
+[node name="Bedroom" type="Node2D" unique_id=673252583]
 script = ExtResource("1_room")
 room_title = "LOŽNICE"
 room_color = Color(0.78824, 0.81176, 0.8549, 1)
 walkable_outline = PackedVector2Array(500, 310, 2000, 300, 2000, 563, 0, 563)
 
-[node name="FloorFill" type="Polygon2D" parent="."]
+[node name="FloorFill" type="Polygon2D" parent="." unique_id=1490553913]
 z_index = -2
-color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(0, 0, 2000, 0, 2000, 563, 0, 563)
 
-[node name="Background" type="Sprite2D" parent="."]
+[node name="Background" type="Sprite2D" parent="." unique_id=1817450984]
+z_index = -1
 texture = ExtResource("2_background")
 centered = false
-z_index = -1
 
-[node name="BedsideLamp" parent="." instance=ExtResource("3_light")]
+[node name="BedsideLamp" parent="." unique_id=2123186366 instance=ExtResource("3_light")]
 position = Vector2(620, 210)
 
-[node name="LightSwitch" parent="." instance=ExtResource("4_switch")]
-position = Vector2(1435, 320)
+[node name="LightSwitch" parent="." unique_id=1271080815 instance=ExtResource("4_switch")]
+position = Vector2(1431, 303)
 
-[node name="BedInteractor" type="Area2D" parent="."]
+[node name="BedInteractor" type="Area2D" parent="." unique_id=1104536356]
 position = Vector2(475, 420)
 collision_layer = 0
-collision_mask = 1
 script = ExtResource("5_bed")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="BedInteractor"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BedInteractor" unique_id=1201722230]
 shape = SubResource("BedInteractionRange")
 
-[node name="FurnitureCollisions" parent="." instance=ExtResource("6_collisions")]
+[node name="FurnitureCollisions" parent="." unique_id=208266254 instance=ExtResource("6_collisions")]
 
-[node name="AuntCall" parent="." instance=ExtResource("7_call")]
+[node name="AuntCall" parent="." unique_id=252696509 instance=ExtResource("7_call")]
 position = Vector2(1125, 405)
 room_flag = "story.call.bedroom"
 
-[node name="ExitToHall" parent="." instance=ExtResource("2_exit")]
+[node name="ExitToHall" parent="." unique_id=308032269 instance=ExtResource("2_exit")]
 position = Vector2(1610, 300)
 destination_scene_path = "res://scenes/rooms/hall.tscn"
 destination_arrival_id = "from_bedroom"
-wall_side = "north"
 
-[node name="Arrivals" type="Node2D" parent="."]
+[node name="Arrivals" type="Node2D" parent="." unique_id=1324770303]
 
-[node name="start" type="Marker2D" parent="Arrivals"]
+[node name="start" type="Marker2D" parent="Arrivals" unique_id=506756489]
 position = Vector2(900, 500)
 
-[node name="from_hall" type="Marker2D" parent="Arrivals"]
+[node name="from_hall" type="Marker2D" parent="Arrivals" unique_id=1173236357]
 position = Vector2(1610, 380)
+
+[node name="wake_after_sleep" type="Marker2D" parent="Arrivals" unique_id=1787095934]
+position = Vector2(690, 500)

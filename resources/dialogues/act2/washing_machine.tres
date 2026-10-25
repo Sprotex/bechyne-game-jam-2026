@@ -1,7 +1,6 @@
-[gd_resource type="Resource" script_class="StoryText" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="StoryText" format=3 uid="uid://bmfuxqeoebx5w"]
 
-[ext_resource type="Script" path="res://scripts/core/story_text.gd" id="1"]
+[ext_resource type="Script" uid="uid://c2gp8p0uvna0b" path="res://scripts/core/story_text.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
-messages = PackedStringArray("TETY stará pračka? A něco v ní břinčí.", "Vysypu kapsy těch hadrů, přehrabovat se v tom nebudu.", "Nějakej dement zase zapomněl vyndat klíč z kapsy.", "…", "Kdo tu pračku zapnul? TETA musí být zpátky.", "Ale kde je? Vždyť jsme ji nikdo z rodiny dlouho neviděli.", "Divný.", "No ale na tomhle smradu už to tu nevymyslim.")

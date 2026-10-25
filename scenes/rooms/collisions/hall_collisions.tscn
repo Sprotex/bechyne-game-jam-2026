@@ -1,15 +1,9 @@
 [gd_scene format=3]
 
-[sub_resource type="ConvexPolygonShape2D" id="HallLaundryFootprint"]
-points = PackedVector2Array(705, 246, 822, 246, 830, 262, 800, 273, 735, 274, 700, 265)
-
-[sub_resource type="ConvexPolygonShape2D" id="HallForegroundFootprint"]
-points = PackedVector2Array(1295, 363, 1490, 363, 1505, 377, 1280, 377)
+[sub_resource type="ConvexPolygonShape2D" id="HallStaircaseFootprint"]
+points = PackedVector2Array(276, 192, 442, 192, 442, 212, 276, 212)
 
 [node name="FurnitureCollisions" type="StaticBody2D"]
 
-[node name="LaundryCollision" type="CollisionShape2D" parent="."]
-shape = SubResource("HallLaundryFootprint")
-
-[node name="ForegroundCollision" type="CollisionShape2D" parent="."]
-shape = SubResource("HallForegroundFootprint")
+[node name="StaircaseCollision" type="CollisionShape2D" parent="."]
+shape = SubResource("HallStaircaseFootprint")

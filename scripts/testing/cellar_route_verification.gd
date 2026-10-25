@@ -23,18 +23,22 @@ func _run() -> void:
 	_check(hall_exit != null, "hall has cellar exit")
 	_check(hall_exit.destination_scene_path == CELLAR and hall_exit.destination_arrival_id == "from_hall", "hall cellar exit targets cellar from_hall arrival")
 	_check(hall_exit.position == Vector2(150, 211) and hall_exit.wall_side == "north", "cellar exit uses the authored north doorway")
-	_check(hall_exit.required_flag.is_empty() and hall_exit.locked_message.is_empty(), "cellar exit has no gate")
+	_check(hall_exit.required_flag == "story.day_two" and hall_exit.locked_message == "Do sklepa zatím nemám důvod chodit.", "cellar exit requires the second day and has a cellar-specific rejection")
 	var attic_exit := hall.get_node("ExitToAttic") as RoomExit
 	_check(attic_exit.position == Vector2(350, 211) and attic_exit.wall_side == "north", "attic entrance stays next to the cellar entrance")
-	_check(attic_exit.required_flag.is_empty() and attic_exit.locked_message.is_empty(), "attic entrance has no gate")
+	_check(attic_exit.required_flag == "story.attic_unlocked" and not attic_exit.locked_message.is_empty(), "attic entrance keeps its story gate")
 	_check(hall.get_node("Arrivals/from_cellar").position == Vector2(150, 320), "hall cellar arrival stays inside the doorway")
 	_check(hall.get_node("Arrivals/from_attic").position == Vector2(550, 300), "hall attic arrival remains separate")
 	hall_exit.nearby = true
 	_check(level.room == hall, "cellar does not auto-enter from proximity")
 	hall_exit._unhandled_input(_interact_event())
-	_check(level.room == hall, "cellar exit waits for E interaction")
+	_check(level.room == hall and level.dialog_manager.is_dialog_open(), "first-act cellar interaction is rejected with a dialog")
+	_check(level.dialog_manager.messages.size() == 1 and level.dialog_manager.messages[0] == hall_exit.locked_message, "cellar rejection shows the configured room-specific message")
+	level.dialog_manager.hide_dialog()
+	level.set_flag("story.day_two")
+	hall_exit._unhandled_input(_interact_event())
 	await get_tree().create_timer(0.32).timeout
-	_check(level.room.scene_file_path == CELLAR, "E enters the cellar")
+	_check(level.room.scene_file_path == CELLAR, "E enters the cellar on the second day")
 	var cellar := level.room
 	_check(player.global_position == cellar.get_node("Arrivals/from_hall").global_position, "cellar transition uses its from_hall arrival")
 	_check(_capsule_clear(level, player.global_position), "cellar arrival is clear for the player capsule")

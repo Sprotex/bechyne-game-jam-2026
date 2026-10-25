@@ -1,4 +1,4 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://1ua6xryhbo8m"]
 
 [sub_resource type="RectangleShape2D" id="BathroomSinkFeet"]
 size = Vector2(300, 24)
@@ -13,7 +13,7 @@ size = Vector2(130, 24)
 size = Vector2(400, 30)
 
 [sub_resource type="RectangleShape2D" id="BathroomToiletFeet"]
-size = Vector2(250, 28)
+size = Vector2(250, 190)
 
 [node name="FurnitureCollisions" type="StaticBody2D" unique_id=1368197858]
 
@@ -34,5 +34,5 @@ position = Vector2(1750, 450)
 shape = SubResource("BathroomShowerFeet")
 
 [node name="ToiletFeetCollision" type="CollisionShape2D" parent="." unique_id=846439524]
-position = Vector2(125, 545)
+position = Vector2(125, 464)
 shape = SubResource("BathroomToiletFeet")

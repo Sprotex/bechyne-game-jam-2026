@@ -6,9 +6,12 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/photo_camera.tscn" id="5_camera"]
 [ext_resource type="PackedScene" path="res://scenes/objects/camera_photo_spot.tscn" id="6_photo_spot"]
 [ext_resource type="PackedScene" path="res://scenes/objects/light_source.tscn" id="7_light"]
-[ext_resource type="PackedScene" path="res://scenes/rooms/collisions/bathroom_collisions.tscn" id="9_collisions"]
-[ext_resource type="PackedScene" path="res://scenes/objects/light_switch.tscn" id="8_switch"]
+[ext_resource type="PackedScene" uid="uid://cvnwv3ofng0cr" path="res://scenes/objects/light_switch.tscn" id="8_switch"]
+[ext_resource type="PackedScene" uid="uid://1ua6xryhbo8m" path="res://scenes/rooms/collisions/bathroom_collisions.tscn" id="9_collisions"]
 [ext_resource type="PackedScene" path="res://scenes/objects/aunt_call_interactor.tscn" id="10_call"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_won8x"]
+radius = 75.0
 
 [node name="Bathroom" type="Node2D" unique_id=1178015887]
 script = ExtResource("1_room")
@@ -26,33 +29,36 @@ z_index = -1
 texture = ExtResource("2_background")
 centered = false
 
-[node name="CeilingLightLeft" parent="." instance=ExtResource("7_light")]
+[node name="CeilingLightLeft" parent="." unique_id=1126356890 instance=ExtResource("7_light")]
 position = Vector2(650, 60)
 
-[node name="CeilingLightRight" parent="." instance=ExtResource("7_light")]
+[node name="CeilingLightRight" parent="." unique_id=1790127167 instance=ExtResource("7_light")]
 position = Vector2(1450, 60)
 
-[node name="LightSwitch" parent="." instance=ExtResource("8_switch")]
-position = Vector2(500, 400)
+[node name="LightSwitch" parent="." unique_id=387922972 instance=ExtResource("8_switch")]
+position = Vector2(268, 302)
 
-[node name="FurnitureCollisions" parent="." instance=ExtResource("9_collisions") unique_id=1368197858]
+[node name="CollisionShape2D" parent="LightSwitch" index="1" unique_id=1945944407]
+position = Vector2(-10, -14)
+shape = SubResource("CircleShape2D_won8x")
+
+[node name="FurnitureCollisions" parent="." unique_id=1368197858 instance=ExtResource("9_collisions")]
 
 [node name="PhotoCamera" parent="." unique_id=1267620424 instance=ExtResource("5_camera")]
-position = Vector2(790, 385)
-scale = Vector2(0.28651762, 0.28651762)
+position = Vector2(115, 350)
+scale = Vector2(0.40583956, 0.40583956)
 
 [node name="CameraPhotoSpot" parent="." unique_id=2020537783 instance=ExtResource("6_photo_spot")]
-position = Vector2(410, 385)
+position = Vector2(434, 480)
 
-[node name="AuntCall" parent="." instance=ExtResource("10_call")]
-position = Vector2(1250, 420)
+[node name="AuntCall" parent="." unique_id=2125485244 instance=ExtResource("10_call")]
+position = Vector2(843, 455)
 room_flag = "story.call.bathroom"
 
 [node name="ExitToEntrance" parent="." unique_id=1441039457 instance=ExtResource("4_exit")]
-position = Vector2(350, 300)
+position = Vector2(416, 295)
 destination_scene_path = "res://scenes/rooms/main_entrance.tscn"
 destination_arrival_id = "from_bathroom"
-wall_side = "north"
 
 [node name="Arrivals" type="Node2D" parent="." unique_id=1548141687]
 
@@ -61,3 +67,5 @@ position = Vector2(1050, 500)
 
 [node name="from_entrance" type="Marker2D" parent="Arrivals" unique_id=1586926254]
 position = Vector2(350, 375)
+
+[editable path="LightSwitch"]

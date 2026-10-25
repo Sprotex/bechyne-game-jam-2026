@@ -1,27 +1,27 @@
 [gd_scene format=3]
 
+[sub_resource type="ConvexPolygonShape2D" id="CellarStaircaseFootprint"]
+points = PackedVector2Array(0, 266, 244, 266, 276, 292, 0, 292)
+
 [sub_resource type="ConvexPolygonShape2D" id="CellarBicycleFootprint"]
-points = PackedVector2Array(340, 207, 354, 197, 565, 197, 580, 209, 574, 221, 347, 221)
+points = PackedVector2Array(340, 181, 354, 174, 565, 174, 580, 190, 574, 202, 347, 202)
 
-[sub_resource type="ConvexPolygonShape2D" id="CellarBroomFootprint"]
-points = PackedVector2Array(1030, 207, 1145, 207, 1145, 221, 1030, 221)
-
-[sub_resource type="ConvexPolygonShape2D" id="CellarBagsBoxesFootprint"]
-points = PackedVector2Array(1290, 216, 1455, 216, 1455, 240, 1290, 240)
+[sub_resource type="ConvexPolygonShape2D" id="CellarTrashBagsFootprint"]
+points = PackedVector2Array(1285, 211, 1374, 211, 1374, 232, 1285, 232)
 
 [sub_resource type="ConvexPolygonShape2D" id="CellarWasherFootprint"]
-points = PackedVector2Array(1670, 215, 1780, 215, 1780, 245, 1670, 245)
+points = PackedVector2Array(1672, 222, 1784, 222, 1784, 243, 1672, 243)
 
 [node name="FurnitureCollisions" type="StaticBody2D"]
+
+[node name="StaircaseCollision" type="CollisionShape2D" parent="."]
+shape = SubResource("CellarStaircaseFootprint")
 
 [node name="BicycleCollision" type="CollisionShape2D" parent="."]
 shape = SubResource("CellarBicycleFootprint")
 
-[node name="BroomCollision" type="CollisionShape2D" parent="."]
-shape = SubResource("CellarBroomFootprint")
-
-[node name="BagsBoxesCollision" type="CollisionShape2D" parent="."]
-shape = SubResource("CellarBagsBoxesFootprint")
+[node name="TrashBagsCollision" type="CollisionShape2D" parent="."]
+shape = SubResource("CellarTrashBagsFootprint")
 
 [node name="WasherCollision" type="CollisionShape2D" parent="."]
 shape = SubResource("CellarWasherFootprint")

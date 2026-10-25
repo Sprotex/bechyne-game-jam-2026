@@ -4,5 +4,5 @@
 
 [resource]
 script = ExtResource("1")
-messages = PackedStringArray("Nevím proč, ale sníst tenhle mech.", "...", "Bylo to meh.")
+messages = PackedStringArray("Chci sníst tenhle mech.", "...", "Bylo to meh.")
 completed_flag = "story.moss_eaten"

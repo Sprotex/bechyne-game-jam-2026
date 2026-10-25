@@ -1,61 +1,60 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bpkg0qtw6jwei"]
 
-[ext_resource type="Script" path="res://scripts/rooms/room.gd" id="1_room"]
-[ext_resource type="Texture2D" path="res://assets/gfx/chodba.png" id="2_background"]
+[ext_resource type="Script" uid="uid://dxu1rm7tuyuq2" path="res://scripts/rooms/room.gd" id="1_room"]
+[ext_resource type="Texture2D" uid="uid://b6u43pmkmkynv" path="res://assets/gfx/chodba.png" id="2_background"]
 [ext_resource type="PackedScene" path="res://scenes/objects/room_exit.tscn" id="4_exit"]
-[ext_resource type="PackedScene" path="res://scenes/objects/light_switch.tscn" id="5_switch"]
+[ext_resource type="PackedScene" uid="uid://cvnwv3ofng0cr" path="res://scenes/objects/light_switch.tscn" id="5_switch"]
 [ext_resource type="PackedScene" path="res://scenes/objects/light_source.tscn" id="6_light"]
 [ext_resource type="PackedScene" path="res://scenes/rooms/collisions/main_entrance_collisions.tscn" id="7_collisions"]
 [ext_resource type="PackedScene" path="res://scenes/rooms/arrivals/main_entrance_arrivals.tscn" id="8_arrivals"]
 [ext_resource type="PackedScene" path="res://scenes/objects/aunt_call_interactor.tscn" id="9_call"]
 
-[node name="MainEntrance" type="Node2D"]
+[node name="MainEntrance" type="Node2D" unique_id=1074248783]
 script = ExtResource("1_room")
 room_title = "VSTUPNÍ HALA"
 room_color = Color(0.84706, 0.78039, 0.71765, 1)
 walkable_outline = PackedVector2Array(165, 285, 1805, 298, 2000, 550, 2000, 563, 0, 563, 0, 540)
 
-[node name="FloorFill" type="Polygon2D" parent="."]
+[node name="FloorFill" type="Polygon2D" parent="." unique_id=1819524409]
 z_index = -2
 color = Color(0.6902, 0.6157, 0.451, 1)
 polygon = PackedVector2Array(0, 0, 2000, 0, 2000, 563, 0, 563)
 
-[node name="Background" type="Sprite2D" parent="."]
+[node name="Background" type="Sprite2D" parent="." unique_id=675714679]
+z_index = -1
 texture = ExtResource("2_background")
 centered = false
-z_index = -1
 
-[node name="CeilingLightLeft" parent="." instance=ExtResource("6_light")]
+[node name="CeilingLightLeft" parent="." unique_id=980572583 instance=ExtResource("6_light")]
 position = Vector2(650, 60)
 
-[node name="CeilingLightRight" parent="." instance=ExtResource("6_light")]
+[node name="CeilingLightRight" parent="." unique_id=1636014755 instance=ExtResource("6_light")]
 position = Vector2(1450, 60)
 
-[node name="LightSwitch" parent="." instance=ExtResource("5_switch")]
-position = Vector2(1850, 390)
+[node name="LightSwitch" parent="." unique_id=823846576 instance=ExtResource("5_switch")]
+position = Vector2(1827, 318)
 
-[node name="FurnitureCollisions" parent="." instance=ExtResource("7_collisions")]
+[node name="FurnitureCollisions" parent="." unique_id=1818676760 instance=ExtResource("7_collisions")]
 
-[node name="AuntCall" parent="." instance=ExtResource("9_call")]
+[node name="AuntCall" parent="." unique_id=419748668 instance=ExtResource("9_call")]
 position = Vector2(1000, 330)
 room_flag = "story.call.entrance"
 
-[node name="ExitToHall" parent="." instance=ExtResource("4_exit")]
+[node name="ExitToHall" parent="." unique_id=1001436287 instance=ExtResource("4_exit")]
 position = Vector2(55, 430)
 destination_scene_path = "res://scenes/rooms/hall.tscn"
 destination_arrival_id = "from_entrance"
 wall_side = "west"
 
-[node name="ExitToLivingRoom" parent="." instance=ExtResource("4_exit")]
+[node name="ExitToLivingRoom" parent="." unique_id=277418622 instance=ExtResource("4_exit")]
 position = Vector2(1650, 555)
 destination_scene_path = "res://scenes/rooms/living_room.tscn"
 destination_arrival_id = "from_entrance"
 wall_side = "south"
 
-[node name="ExitToBathroom" parent="." instance=ExtResource("4_exit")]
+[node name="ExitToBathroom" parent="." unique_id=902575917 instance=ExtResource("4_exit")]
 position = Vector2(1450, 298)
 destination_scene_path = "res://scenes/rooms/bathroom.tscn"
 destination_arrival_id = "from_entrance"
-wall_side = "north"
 
-[node name="Arrivals" parent="." instance=ExtResource("8_arrivals")]
+[node name="Arrivals" parent="." unique_id=593600630 instance=ExtResource("8_arrivals")]
