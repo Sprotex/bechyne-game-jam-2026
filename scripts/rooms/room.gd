@@ -9,7 +9,6 @@ signal lights_state_changed(is_on: bool)
 @export var walkable_outline := PackedVector2Array()
 
 const WALL_THICKNESS := 18.0
-const EXIT_EDGE_TOLERANCE := 100.0
 
 var lights_are_on := false
 var exit_gates: Array[Dictionary] = []
@@ -112,50 +111,7 @@ func _add_outline_edge(walls: StaticBody2D, first: Vector2, last: Vector2, clock
 	if edge_length <= 1.0:
 		return
 	var direction := edge / edge_length
-	var openings: Array[Dictionary] = []
-	for node in find_children("*", "RoomExit", true, false):
-		var exit := node as RoomExit
-		var along := clampf((exit.position - first).dot(direction), 0.0, edge_length)
-		var nearest := first + direction * along
-		if nearest.distance_to(exit.position) > EXIT_EDGE_TOLERANCE:
-			continue
-		openings.append({
-			"range": Vector2(
-				maxf(0.0, along - exit.opening_half_width),
-				minf(edge_length, along + exit.opening_half_width)
-			),
-			"exit": exit,
-		})
-	openings.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a["range"].x < b["range"].x)
-	var cursor := 0.0
-	for opening in openings:
-		var opening_range: Vector2 = opening["range"]
-		var exit := opening["exit"] as RoomExit
-		_add_wall_segment(walls, first, direction, cursor, opening_range.x, clockwise)
-		if not exit.required_flag.is_empty():
-			_add_exit_gate(walls, first, direction, opening_range, clockwise, exit.required_flag)
-		cursor = maxf(cursor, opening_range.y)
-	_add_wall_segment(walls, first, direction, cursor, edge_length, clockwise)
-
-
-func _add_exit_gate(
-	parent: StaticBody2D,
-	first: Vector2,
-	direction: Vector2,
-	opening: Vector2,
-	clockwise: bool,
-	flag: String
-) -> void:
-	var outward := Vector2(direction.y, -direction.x) if clockwise else Vector2(-direction.y, direction.x)
-	var center := first + direction * ((opening.x + opening.y) * 0.5) + outward * (WALL_THICKNESS * 0.5)
-	var collision := CollisionShape2D.new()
-	var rectangle := RectangleShape2D.new()
-	rectangle.size = Vector2(opening.y - opening.x + WALL_THICKNESS, WALL_THICKNESS)
-	collision.shape = rectangle
-	collision.position = center
-	collision.rotation = direction.angle()
-	parent.add_child(collision)
-	exit_gates.append({"shape": collision, "flag": flag})
+	_add_wall_segment(walls, first, direction, 0.0, edge_length, clockwise)
 
 
 func _add_wall_segment(

@@ -10,22 +10,105 @@ signal exit_entered(exit: RoomExit)
 @export var required_flag := ""
 @export_multiline var locked_message := ""
 
+var nearby := false
+var activated := false
+var level: Level
+var hint: Label
+
 
 func _ready() -> void:
+	level = _get_level()
 	var shape := get_node("CollisionShape2D") as CollisionShape2D
 	shape.shape = shape.shape.duplicate()
 	var rectangle := shape.shape as RectangleShape2D
-	rectangle.size = Vector2(300, 40) if wall_side in ["north", "south"] else Vector2(40, 300)
+	var horizontal_exit := wall_side in ["north", "south"]
+	rectangle.size = Vector2(300, 120) if horizontal_exit else Vector2(120, 300)
+	shape.position = _walkable_side_offset()
 	body_entered.connect(_on_body_entered)
+	body_exited.connect(_on_body_exited)
+	_build_hint()
+
+
+func _process(_delta: float) -> void:
+	_update_hint()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not nearby or activated or level == null or not level.player_controls_enabled():
+		return
+	if not event.is_action_pressed("interact") or event.is_echo():
+		return
+	get_viewport().set_input_as_handled()
+	if not required_flag.is_empty() and not level.has_flag(required_flag):
+		if not locked_message.is_empty():
+			level.dialog_manager.show_dialog([locked_message])
+		return
+	activated = true
+	hint.hide()
+	EventBus.request_audio(&"door")
+	exit_entered.emit(self)
 
 
 func _on_body_entered(body: Node2D) -> void:
-	if body is CharacterBody2D:
-		if not required_flag.is_empty():
-			var level := get_tree().current_scene as Level
-			if level == null or not level.has_flag(required_flag):
-				if level != null and not locked_message.is_empty():
-					level.dialog_manager.show_dialog([locked_message])
-				return
-		EventBus.request_audio(&"door")
-		exit_entered.emit(self)
+	if _is_player(body):
+		nearby = true
+		_update_hint()
+
+
+func _on_body_exited(body: Node2D) -> void:
+	if _is_player(body):
+		nearby = false
+		activated = false
+		_update_hint()
+
+
+func _is_player(body: Node2D) -> bool:
+	return body is CharacterBody2D and level != null and body == level.get_node_or_null("Player")
+
+
+func _get_level() -> Level:
+	var ancestor := get_parent()
+	while ancestor != null:
+		if ancestor is Level:
+			return ancestor as Level
+		ancestor = ancestor.get_parent()
+	return get_tree().current_scene as Level
+
+
+func _walkable_side_offset() -> Vector2:
+	match wall_side:
+		"north":
+			return Vector2(0, 65)
+		"south":
+			return Vector2(0, -65)
+		"west":
+			return Vector2(65, 0)
+		"east":
+			return Vector2(-65, 0)
+	return Vector2.ZERO
+
+
+func _build_hint() -> void:
+	var layer := CanvasLayer.new()
+	layer.layer = 20
+	add_child(layer)
+	hint = Label.new()
+	hint.anchor_left = 0.15
+	hint.anchor_top = 1.0
+	hint.anchor_right = 0.85
+	hint.anchor_bottom = 1.0
+	hint.offset_top = -58
+	hint.offset_bottom = -24
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hint.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	hint.text = "%s  Projít dveřmi" % InputPrompts.action_label(&"interact")
+	hint.add_theme_color_override("font_color", Color("#fff8df"))
+	hint.add_theme_color_override("font_outline_color", Color.BLACK)
+	hint.add_theme_constant_override("outline_size", 3)
+	hint.add_theme_font_size_override("font_size", 16)
+	hint.hide()
+	layer.add_child(hint)
+
+
+func _update_hint() -> void:
+	hint.visible = nearby and not activated and level != null and level.player_controls_enabled()
