@@ -66,6 +66,10 @@ func _check_cutscene_completion_connection() -> void:
 	add_child(root)
 	await get_tree().process_frame
 	root._show_cutscene()
+	_check(root.CUTSCENE_BACKGROUNDS.size() == root.CUTSCENE_MESSAGES.size(), "cutscene keeps one background step for each intro message")
+	for message_index in root.CUTSCENE_MESSAGES.size():
+		root._update_cutscene_background(message_index)
+		_check(root.cutscene_background.texture == root.DOMECEK, "intro message %d keeps the house backdrop without item art" % message_index)
 	var dialog: GameDialogManager = root.cutscene_dialog
 	var callbacks := 0
 	for connection in dialog.dialog_finished.get_connections():

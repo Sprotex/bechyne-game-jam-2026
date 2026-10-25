@@ -4,8 +4,8 @@ const LEVEL_SCENE := "res://scenes/level.tscn"
 const DOMECEK := preload("res://assets/gfx/domecek.png")
 const CUTSCENE_BACKGROUNDS := [
 	DOMECEK,
-	preload("res://assets/gfx/fotak.png"),
-	preload("res://assets/gfx/klic.png"),
+	DOMECEK,
+	DOMECEK,
 ]
 const CUTSCENE_MESSAGES: Array[String] = [
 	"Věci nemusí bejt tak, jak se na první pohled zdá.",
