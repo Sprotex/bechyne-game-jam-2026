@@ -24,8 +24,12 @@ func _run() -> void:
 
 
 func _check_audio_manager() -> void:
-	for sound_id in [&"door", &"lock", &"footsteps", &"washing_machine"]:
+	for sound_id in [&"door", &"lock", &"door_unlock", &"footsteps", &"washing_machine"]:
 		_check(AudioManager._get_sound_stream(sound_id) != null, "%s sound is registered" % sound_id)
+	var door_unlock := AudioManager._get_sound_stream(&"door_unlock") as AudioStreamWAV
+	_check(door_unlock != null, "door unlock sound is a WAV resource")
+	if door_unlock != null:
+		_check(door_unlock.mix_rate == 44100 and not door_unlock.stereo, "door unlock WAV is mono at 44100 Hz")
 	_check(AudioServer.get_bus_index(&"Sound") >= 0, "Sound bus exists")
 	AudioManager.set_loop_active(&"washing_machine", true, &"Sound")
 	var first_player: AudioStreamPlayer = AudioManager.looping_players.get(&"washing_machine")

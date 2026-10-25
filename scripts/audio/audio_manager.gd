@@ -9,6 +9,7 @@ extends Node
 	&"key": null,
 	&"pickup": null,
 	&"lock": null,
+	&"door_unlock": null,
 	&"footsteps": null,
 	&"washing_machine": null,
 }

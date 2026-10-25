@@ -8,6 +8,7 @@
 [ext_resource type="AudioStreamWAV" path="res://assets/audio/lock.wav" id="6_lock"]
 [ext_resource type="AudioStreamWAV" path="res://assets/audio/footsteps.wav" id="7_footsteps"]
 [ext_resource type="AudioStreamWAV" path="res://assets/audio/washing_machine.wav" id="8_washing_machine"]
+[ext_resource type="AudioStreamWAV" path="res://assets/audio/door_unlock.wav" id="9_door_unlock"]
 
 [node name="AudioManager" type="Node" unique_id=1251892382]
 script = ExtResource("1_audio_manager")
@@ -18,6 +19,7 @@ sound_registry = {
 &"key": null,
 &"pickup": null,
 &"lock": ExtResource("6_lock"),
+&"door_unlock": ExtResource("9_door_unlock"),
 &"footsteps": ExtResource("7_footsteps"),
 &"washing_machine": ExtResource("8_washing_machine")
 }

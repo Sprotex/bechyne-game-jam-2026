@@ -54,3 +54,5 @@ Převod provedl `scripts/convert_wav_to_ogg.cmd`; nová stopa má délku 54 seku
 Přehrává se ve stávajícím AudioManageru přes bus `Music`, s `loop_music = true`.
 Smyčku zajišťuje `AudioStreamOggVorbis.loop`, nikoli jen opakované spouštění po konci.
 Alternativní hudba `not_creepy.ogg` zůstává beze změny.
+
+Zvuk `assets/audio/door_unlock.wav` je připravený pro pozdější použití: z původního `door_unlock.m4a` v `audio_sources/untrimmed/2026-10-25/` jsem vybral rozsah 0,20–1,29 s (délka 1,09 s) a převedl jej na PCM16 mono, 44,1 kHz. Záloha M4A je bajtově shodná se zdrojem (SHA256 `70C89F21CDC1D4318E9098ED57E41AFB2B379F485D6CC3685C81E7589BB177A5`). Jde pouze o import do AudioManageru pod ID `door_unlock`; zvuk zatím nemá herní spouštěč.
